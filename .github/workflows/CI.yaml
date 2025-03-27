@@ -1,0 +1,49 @@
+name: Unlock Music Project Archive
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 4 */7 * *"
+  push:
+    branches:
+      - main
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run
+        run: |
+          pip install requests
+          python main.py
+          du -sh
+
+      - name: Set variables
+        run: |
+          echo "BUILDTIME=$(TZ=Asia/Shanghai date +'%Y-%m-%d %H:%M')" >> $GITHUB_ENV
+          echo "BTIME=$(TZ=Asia/Shanghai date +'%Y%m%d%H%M')" >> $GITHUB_ENV
+        shell: bash
+
+         # 添加commit 防止workflows停止
+      - name: push rep
+        run: |
+          echo ${{ env.BUILDTIME }} >> commit
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "triggle by commit ${{ env.BUILDTIME }}"
+          git remote set-url origin "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}"
+          git push -f -u origin main
+
+      - name: Create and Upload Release
+        id: upload_release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          release_name: Release ${{ env.BUILDTIME }}
+          tag: v${{ env.BTIME }}
+          file_glob: true
+          overwrite: true
+          file: ./code/*
