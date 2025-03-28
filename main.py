@@ -22,6 +22,7 @@ if response.status_code != 200:
 projects = re.findall(r"/um/(.*?)/stars", response.text)
 current_date = datetime.now()
 formatted_date = current_date.strftime('%Y%m%d')
+error_log = ''
 
 for project in projects:
     url = f"{domain}/um/{project}/archive/main.tar.gz"
@@ -39,8 +40,7 @@ for project in projects:
 
     if code == 404:
         print(project + "404\n")
-        with open("error_log.txt", "a", encoding="utf-8") as file:
-            file.write(f"{project}: 404\n")
+        error_log += f'{project}: 404\n'
     else:
         # pass
         download = session.get(url)
@@ -48,3 +48,10 @@ for project in projects:
         with open(f"code/{formatted_date}/{project}.tar.gz", 'wb') as file:
             file.write(download.content)
         print(f"{project}已下载到当前目录: code/{formatted_date}/{project}.tar.gz")
+
+if not error_log:
+    if os.path.isfile("error_log.txt"):
+        os.remove("error_log.txt")
+else:
+    with open("error_log.txt", "w", encoding="utf-8") as file:
+        file.write(error_log)
