@@ -1,0 +1,9 @@
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = true
+[remote "origin"]
+	url = http://jbdjacp5pfkowm7snq.010802.best/um/go-mmkv.git
+	tagOpt = --no-tags
+	fetch = +refs/*:refs/*
+	mirror = true
