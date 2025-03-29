@@ -3,9 +3,9 @@ on:
   workflow_dispatch:
   schedule:
     - cron: "0 4 */5 * *"
-  push:
-    branches:
-      - main
+  # push:
+  #   branches:
+  #     - main
 
 jobs:
   run:
@@ -71,7 +71,7 @@ jobs:
       # 上传文件到 OneDrive
       - name: Upload files to OneDrive
         run: |
-          rclone copy ./code gh_bk:/ -P
-          rclone copy main.py gh_bk:/code -P
-          rclone copy .github gh_bk:/code -P
+          rclone copy ./code gh_bk:/um
+          rclone copy main.py gh_bk:/um
+          rclone copy .github gh_bk:/um
           rm -rf ~/.config/rclone/rclone.conf
