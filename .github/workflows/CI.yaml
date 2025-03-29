@@ -19,7 +19,8 @@ jobs:
           wget ${{ secrets.URLS }} -O url.py
           pip install requests
           python main.py
-          du -sh
+          du -sh *
+          du -sh code/*
 
       - name: Set variables
         run: |
@@ -30,7 +31,7 @@ jobs:
          # 添加commit 防止workflows停止
       - name: push rep
         run: |
-          echo ${{ env.BUILDTIME }} >> commit
+          echo ${{ env.BUILDTIME }} > commit
           git config --local user.name "github-actions[bot]"
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add .
@@ -48,3 +49,29 @@ jobs:
           file_glob: true
           overwrite: true
           file: ./code/*/*
+
+      # 安装 rclone
+      - name: Install rclone
+        run: |
+          curl -O https://downloads.rclone.org/rclone-current-linux-amd64.zip
+          unzip rclone-current-linux-amd64.zip
+          sudo mv rclone-*-linux-amd64/rclone /usr/bin/
+          rm rclone-current-linux-amd64.zip
+          rm -rf rclone-*-linux-amd64
+          rclone version
+
+      # 配置 rclone
+      - name: Setup rclone config
+        env:
+          RCLONE_CONFIG_BASE64: ${{ secrets.RCLONE_CONFIG }}
+        run: |
+          echo "$RCLONE_CONFIG_BASE64" | base64 -d > ~/.config/rclone/rclone.conf
+          chmod 600 ~/.config/rclone/rclone.conf
+
+      # 上传文件到 OneDrive
+      - name: Upload files to OneDrive
+        run: |
+          rclone copy ./code gh_bk:/ -P
+          rclone main.py gh_bk:/code -P
+          rclone .github gh_bk:/code -P
+          rm -rf ~/.config/rclone/rclone.conf
