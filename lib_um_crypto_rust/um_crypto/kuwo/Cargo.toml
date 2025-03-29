@@ -1,0 +1,12 @@
+[package]
+name = "umc_kuwo"
+version = "0.1.6"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0.86"
+byteorder = "1.5.0"
+itertools = "0.13.0"
+thiserror = "2.0.7"
+umc_qmc = { path = "../qmc" }
+umc_utils = { path = "../utils" }

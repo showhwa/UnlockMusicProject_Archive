@@ -1,0 +1,38 @@
+{
+  "name": "@unlock-music/joox-crypto",
+  "type": "commonjs",
+  "version": "0.0.1",
+  "description": "Crypto library to decrypt joox encrypted music files.",
+  "main": "src/index.js",
+  "types": "src/index.d.ts",
+  "bin": {
+    "joox-decrypt": "joox-decrypt"
+  },
+  "scripts": {
+    "test": "jest -w 50% src",
+    "prepare": "simple-git-hooks"
+  },
+  "repository": "https://git.unlock-music.dev/um/joox-crypto.git",
+  "keywords": [
+    "joox"
+  ],
+  "author": "LSR",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/jest": "^29.5.13",
+    "jest": "^29.7.0",
+    "lint-staged": "^15.2.10",
+    "prettier": "3.3.3",
+    "simple-git-hooks": "^2.11.1"
+  },
+  "dependencies": {
+    "crypto-js": "^4.2.0"
+  },
+  "lint-staged": {
+    "*.{js,css,md}": "prettier --write"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "npx lint-staged",
+    "pre-push": "npm test"
+  }
+}

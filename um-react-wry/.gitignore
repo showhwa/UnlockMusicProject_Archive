@@ -1,0 +1,6 @@
+/target
+/um-react.zip
+/um-react.exe
+/um-react@*.zip
+/um-react@*.exe
+/*.gz

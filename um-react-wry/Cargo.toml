@@ -1,0 +1,42 @@
+[package]
+name = "um-react-wry"
+version = "0.1.1"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+wry = { version = "0.35.1", optional = true }
+tao = { version = "0.24", default-features = false, optional = true, features = [
+    "rwh_05",
+] }
+image = { version = "0.24", default-features = true, optional = true, features = [
+    "webp",
+    "ico",
+] }
+
+zip = { version = "0.6.6" }
+http = { version = "0.2" }
+bytes = { version = "1.5.0" }
+clap = { version = "4.4.12", features = ["derive"] }
+dirs = { version = "5.0.1" }
+
+[build-dependencies]
+winres = "0.1"
+
+[features]
+stub-pkgs = ["wry", "tao", "image"]
+
+[[bin]]
+name = "um-react-wry-stub"
+path = "src/stub.rs"
+required-features = ["stub-pkgs"]
+
+[[bin]]
+name = "builder"
+path = "src/builder.rs"
+
+[profile.release]
+opt-level = "z"
+debug = false
+lto = true

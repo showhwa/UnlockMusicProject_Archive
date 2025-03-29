@@ -1,0 +1,6 @@
+target/
+pkg/
+pkg-*/
+node_modules/
+.pnpm-store
+*.local
