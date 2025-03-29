@@ -23,7 +23,7 @@ projects = re.findall(r"/um/(.*?)/stars", response.text)
 current_date = datetime.now()
 formatted_date = current_date.strftime('%Y%m%d')
 error_log = ''
-# projects.remove['testsuite']
+projects.remove['testsuite']
 for project in projects:
     if project:
         repo = f"{domain}/um/{project}.git"

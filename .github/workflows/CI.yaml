@@ -72,6 +72,6 @@ jobs:
       - name: Upload files to OneDrive
         run: |
           rclone copy ./code gh_bk:/ -P
-          rclone main.py gh_bk:/code -P
-          rclone .github gh_bk:/code -P
+          rclone copy main.py gh_bk:/code -P
+          rclone copy .github gh_bk:/code -P
           rm -rf ~/.config/rclone/rclone.conf
