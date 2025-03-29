@@ -25,29 +25,20 @@ formatted_date = current_date.strftime('%Y%m%d')
 error_log = ''
 
 for project in projects:
-    url = f"{domain}/um/{project}/archive/main.tar.gz"
-    time.sleep(3)
-    print(project)
-    if not os.path.isdir("code"):
-        os.mkdir("code")
-    if not os.path.isdir(f"code/{formatted_date}/"):
-        os.mkdir(f"code/{formatted_date}/")
+    if project:
+        repo = f"{domain}/um/{project}.git"
+        time.sleep(3)
+        if not os.path.isdir("code"):
+            os.mkdir("code")
+        if not os.path.isdir(f"code/{formatted_date}/"):
+            os.mkdir(f"code/{formatted_date}/")
 
-    code = session.head(url).status_code
-    if code == 404:
-        url = f"{domain}/um/{project}/archive/master.tar.gz"
-        code = session.head(url).status_code
-
-    if code == 404:
-        print(project + "404\n")
-        error_log += f'{project}: 404\n'
-    else:
-        # pass
-        download = session.get(url)
-        download.raise_for_status()
-        with open(f"code/{formatted_date}/{project}.tar.gz", 'wb') as file:
-            file.write(download.content)
-        print(f"{project}已下载到当前目录: code/{formatted_date}/{project}.tar.gz")
+        if session.head(repo).status_code == 200:
+            os.system(f'git clone --mirror {repo} {project}')
+            os.system(f'tar czf code/{formatted_date}/{project}.tar.gz {project}')
+            # os.system(f'rm -rf {project}')
+        else:
+            error_log += f'{project}: 404\n'
 
 if not error_log:
     if os.path.isfile("error_log.txt"):
