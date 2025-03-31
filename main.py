@@ -13,6 +13,9 @@ from url import domain
 
 # /um/kgg-dec/stars
 
+big_projects = [
+    'testsuite'
+]
 
 session = requests.Session()
 # response = session.get("https://git.unlock-music.dev/um")
@@ -23,7 +26,11 @@ projects = re.findall(r"/um/(.*?)/stars", response.text)
 current_date = datetime.now()
 formatted_date = current_date.strftime('%Y%m%d')
 error_log = ''
-projects.remove['testsuite']
+if os.path.isdir("tmp"):
+    os.system(f"rm -rf tmp/")
+os.system(f"mkdir tmp")
+# if 'testsuite' in projects:
+#     projects.remove('testsuite')
 for project in projects:
     if project:
         repo = f"{domain}/um/{project}.git"
@@ -34,12 +41,22 @@ for project in projects:
             os.mkdir(f"code/{formatted_date}/")
 
         if session.head(repo).status_code == 200:
-            os.system(f'git clone {repo} {project}')
+            tar_name = f"code/{formatted_date}/{project}.tar.zst"
+            if project in big_projects:
+                os.system(f'git clone --depth 1 {repo} {project}')
+            else:
+                os.system(f'git clone {repo} {project}')
             os.system(f"find . -type f -exec sed -i 's|{domain}|https://git\.unlock-music\.dev|g' {{}} \;")
-            os.system(f'tar czf code/{formatted_date}/{project}.tar.gz {project}')
+            os.system(f'tar -I zstd -cf {tar_name} {project}')
             os.system(f'rm -rf {project}/.git')
+            os.system(f"mv {project} tmp/")
         else:
             error_log += f'{project}: 404\n'
+
+os.system(f"rclone copy ./code/{formatted_date}/ gh_bk:/um-code-archive/{formatted_date}")
+os.system(f"rclone copy main.py gh_bk:/um-code-archive/{formatted_date}")
+os.system(f"rclone copy .github gh_bk:/um-code-archive/{formatted_date}")
+os.system(f"rm -rf ~/.config/rclone/rclone.conf")
 
 if not error_log:
     if os.path.isfile("error_log.txt"):
