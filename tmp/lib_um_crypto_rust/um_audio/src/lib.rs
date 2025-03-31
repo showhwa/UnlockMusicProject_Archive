@@ -1,80 +1,10 @@
 mod metadata;
+mod audio_type;
+mod sync_frame;
 
-use std::fmt::Display;
-use thiserror::Error;
-
-#[derive(Error, Debug, Clone)]
-pub enum AudioError {
-    #[error("Require at least {0} bytes of header.")]
-    NeedMoreHeader(usize),
-}
-
-pub const MASK_LOSSLESS: u32 = 0x80000000;
-
-#[repr(u32)]
-#[derive(Debug, PartialEq, Eq)]
-pub enum AudioType {
-    Unknown = 0,
-
-    // Lossy
-    OGG = 1,
-    AAC = 2,
-    MP3 = 3,
-    M4A = 4,
-    M4B = 5,
-    MP4 = 6,
-    WMA = 7, // While possible, it is rare to find a lossless WMA file.
-    MKV = 8, // Matroska (mkv, mka, webm etc.; can contain lossy or lossless audio tracks)
-
-    // Lossless
-    FLAC = MASK_LOSSLESS | 1,
-    DFF = MASK_LOSSLESS | 2,
-    WAV = MASK_LOSSLESS | 3,
-    APE = MASK_LOSSLESS | 5,
-}
-
-impl AudioType {
-    pub fn as_str(&self) -> &str {
-        match self {
-            AudioType::OGG => "ogg",
-            AudioType::AAC => "aac",
-            AudioType::MP3 => "mp3",
-            AudioType::M4A => "m4a",
-            AudioType::M4B => "m4b",
-            AudioType::MP4 => "mp4",
-            AudioType::WMA => "wma",
-            AudioType::FLAC => "flac",
-            AudioType::DFF => "dff",
-            AudioType::WAV => "wav",
-            AudioType::APE => "ape",
-            AudioType::MKV => "mka",
-
-            _ => "bin",
-        }
-    }
-}
-
-impl Display for AudioType {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.as_str())
-    }
-}
-
-fn is_mp3(magic: u32) -> bool {
-    // Frame sync should have the first 11 bits set to 1.
-    const MP3_AND_MASK: u32 = 0b1111_1111_1110_0000u32 << 16;
-    const MP3_EXPECTED: u32 = 0b1111_1111_1110_0000u32 << 16;
-
-    (magic & MP3_AND_MASK) == MP3_EXPECTED
-}
-
-fn is_aac(magic: u32) -> bool {
-    // Frame sync should have the first 12 bits set to 1.
-    const AAC_AND_MASK: u32 = 0b1111_1111_1111_0110u32 << 16;
-    const AAC_EXPECTED: u32 = 0b1111_1111_1111_0000u32 << 16;
-
-    (magic & AAC_AND_MASK) == AAC_EXPECTED
-}
+use crate::sync_frame::SYNC_FRAME_TEST_SIZE;
+pub use audio_type::{AudioError, AudioType};
+use sync_frame::{is_aac, is_mp3};
 
 const MAGIC_FLAC: [u8; 4] = *b"fLaC";
 const MAGIC_OGG: [u8; 4] = *b"OggS";
@@ -131,6 +61,21 @@ pub fn detect_audio_type(buffer: &[u8]) -> Result<AudioType, AudioError> {
         };
     }
 
+    // brute force test for MP3 / AAC
+    for magic_window in buffer.windows(4).take(SYNC_FRAME_TEST_SIZE) {
+        let magic = u32::from_be_bytes(magic_window.try_into().unwrap());
+        if is_mp3(magic) {
+            return Ok(AudioType::MP3);
+        } else if is_aac(magic) {
+            return Ok(AudioType::AAC);
+        }
+    }
+
+    // Ask for more data to test for MP3 / AAC
+    if buffer.len() < SYNC_FRAME_TEST_SIZE {
+        return Err(AudioError::NeedMoreHeader(offset + SYNC_FRAME_TEST_SIZE));
+    }
+
     Ok(AudioType::Unknown)
 }
 
@@ -150,5 +95,20 @@ mod tests {
         let mp3_data = include_bytes!("__fixtures__/mp3_with_id3v2_x3.bin");
         let result = detect_audio_type(mp3_data).expect("failed to parse mp3");
         assert_eq!(result, AudioType::MP3);
+    }
+
+    #[test]
+    fn test_mp3_large_id3() {
+        let mp3_data = include_bytes!("__fixtures__/mp3_id3v2_with_junk.bin");
+        let result = detect_audio_type(mp3_data).expect("failed to parse mp3");
+        assert_eq!(result, AudioType::MP3);
+    }
+
+    #[test]
+    fn test_mp3_invalid_data() {
+        let mut mp3_data = [0; 4096];
+        mp3_data[0..4].copy_from_slice(&[0xff; 4]);
+        let result = detect_audio_type(&mp3_data).expect("failed to parse mp3");
+        assert_eq!(result, AudioType::Unknown);
     }
 }

@@ -1,6 +1,6 @@
 import * as initSqlite from 'sql.js';
 
-const urlWasm = new URL('@nm/sql.js/dist/sql-wasm.wasm', import.meta.url).toString();
+const urlWasm = new URL('@sql-wasm', import.meta.url).toString();
 
 export type SQLStatic = Awaited<ReturnType<(typeof initSqlite)['default']>>;
 export type SQLDatabase = SQLStatic['Database']['prototype'];

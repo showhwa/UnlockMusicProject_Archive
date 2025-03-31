@@ -15,8 +15,8 @@ const projectRoot = url.fileURLToPath(new URL('.', import.meta.url));
 const pkg = JSON.parse(fs.readFileSync(projectRoot + '/package.json', 'utf-8'));
 
 const COMMAND_GIT_VERSION = 'git describe --long --dirty --tags --always';
-const shortCommit = process.env.GIT_COMMIT_FULL || tryCommand(COMMAND_GIT_VERSION, __dirname, 'unknown');
-const version = `${pkg.version}-${shortCommit}`;
+const shortCommit = process.env.GIT_COMMIT || tryCommand(COMMAND_GIT_VERSION, __dirname, 'unknown');
+const version = `${pkg.version} (${shortCommit})`;
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -85,7 +85,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '~': path.resolve(__dirname, 'src'),
-      '@nm': path.resolve(__dirname, 'node_modules'),
+      '@sql-wasm': path.resolve(__dirname, 'node_modules', 'sql.js', 'dist', 'sql-wasm.wasm'),
 
       // workaround for vite, workbox (PWA)
       module: path.resolve(__dirname, 'src', 'dummy.mjs'),

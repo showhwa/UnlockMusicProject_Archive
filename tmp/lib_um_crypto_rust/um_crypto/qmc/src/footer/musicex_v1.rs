@@ -44,8 +44,8 @@ impl MusicExV1 {
         result.unknown_0 = cursor.read_u32::<LE>()?;
         result.unknown_1 = cursor.read_u32::<LE>()?;
         result.unknown_2 = cursor.read_u32::<LE>()?;
-        cursor.read(&mut result.mid)?;
-        cursor.read(&mut result.media_filename)?;
+        cursor.read_exact(&mut result.mid)?;
+        cursor.read_exact(&mut result.media_filename)?;
         result.unknown_3 = cursor.read_u32::<LE>()?;
 
         Ok(result)

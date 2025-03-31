@@ -24,7 +24,7 @@ import {
   VStack,
 } from '@chakra-ui/react';
 import { PanelQMCv2Key } from './panels/PanelQMCv2Key';
-import { useState } from 'react';
+import { useState, type FC } from 'react';
 import { MdExpandMore, MdMenu, MdOutlineSettingsBackupRestore } from 'react-icons/md';
 import { useAppDispatch, useAppSelector } from '~/hooks';
 import { commitStagingChange, discardStagingChanges } from './settingsSlice';
@@ -33,7 +33,7 @@ import { selectIsSettingsNotSaved } from './settingsSelector';
 import { PanelQingTing } from './panels/PanelQingTing';
 import { PanelKGGKey } from '~/features/settings/panels/PanelKGGKey.tsx';
 
-const TABS: { name: string; Tab: () => JSX.Element }[] = [
+const TABS: { name: string; Tab: FC }[] = [
   { name: 'QMCv2 密钥', Tab: PanelQMCv2Key },
   { name: 'KWMv2 密钥', Tab: PanelKWMv2Key },
   { name: 'KGG 密钥', Tab: PanelKGGKey },

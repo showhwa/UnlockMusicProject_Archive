@@ -9,7 +9,7 @@ const __dirname = dirname(__filename);
 
 let commitHash = process.env.GIT_COMMIT || 'unknown';
 try {
-  execSync('git rev-parse --short HEAD').toString('utf-8').trim();
+  commitHash = execSync('git rev-parse --short HEAD').toString('utf-8').trim();
 } catch (e) {
   console.error('Failed to get commit hash:', e);
 }

@@ -1,7 +1,7 @@
 {
   "packageManager": "pnpm@10.4.0",
   "name": "@unlock-music/crypto",
-  "version": "0.1.6",
+  "version": "0.1.9",
   "description": "Project Unlock Music: 加解密支持库",
   "scripts": {
     "build": "node build.js",

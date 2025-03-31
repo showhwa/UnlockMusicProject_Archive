@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module type="EMPTY_MODULE" version="4">
+  <component name="FacetManager">
+    <facet type="Python" name="Python facet">
+      <configuration sdkName="Python 3.12 (lib_um_crypto_rust)" />
+    </facet>
+  </component>
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/um_wasm/src" isTestSource="false" />
@@ -20,8 +25,10 @@
       <excludeFolder url="file://$MODULE_DIR$/target" />
       <excludeFolder url="file://$MODULE_DIR$/um_wasm_loader/dist" />
       <excludeFolder url="file://$MODULE_DIR$/um_wasm_loader/pkg" />
+      <excludeFolder url="file://$MODULE_DIR$/.venv" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Python 3.12 (lib_um_crypto_rust) interpreter library" level="application" />
   </component>
 </module>

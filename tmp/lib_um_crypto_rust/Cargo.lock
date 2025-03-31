@@ -500,7 +500,7 @@ checksum = "42ff0bf0c66b8238c6f3b578df37d0b7848e55df8577b3f74f92a69acceeb825"
 
 [[package]]
 name = "um_audio"
-version = "0.1.6"
+version = "0.1.9"
 dependencies = [
  "byteorder",
  "thiserror",
@@ -508,7 +508,7 @@ dependencies = [
 
 [[package]]
 name = "um_cli"
-version = "0.1.6"
+version = "0.1.9"
 dependencies = [
  "anyhow",
  "clap",
@@ -526,7 +526,7 @@ dependencies = [
 
 [[package]]
 name = "um_wasm"
-version = "0.1.6"
+version = "0.1.9"
 dependencies = [
  "anyhow",
  "console_error_panic_hook",
@@ -547,7 +547,7 @@ dependencies = [
 
 [[package]]
 name = "umc_joox"
-version = "0.1.6"
+version = "0.1.9"
 dependencies = [
  "aes",
  "byteorder",
@@ -560,7 +560,7 @@ dependencies = [
 
 [[package]]
 name = "umc_kgm"
-version = "0.1.6"
+version = "0.1.9"
 dependencies = [
  "aes",
  "block-padding",
@@ -573,7 +573,7 @@ dependencies = [
 
 [[package]]
 name = "umc_kuwo"
-version = "0.1.6"
+version = "0.1.9"
 dependencies = [
  "anyhow",
  "byteorder",
@@ -585,7 +585,7 @@ dependencies = [
 
 [[package]]
 name = "umc_mg3d"
-version = "0.1.6"
+version = "0.1.9"
 dependencies = [
  "hex",
  "thiserror",
@@ -594,7 +594,7 @@ dependencies = [
 
 [[package]]
 name = "umc_ncm"
-version = "0.1.6"
+version = "0.1.9"
 dependencies = [
  "aes",
  "byteorder",
@@ -607,7 +607,7 @@ dependencies = [
 
 [[package]]
 name = "umc_qmc"
-version = "0.1.6"
+version = "0.1.9"
 dependencies = [
  "anyhow",
  "byteorder",
@@ -620,7 +620,7 @@ dependencies = [
 
 [[package]]
 name = "umc_qrc"
-version = "0.1.6"
+version = "0.1.9"
 dependencies = [
  "byteorder",
  "hex",
@@ -632,7 +632,7 @@ dependencies = [
 
 [[package]]
 name = "umc_qtfm"
-version = "0.1.6"
+version = "0.1.9"
 dependencies = [
  "aes",
  "byteorder",
@@ -643,7 +643,7 @@ dependencies = [
 
 [[package]]
 name = "umc_utils"
-version = "0.1.6"
+version = "0.1.9"
 dependencies = [
  "base64",
  "md-5",
@@ -651,14 +651,14 @@ dependencies = [
 
 [[package]]
 name = "umc_xiami"
-version = "0.1.6"
+version = "0.1.9"
 dependencies = [
  "thiserror",
 ]
 
 [[package]]
 name = "umc_xmly"
-version = "0.1.0"
+version = "0.1.9"
 dependencies = [
  "aes",
  "byteorder",

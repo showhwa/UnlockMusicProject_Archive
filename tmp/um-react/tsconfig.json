@@ -21,7 +21,7 @@
     "esModuleInterop": true,
     "paths": {
       "~/*": ["./src/*"],
-      "@nm/*": ["./node_modules/*"]
+      "@sql-wasm": ["./node_modules/sql.js/dist/sql-wasm.wasm"]
     }
   },
   "include": ["src"],
