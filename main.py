@@ -29,6 +29,9 @@ error_log = ''
 if os.path.isdir("tmp"):
     os.system(f"rm -rf tmp/")
 os.system(f"mkdir tmp")
+for big_project in big_projects:
+    if big_project in projects:
+        projects.remove(big_project)
 # if 'testsuite' in projects:
 #     projects.remove('testsuite')
 for project in projects:
@@ -42,10 +45,7 @@ for project in projects:
 
         if session.head(repo).status_code == 200:
             tar_name = f"code/{formatted_date}/{project}.tar.zst"
-            if project in big_projects:
-                os.system(f'git clone --depth 1 {repo} {project}')
-            else:
-                os.system(f'git clone {repo} {project}')
+            os.system(f'git clone {repo} {project}')
             os.system(f"find . -type f -exec sed -i 's|{domain}|https://git\.unlock-music\.dev|g' {{}} \;")
             os.system(f'tar -I zstd -cf {tar_name} {project}')
             os.system(f'rm -rf {project}/.git')
