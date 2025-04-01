@@ -1,7 +1,0 @@
-ncm/* filter=lfs diff=lfs merge=lfs -text
-qmc/* filter=lfs diff=lfs merge=lfs -text
-kwm/* filter=lfs diff=lfs merge=lfs -text
-kgm/* filter=lfs diff=lfs merge=lfs -text
-xiami/* filter=lfs diff=lfs merge=lfs -text
-tm/* filter=lfs diff=lfs merge=lfs -text
-ximalaya/* filter=lfs diff=lfs merge=lfs -text
