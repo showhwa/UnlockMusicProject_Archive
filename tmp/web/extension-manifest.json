@@ -19,5 +19,11 @@
   "action": {
     "default_icon": "img/icons/favicon-32x32.png",
     "default_popup": "./popup.html"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "addon@unlock-music.dev",
+      "strict_min_version": "128.0"
+    }
   }
 }
