@@ -1,4 +1,3 @@
-use anyhow::Result;
 use itertools::Itertools;
 use lazy_static::lazy_static;
 use std::ops::Mul;
@@ -27,6 +26,8 @@ pub enum EKeyDecryptError {
     FailDecryptV1(TcTeaError),
     #[error("Error when decrypting ekey v2: {0}")]
     FailDecryptV2(TcTeaError),
+    #[error("Failed to decode b64 content: {0}")]
+    Base64Decode(#[from] base64::DecodeError),
 }
 
 fn make_simple_key<const N: usize>() -> [u8; N] {
@@ -42,7 +43,7 @@ fn make_simple_key<const N: usize>() -> [u8; N] {
     result
 }
 
-pub fn decrypt_v1(ekey: &[u8]) -> Result<Vec<u8>> {
+pub fn decrypt_v1(ekey: &[u8]) -> Result<Vec<u8>, EKeyDecryptError> {
     if ekey.len() < 12 {
         Err(EKeyDecryptError::EKeyTooShort)?;
     }
@@ -61,7 +62,7 @@ pub fn decrypt_v1(ekey: &[u8]) -> Result<Vec<u8>> {
     Ok([header, &plaintext].concat())
 }
 
-pub fn decrypt_v2(ekey: &[u8]) -> Result<Vec<u8>> {
+pub fn decrypt_v2(ekey: &[u8]) -> Result<Vec<u8>, EKeyDecryptError> {
     let ekey = base64::decode(ekey)?;
     let ekey = tc_tea::decrypt(ekey, EKEY_V2_KEY1).map_err(EKeyDecryptError::FailDecryptV2)?;
     let ekey = tc_tea::decrypt(ekey, EKEY_V2_KEY2).map_err(EKeyDecryptError::FailDecryptV2)?;
@@ -70,7 +71,7 @@ pub fn decrypt_v2(ekey: &[u8]) -> Result<Vec<u8>> {
     decrypt_v1(&ekey)
 }
 
-pub fn decrypt<T: AsRef<[u8]>>(ekey: T) -> Result<Vec<u8>> {
+pub fn decrypt<T: AsRef<[u8]>>(ekey: T) -> Result<Vec<u8>, EKeyDecryptError> {
     let ekey = ekey.as_ref();
     match ekey.strip_prefix(EKEY_V2_PREFIX) {
         Some(v2_ekey) => decrypt_v2(v2_ekey),

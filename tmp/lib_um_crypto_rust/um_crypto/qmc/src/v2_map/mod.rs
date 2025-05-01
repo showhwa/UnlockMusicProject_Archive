@@ -2,7 +2,7 @@ mod key;
 
 use crate::v1::cipher::{qmc1_transform, V1_KEY_SIZE};
 use crate::v2_map::key::key_compress;
-use anyhow::Result;
+use crate::QmcCryptoError;
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct QMC2Map {
@@ -10,7 +10,7 @@ pub struct QMC2Map {
 }
 
 impl QMC2Map {
-    pub fn new<T: AsRef<[u8]>>(key: T) -> Result<Self> {
+    pub fn new<T: AsRef<[u8]>>(key: T) -> Result<Self, QmcCryptoError> {
         let key = key_compress(key)?;
         Ok(Self { key })
     }

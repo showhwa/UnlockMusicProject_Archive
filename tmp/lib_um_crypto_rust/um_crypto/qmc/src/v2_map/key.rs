@@ -3,7 +3,7 @@ use crate::QmcCryptoError;
 
 const INDEX_OFFSET: usize = 71214;
 
-pub fn key_compress<T: AsRef<[u8]>>(long_key: T) -> anyhow::Result<[u8; V1_KEY_SIZE]> {
+pub fn key_compress<T: AsRef<[u8]>>(long_key: T) -> Result<[u8; V1_KEY_SIZE], QmcCryptoError> {
     let long_key = long_key.as_ref();
     if long_key.is_empty() {
         Err(QmcCryptoError::QMCV2MapKeyEmpty)?;

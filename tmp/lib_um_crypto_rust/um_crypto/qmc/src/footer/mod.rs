@@ -26,8 +26,6 @@ pub enum FooterParseError {
     PCv2InvalidVersion(u32),
     #[error("PCv2/MusicEx: Invalid `MusicEx` size: {0}")]
     PCv2MusicExUnsupportedPayloadSize(usize),
-    #[error("PCv2/MusicEx: Invalid `MusicEx` data: {0}")]
-    PCv2MusicExInvalidError(anyhow::Error),
 
     #[error("Android/STag: Invalid ID field: {0}")]
     STagInvalidId(String),
@@ -45,6 +43,9 @@ pub enum FooterParseError {
 
     #[error("Parse: Failed to parse string '{0}' as integer")]
     StringToIntError(String),
+
+    #[error("Failed to parse MusicExV1: {0}")]
+    MusicEx1ParseError(std::io::Error),
 }
 
 /// Footer type

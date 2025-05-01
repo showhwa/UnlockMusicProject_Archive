@@ -36,7 +36,8 @@ impl Default for MusicExV1 {
 }
 
 impl MusicExV1 {
-    pub fn from_bytes(buffer: &[u8]) -> anyhow::Result<MusicExV1> {
+    #[allow(clippy::field_reassign_with_default)]
+    fn from_bytes_inner(buffer: &[u8]) -> Result<MusicExV1, std::io::Error> {
         assert_eq!(buffer.len(), 0xC0 - 0x10);
 
         let mut cursor = Cursor::new(&buffer);
@@ -50,11 +51,15 @@ impl MusicExV1 {
 
         Ok(result)
     }
+
+    pub fn from_bytes(buffer: &[u8]) -> Result<MusicExV1, FooterParseError> {
+        Self::from_bytes_inner(buffer).map_err(FooterParseError::MusicEx1ParseError)
+    }
 }
 
 pub fn parse_v1(footer: &[u8]) -> Result<Option<Metadata>, FooterParseError> {
     let (payload, payload_len) = footer.split_at(footer.len() - 4);
-    let payload_len = LE::read_u32(&payload_len) as usize;
+    let payload_len = LE::read_u32(payload_len) as usize;
     if payload_len != 0xC0 {
         Err(FooterParseError::PCv2MusicExUnsupportedPayloadSize(
             payload_len,
@@ -62,8 +67,7 @@ pub fn parse_v1(footer: &[u8]) -> Result<Option<Metadata>, FooterParseError> {
     }
 
     let payload = &payload[payload.len() - (payload_len - 0x10)..];
-    let payload =
-        MusicExV1::from_bytes(payload).map_err(FooterParseError::PCv2MusicExInvalidError)?;
+    let payload = MusicExV1::from_bytes(payload)?;
     let mid = from_ascii_utf16(&payload.mid);
     let media_filename = from_ascii_utf16(&payload.media_filename);
 

@@ -77,11 +77,11 @@ impl ArgsQMCv2 {
                 (metadata.size, metadata.ekey.or_else(|| self.ekey.clone()))
             }
             Ok(None) => {
-                eprintln!("could not find any qmc metadata.");
+                eprintln!("[warn] could not find any qmc metadata.");
                 (0usize, self.ekey.clone())
             }
             Err(err) => {
-                eprintln!("failed to parse qmc metadata: {}", err);
+                eprintln!("[warn] failed to parse qmc metadata: {}", err);
                 (0usize, self.ekey.clone())
             }
         };
