@@ -1,15 +1,14 @@
 use crate::kwm_v1::CipherV1;
-use anyhow::Result;
 use byteorder::{ReadBytesExt, LE};
 use std::fmt;
 use std::io::{Cursor, Read};
 use thiserror::Error;
-use umc_qmc::QMCv2Cipher;
+use umc_utils::base64::DecodeError;
 
 pub mod des;
 
 pub mod kwm_v1;
-pub use umc_qmc::QMCv2Cipher as CipherV2;
+pub use umc_qmc::{QMCv2Cipher as CipherV2, QmcCryptoError};
 
 /// Commonly used secret key for Kuwo services.
 pub const SECRET_KEY: [u8; 8] = *b"ylzsxkwm";
@@ -30,6 +29,15 @@ pub enum KuwoCryptoError {
 
     #[error("KWM: Unsupported version {0}")]
     UnsupportedVersion(usize),
+
+    #[error("Failed to decode base64: {0}")]
+    Base64DecodeError(#[from] DecodeError),
+
+    #[error("{0}")]
+    QMCCipherError(#[from] QmcCryptoError),
+
+    #[error("Failed to read data: {0}")]
+    IoError(#[from] std::io::Error),
 }
 
 impl fmt::Display for HeaderMagicBytes {
@@ -49,7 +57,10 @@ pub enum Decipher {
 }
 
 impl Decipher {
-    pub fn new<T: AsRef<[u8]>>(header: &Header, ekey: Option<T>) -> Result<Decipher> {
+    pub fn new<T: AsRef<[u8]>>(
+        header: &Header,
+        ekey: Option<T>,
+    ) -> Result<Decipher, KuwoCryptoError> {
         let cipher = match header.version {
             1 => Decipher::V1(CipherV1::new(header.resource_id)),
             2 => match ekey {
@@ -89,7 +100,7 @@ impl Header {
     const MAGIC_1: [u8; 16] = *b"yeelion-kuwo-tme";
     const MAGIC_2: [u8; 16] = *b"yeelion-kuwo\0\0\0\0";
 
-    pub fn from_bytes<T>(bytes: T) -> Result<Self>
+    pub fn from_bytes<T>(bytes: T) -> Result<Self, KuwoCryptoError>
     where
         T: AsRef<[u8]>,
     {
@@ -128,10 +139,10 @@ impl Header {
     }
 }
 
-pub struct CipherBoDian(QMCv2Cipher);
+pub struct CipherBoDian(CipherV2);
 
 impl CipherBoDian {
-    pub fn new<T: AsRef<[u8]>>(ekey: T) -> Result<Self> {
+    pub fn new<T: AsRef<[u8]>>(ekey: T) -> Result<Self, KuwoCryptoError> {
         let ekey = des::decode_ekey(ekey, &SECRET_KEY)?;
         let cipher = CipherV2::new_from_ekey(ekey.as_str())?;
         Ok(Self(cipher))

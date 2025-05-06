@@ -1,0 +1,46 @@
+name: QQ 音乐 (安卓)
+about: 解密使用「QQ 音乐」的「安卓」客户端下载的文件失败时选择该项。
+title: '[QQ音乐]: 请填写标题'
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ### 安卓客户端
+
+        你的手机需要 root 权限。注意 root 可能会导致手机保修失效，操作不当可能会导致手机变砖。
+
+        请参考 [um-react](https://um-react.netlify.app/) 上方的答疑区域获取说明。
+
+        此外请使用 Chrome 或 Firefox 浏览器，而非系统自带的浏览器或轻量浏览器，如 Via 浏览器。
+
+        ---
+
+        如果你确定你的客户端版本符合上述描述，并遇到了问题，请继续填写下面的表单。
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: 错误描述
+      description: |
+        请详细描述你遇到的问题，例如下载使用的客户端、提供下载后的文件、操作步骤、错误提示等你认为会帮助修正错误的信息。
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: 相关日志
+      description: 如果有相关日志，请附上。浏览器日志可以通过 F12 打开开发者工具，在 Console 选项卡中查看。
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: 检查清单
+      description: 请检查下方的快速检查清单，确保你已经完成了所有步骤。
+      options:
+        - label: 我有填写一个简单易懂的标题
+          required: true
+        - label: 我有阅读上方的说明
+          required: true
+        - label: 我有阅读 um-react 的答疑部分
+          required: true
+        - label: 我的安卓设备已获得 root 权限
+          required: true

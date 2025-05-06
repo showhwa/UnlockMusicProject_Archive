@@ -1,6 +1,6 @@
 [package]
 name = "um_wasm"
-version = "0.1.9"
+version = "0.1.10"
 authors = ["鲁树人 <lu.shuren@um-react.app>"]
 edition = "2018"
 description = "um_crypo in WebAssembly"

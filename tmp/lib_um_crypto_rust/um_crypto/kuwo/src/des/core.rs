@@ -1,6 +1,5 @@
 use super::{constants, helper};
 use crate::KuwoCryptoError;
-use anyhow::Result;
 use itertools::Either;
 
 /// Encrypt or Decrypt?
@@ -82,13 +81,13 @@ impl KuwoDes {
         state
     }
 
-    pub fn transform(&self, data: &mut [u8]) -> Result<()> {
+    pub fn transform(&self, data: &mut [u8]) -> Result<(), KuwoCryptoError> {
         if data.len() % 8 != 0 {
             Err(KuwoCryptoError::InvalidDesDataSize(data.len()))?
         }
 
         for block in data.chunks_exact_mut(8) {
-            let value = u64::from_le_bytes(block.try_into()?);
+            let value = u64::from_le_bytes(block.try_into().unwrap_or_default());
             let value = self.transform_block(value);
             block.copy_from_slice(&value.to_le_bytes());
         }

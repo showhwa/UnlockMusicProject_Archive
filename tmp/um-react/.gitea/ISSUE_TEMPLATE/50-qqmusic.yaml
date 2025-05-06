@@ -1,0 +1,63 @@
+name: QQ 音乐 (Windows/Mac)
+about: 解密使用「QQ 音乐」的「Windows」或「Mac」客户端下载的文件失败时选择该项。
+title: '[QQ音乐]: 请填写标题'
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ### Windows 客户端
+
+        目前 Windows 客户端仅支持 19.51 或更低版本下载的歌曲文件。
+
+        * [web.archive.org 镜像](https://web.archive.org/web/2023/https://dldir1v6.qq.com/music/clntupate/QQMusic_Setup_1951.exe)
+        * [通过 Telegram 下载](https://t.me/um_lsr_ch/24)
+
+        安装好客户端后可以加装更新屏蔽更新：
+
+        * [通过 Telegram 下载](https://t.me/um_lsr_ch/6)
+
+        ### Mac 客户端
+
+        目前 Mac 客户端仅支持 v8.8.0 或更低版本下载的歌曲文件。
+
+        * [通过 Telegram 下载](https://t.me/um_lsr_ch/21)
+
+        ---
+
+        如果你确定你的客户端版本符合上述描述，并遇到了问题，请继续填写下面的表单。
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: 平台
+      description: 你使用的客户端平台是…
+      options:
+        - Windows
+        - Mac
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: 错误描述
+      description: |
+        请详细描述你遇到的问题，例如下载使用的客户端、提供下载后的文件、操作步骤、错误提示等你认为会帮助修正错误的信息。
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: 相关日志
+      description: 如果有相关日志，请附上。浏览器日志可以通过 F12 打开开发者工具，在 Console 选项卡中查看。
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: 检查清单
+      description: 请检查下方的快速检查清单，确保你已经完成了所有步骤。
+      options:
+        - label: 我有填写一个简单易懂的标题
+          required: true
+        - label: 我有阅读上方的说明
+          required: true
+        - label: 我有阅读 um-react 的答疑部分
+          required: true

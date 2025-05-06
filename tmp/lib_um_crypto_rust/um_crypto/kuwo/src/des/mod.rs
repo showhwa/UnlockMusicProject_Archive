@@ -1,13 +1,13 @@
-use anyhow::Result;
-
 mod constants;
 mod core;
 mod helper;
 use core::{KuwoDes, Mode};
 use umc_utils::base64;
 
+use crate::KuwoCryptoError;
+
 /// Decrypt string content
-pub fn decrypt_ksing<T: AsRef<[u8]>>(data: T, key: &[u8; 8]) -> Result<String> {
+pub fn decrypt_ksing<T: AsRef<[u8]>>(data: T, key: &[u8; 8]) -> Result<String, KuwoCryptoError> {
     let mut decoded = base64::decode(data)?;
 
     let des = KuwoDes::new(key, Mode::Decrypt);
@@ -20,17 +20,19 @@ pub fn decrypt_ksing<T: AsRef<[u8]>>(data: T, key: &[u8; 8]) -> Result<String> {
     Ok(result)
 }
 
-pub fn encrypt_ksing<T: AsRef<[u8]>>(data: T, key: &[u8; 8]) -> Result<String> {
+pub fn encrypt_ksing<T: AsRef<[u8]>>(data: T, key: &[u8; 8]) -> Result<String, KuwoCryptoError> {
     let mut data = Vec::from(data.as_ref());
-    let padded_len = ((data.len() + 7) / 8) * 8;
-    data.resize(padded_len, 0u8);
+    let padded_len = data.len() % 8;
+    if padded_len != 0 {
+        data.resize(data.len() + (8 - padded_len), 0);
+    }
 
     let des = KuwoDes::new(key, Mode::Encrypt);
     des.transform(&mut data[..])?;
     Ok(base64::encode(data))
 }
 
-pub fn decode_ekey<T: AsRef<[u8]>>(data: T, key: &[u8; 8]) -> Result<String> {
+pub fn decode_ekey<T: AsRef<[u8]>>(data: T, key: &[u8; 8]) -> Result<String, KuwoCryptoError> {
     let decoded = decrypt_ksing(data, key)?;
     Ok(decoded[16..].to_string())
 }

@@ -117,6 +117,8 @@ docker run -d -p 8080:80 --name um-react um-react
 
 - [Unlock Music (Web)](https://git.unlock-music.dev/um/web) - 原始项目
 - [Unlock Music (Cli)](https://git.unlock-music.dev/um/cli) - 命令行批量处理版
+- [lib_um_crypto_rust](https://git.unlock-music.dev/um/lib_um_crypto_rust) - 项目引入的解密算法实现
+  - [NPM 包](https://git.unlock-music.dev/um/-/packages/npm/@unlock-music%2Fcrypto)
 - [um-react (Electron 前端)](https://github.com/CarlGao4/um-react-electron) - 使用 Electron 框架封装的本地可执行文件。
   - [GitHub 下载](https://github.com/CarlGao4/um-react-electron/releases/latest) | [仓库镜像](https://git.unlock-music.dev/CarlGao4/um-react-electron)
 - [um-react-wry](https://git.unlock-music.dev/um/um-react-wry) - 使用 WRY 框架封装的 Win64 单文件 (
