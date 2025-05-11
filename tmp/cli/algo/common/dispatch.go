@@ -15,6 +15,9 @@ type DecoderParams struct {
 	FilePath string // optional, source file path
 
 	Logger *zap.Logger // required
+
+	// KuGou
+	KggDatabasePath string
 }
 type NewDecoderFunc func(p *DecoderParams) Decoder
 

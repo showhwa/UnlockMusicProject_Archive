@@ -1,0 +1,97 @@
+name: Build
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "**/*.go"
+      - "go.mod"
+      - "go.sum"
+      - ".gitea/workflows/*.yml"
+  pull_request:
+    branches: [ main ]
+    types: [ opened, synchronize, reopened ]
+    paths:
+      - "**/*.go"
+      - "go.mod"
+      - "go.sum"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        GOOS:
+          - linux
+          - windows
+          - darwin
+        GOARCH:
+          - "amd64"
+          - "arm64"
+
+        include:
+          - GOOS: windows
+            BIN_SUFFIX: ".exe"
+
+    steps:
+      - name: Checkout codebase
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go 1.23
+        uses: actions/setup-go@v5
+        with:
+          go-version: ^1.23
+
+      - name: Setup vars
+        id: vars
+        run: |
+          echo "::set-output name=short_sha::$(git rev-parse --short HEAD)"
+          echo "::set-output name=git_tag::$(git describe --tags --always)"
+
+      - name: Test
+        run: go test -v ./...
+
+      - name: Build
+        env:
+          GOOS: ${{ matrix.GOOS }}
+          GOARCH: ${{ matrix.GOARCH }}
+          CGO_ENABLED: 0
+        run: go build -v -trimpath -ldflags="-w -s -X main.AppVersion=${{ steps.vars.outputs.git_tag }}" -o um-${{ matrix.GOOS }}-${{ matrix.GOARCH }}${{ matrix.BIN_SUFFIX }} ./cmd/um
+
+      - name: Publish artifact
+        uses: christopherhx/gitea-upload-artifact@v4
+        with:
+          name: um-${{ matrix.GOOS }}-${{ matrix.GOARCH }}
+          path: ./um-${{ matrix.GOOS }}-${{ matrix.GOARCH }}${{ matrix.BIN_SUFFIX }}
+
+  archive:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout codebase
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Setup vars
+        id: vars
+        run: |
+          echo "::set-output name=git_tag::$(git describe --tags --always)"
+      - name: prepare archive
+        run: |
+          mkdir -p dist prepare
+      - name: Download artifacts
+        uses: christopherhx/gitea-download-artifact@v4
+        with:
+          path: prepare
+          pattern: um-*
+      - name: repack archive
+        run: |
+          apt-get update
+          apt-get install -y strip-nondeterminism
+          ./misc/repack.sh "${{ steps.vars.outputs.git_tag }}"
+      - name: Publish all-in-one archive
+        uses: christopherhx/gitea-upload-artifact@v4
+        with:
+          name: dist-all
+          path: dist

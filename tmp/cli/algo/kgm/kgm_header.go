@@ -29,6 +29,8 @@ type header struct {
 	CryptoSlot     uint32 // 0x18-0x1b: crypto key slot
 	CryptoTestData []byte // 0x1c-0x2b: crypto test data
 	CryptoKey      []byte // 0x2c-0x3b: crypto key
+
+	AudioHash string // v5: audio hash
 }
 
 func (h *header) FromFile(rd io.ReadSeeker) error {
@@ -36,29 +38,56 @@ func (h *header) FromFile(rd io.ReadSeeker) error {
 		return fmt.Errorf("kgm seek start: %w", err)
 	}
 
-	buf := make([]byte, 0x3c)
-	if _, err := io.ReadFull(rd, buf); err != nil {
-		return fmt.Errorf("kgm read header: %w", err)
-	}
-
-	return h.FromBytes(buf)
+	return h.FromBytes(rd)
 }
 
-func (h *header) FromBytes(buf []byte) error {
-	if len(buf) < 0x3c {
-		return errors.New("invalid kgm header length")
+func (h *header) FromBytes(r io.ReadSeeker) error {
+	h.MagicHeader = make([]byte, 16)
+	_, err := r.Read(h.MagicHeader)
+	if err != nil {
+		return err
 	}
-
-	h.MagicHeader = buf[:0x10]
 	if !bytes.Equal(kgmHeader, h.MagicHeader) && !bytes.Equal(vprHeader, h.MagicHeader) {
 		return ErrKgmMagicHeader
 	}
 
-	h.AudioOffset = binary.LittleEndian.Uint32(buf[0x10:0x14])
-	h.CryptoVersion = binary.LittleEndian.Uint32(buf[0x14:0x18])
-	h.CryptoSlot = binary.LittleEndian.Uint32(buf[0x18:0x1c])
-	h.CryptoTestData = buf[0x1c:0x2c]
-	h.CryptoKey = buf[0x2c:0x3c]
+	err = binary.Read(r, binary.LittleEndian, &h.AudioOffset)
+	if err != nil {
+		return err
+	}
+	err = binary.Read(r, binary.LittleEndian, &h.CryptoVersion)
+	if err != nil {
+		return err
+	}
+	err = binary.Read(r, binary.LittleEndian, &h.CryptoSlot)
+	if err != nil {
+		return err
+	}
+	h.CryptoTestData = make([]byte, 0x10)
+	_, err = r.Read(h.CryptoTestData)
+	if err != nil {
+		return err
+	}
+	h.CryptoKey = make([]byte, 0x10)
+	_, err = r.Read(h.CryptoKey)
+	if err != nil {
+		return err
+	}
+
+	if h.CryptoVersion == 5 {
+		r.Seek(0x08, io.SeekCurrent)
+		var audioHashLen uint32 = 0
+		err = binary.Read(r, binary.LittleEndian, &audioHashLen)
+		if err != nil {
+			return err
+		}
+		audioHashBuffer := make([]byte, audioHashLen)
+		_, err = r.Read(audioHashBuffer)
+		if err != nil {
+			return err
+		}
+		h.AudioHash = string(audioHashBuffer)
+	}
 
 	return nil
 }

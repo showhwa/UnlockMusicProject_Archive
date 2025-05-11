@@ -5,10 +5,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/fsnotify/fsnotify"
-	"github.com/urfave/cli/v2"
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
 	"io"
 	"os"
 	"os/signal"
@@ -18,6 +14,11 @@ import (
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/fsnotify/fsnotify"
+	"github.com/urfave/cli/v2"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 	"unlock-music.dev/cli/algo/common"
 	_ "unlock-music.dev/cli/algo/kgm"
 	_ "unlock-music.dev/cli/algo/kwm"
@@ -31,7 +32,7 @@ import (
 	"unlock-music.dev/cli/internal/utils"
 )
 
-var AppVersion = "v0.2.11"
+var AppVersion = "custom"
 
 var logger = setupLogger(false) // TODO: inject logger to application, instead of using global logger
 
@@ -50,6 +51,7 @@ func main() {
 			&cli.StringFlag{Name: "output", Aliases: []string{"o"}, Usage: "path to output dir", Required: false},
 			&cli.StringFlag{Name: "qmc-mmkv", Aliases: []string{"db"}, Usage: "path to qmc mmkv (.crc file also required)", Required: false},
 			&cli.StringFlag{Name: "qmc-mmkv-key", Aliases: []string{"key"}, Usage: "mmkv password (16 ascii chars)", Required: false},
+			&cli.StringFlag{Name: "kgg-db", Usage: "path to kgg db (win32 kugou v11)", Required: false},
 			&cli.BoolFlag{Name: "remove-source", Aliases: []string{"rs"}, Usage: "remove source file", Required: false, Value: false},
 			&cli.BoolFlag{Name: "skip-noop", Aliases: []string{"n"}, Usage: "skip noop decoder", Required: false, Value: true},
 			&cli.BoolFlag{Name: "verbose", Aliases: []string{"V"}, Usage: "verbose logging", Required: false, Value: false},
@@ -183,10 +185,16 @@ func appMain(c *cli.Context) (err error) {
 		}
 	}
 
+	kggDbPath := c.String("kgg-db")
+	if kggDbPath == "" {
+		kggDbPath = filepath.Join(os.Getenv("APPDATA"), "Kugou8", "KGMusicV3.db")
+	}
+
 	proc := &processor{
 		logger:          logger,
 		inputDir:        inputDir,
 		outputDir:       output,
+		kggDbPath:       kggDbPath,
 		skipNoopDecoder: c.Bool("skip-noop"),
 		removeSource:    c.Bool("remove-source"),
 		updateMetadata:  c.Bool("update-metadata"),
@@ -210,6 +218,8 @@ type processor struct {
 	logger    *zap.Logger
 	inputDir  string
 	outputDir string
+
+	kggDbPath string
 
 	skipNoopDecoder bool
 	removeSource    bool
@@ -342,10 +352,11 @@ func (p *processor) process(inputFile string, allDec []common.DecoderFactory) er
 	logger := logger.With(zap.String("source", inputFile))
 
 	pDec, decoderFactory, err := p.findDecoder(allDec, &common.DecoderParams{
-		Reader:    file,
-		Extension: filepath.Ext(inputFile),
-		FilePath:  inputFile,
-		Logger:    logger,
+		Reader:          file,
+		Extension:       filepath.Ext(inputFile),
+		FilePath:        inputFile,
+		Logger:          logger,
+		KggDatabasePath: p.kggDbPath,
 	})
 	if err != nil {
 		return err

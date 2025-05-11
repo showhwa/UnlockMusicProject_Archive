@@ -1,20 +1,20 @@
 # Unlock Music 音乐解锁
 
-[![Build Status](https://ci.unlock-music.dev/api/badges/um/web/status.svg)](https://ci.unlock-music.dev/um/web)
+[![Build Status](https://git.unlock-music.dev/um/web/actions/workflows/build.yml/badge.svg)][ci]
 
 - 在浏览器中解锁加密的音乐文件。 Unlock encrypted music file in the browser.
 - Unlock Music 项目是以学习和技术研究的初衷创建的，修改、再分发时请遵循[授权协议]。
 - Unlock Music 的 CLI 版本可以在 [unlock-music/cli] 找到，大批量转换建议使用 CLI 版本。
 - 我们新建了 Telegram 群组 [`@unlock_music_chat`] ，欢迎加入！
-- CI 自动构建已经部署，可以在 [um-packages] 下载
+- CI 自动构建已经部署，可以在 [Actions][ci] 下载
 
 > **WARNING**
 > 在本站 fork 不会起到备份的作用，只会浪费服务器储存空间。如无必要请勿 fork 该仓库。
 
-[授权协议]: https://git.unlock-music.dev/um/web/src/branch/master/LICENSE
+[授权协议]: https://git.unlock-music.dev/um/web/src/branch/main/LICENSE
 [unlock-music/cli]: https://git.unlock-music.dev/um/cli
 [`@unlock_music_chat`]: https://t.me/unlock_music_chat
-[um-packages]: https://git.unlock-music.dev/um/-/packages/generic/web-build/
+[ci]: https://git.unlock-music.dev/um/web/actions?workflow=build.yml
 
 ## 特性
 
@@ -45,7 +45,7 @@
 
 ### 使用预构建版本
 
-- 从 [Release] 或 [CI 构建][um-packages] 下载预构建的版本
+- 从 [Release] 或 [CI 构建][ci] 下载预构建的版本
   - :warning: 本地使用请下载`legacy版本`（`modern版本`只能通过 **http(s)协议** 访问）
 - 解压缩后即可部署或本地使用（**请勿直接运行源代码**）
 
@@ -54,7 +54,7 @@
 ### 自行构建
 
 - 环境要求
-  - nodejs (v16.x)
+  - nodejs (v22.x)
   - npm
 
 1. 获取项目源代码后安装相关依赖：

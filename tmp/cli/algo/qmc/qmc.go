@@ -5,11 +5,12 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
-	"go.uber.org/zap"
 	"io"
 	"runtime"
 	"strconv"
 	"strings"
+
+	"go.uber.org/zap"
 
 	"unlock-music.dev/cli/algo/common"
 	"unlock-music.dev/cli/internal/sniff"
@@ -59,6 +60,23 @@ func NewDecoder(p *common.DecoderParams) common.Decoder {
 	return &Decoder{raw: p.Reader, params: p, logger: p.Logger}
 }
 
+func NewQmcCipherDecoder(key []byte) (common.StreamDecoder, error) {
+	if len(key) > 300 {
+		return newRC4Cipher(key)
+	} else if len(key) != 0 {
+		return newMapCipher(key)
+	}
+	return newStaticCipher(), nil
+}
+
+func NewQmcCipherDecoderFromEKey(ekey []byte) (common.StreamDecoder, error) {
+	key, err := deriveKey(ekey)
+	if err != nil {
+		return nil, err
+	}
+	return NewQmcCipherDecoder(key)
+}
+
 func (d *Decoder) Validate() error {
 	// search & derive key
 	err := d.searchKey()
@@ -67,18 +85,9 @@ func (d *Decoder) Validate() error {
 	}
 
 	// check cipher type and init decode cipher
-	if len(d.decodedKey) > 300 {
-		d.cipher, err = newRC4Cipher(d.decodedKey)
-		if err != nil {
-			return err
-		}
-	} else if len(d.decodedKey) != 0 {
-		d.cipher, err = newMapCipher(d.decodedKey)
-		if err != nil {
-			return err
-		}
-	} else {
-		d.cipher = newStaticCipher()
+	d.cipher, err = NewQmcCipherDecoder(d.decodedKey)
+	if err != nil {
+		return fmt.Errorf("qmc init cipher: %w", err)
 	}
 
 	// test with first 16 bytes
@@ -185,11 +194,7 @@ func (d *Decoder) readRawKey(rawKeyLen int64) error {
 	rawKeyData = bytes.TrimRight(rawKeyData, "\x00")
 
 	d.decodedKey, err = deriveKey(rawKeyData)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
 func (d *Decoder) readRawMetaQTag() error {

@@ -2,9 +2,9 @@
 
 Original: Web Edition https://git.unlock-music.dev/um/web
 
-- [![Build Status](https://ci.unlock-music.dev/api/badges/um/cli/status.svg)](https://ci.unlock-music.dev/um/cli)
+- [![Build Status](https://git.unlock-music.dev/um/cli/actions/workflows/build.yml/badge.svg)](https://git.unlock-music.dev/um/cli/actions?workflow=build.yml)
 - [Release Download](https://git.unlock-music.dev/um/cli/releases/latest)
-- [Latest Build](https://git.unlock-music.dev/um/-/packages/generic/cli-build/)
+- [Latest Build](https://git.unlock-music.dev/um/cli/actions)
 
 > **WARNING**
 > 在本站 fork 不会起到备份的作用，只会浪费服务器储存空间。如无必要请勿 fork 该仓库。
@@ -36,13 +36,3 @@ It will produce `um` or `um.exe` (Windows).
 - Drag the encrypted file to `um.exe` (Tested on Windows)
 - Run: `./um [-o <output dir>] [-i] <input dir/file>`
 - Use `./um -h` to show help menu
-
-## Update CI pipeline
-
-1. Install [Drone CI binary](https://docs.drone.io/cli/install/)
-2. Edit `.drone.jsonnet`
-3. Update drone CI pipeline:
-
-   ```sh
-   drone jsonnet --format --stream
-   ```

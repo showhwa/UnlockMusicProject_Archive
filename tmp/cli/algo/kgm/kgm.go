@@ -14,10 +14,12 @@ type Decoder struct {
 	offset int
 
 	header header
+
+	KggDatabasePath string
 }
 
 func NewDecoder(p *common.DecoderParams) common.Decoder {
-	return &Decoder{rd: p.Reader}
+	return &Decoder{rd: p.Reader, KggDatabasePath: p.KggDatabasePath}
 }
 
 // Validate checks if the file is a valid Kugou (.kgm, .vpr, .kgma) file.
@@ -33,6 +35,11 @@ func (d *Decoder) Validate() (err error) {
 		d.cipher, err = newKgmCryptoV3(&d.header)
 		if err != nil {
 			return fmt.Errorf("kgm init crypto v3: %w", err)
+		}
+	case 5:
+		d.cipher, err = newKgmCryptoV5(&d.header, d.KggDatabasePath)
+		if err != nil {
+			return fmt.Errorf("kgm init crypto v5: %w", err)
 		}
 	default:
 		return fmt.Errorf("kgm: unsupported crypto version %d", d.header.CryptoVersion)
@@ -57,6 +64,7 @@ func (d *Decoder) Read(buf []byte) (int, error) {
 
 func init() {
 	// Kugou
+	common.RegisterDecoder("kgg", false, NewDecoder)
 	common.RegisterDecoder("kgm", false, NewDecoder)
 	common.RegisterDecoder("kgma", false, NewDecoder)
 	// Viper

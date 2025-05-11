@@ -1,6 +1,6 @@
 # Unlock Music 音乐解锁 (React)
 
-[![Build Status](https://ci.unlock-music.dev/api/badges/um/um-react/status.svg)](https://ci.unlock-music.dev/um/um-react)
+[![Build Status](https://git.unlock-music.dev/um/um-react/actions/workflows/build.yaml/badge.svg)][um-react-actions]
 
 - 在浏览器中解锁加密的音乐文件。 Unlock encrypted music file in the browser.
   - 查看[原基于 Vue 的 Unlock Music 项目][um-vue]
@@ -17,7 +17,7 @@
 [um-vue]: https://git.unlock-music.dev/um/web
 [unlock-music/cli]: https://git.unlock-music.dev/um/cli
 [`@unlock_music_chat`]: https://t.me/unlock_music_chat
-[um-react-actions]: https://git.unlock-music.dev/um/um-react/actions
+[um-react-actions]: https://git.unlock-music.dev/um/um-react/actions?workflow=build.yaml
 
 ⚠️ 手机端浏览器支持有限，请使用最新版本的 Chrome 或 Firefox 官方浏览器。
 
