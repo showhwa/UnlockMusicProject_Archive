@@ -16,6 +16,7 @@ test('should be able to render App', async () => {
   await waitFor(() => screen.getByTestId('sdk-version'));
 
   // Quick sanity check of known strings.
-  expect(screen.getByText(/在浏览器内对文件进行解锁/i)).toBeInTheDocument();
-  expect(screen.getByText(/UnlockMusic 团队/i)).toBeInTheDocument();
+  expect(screen.getByText(/音乐解锁/i)).toBeInTheDocument();
+  expect(screen.getByText(/Unlock Music/i)).toBeInTheDocument();
+  expect(screen.getByText(/MIT/i)).toBeInTheDocument();
 });

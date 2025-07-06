@@ -1,15 +1,4 @@
-import {
-  Center,
-  Flex,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalHeader,
-  ModalOverlay,
-  Tabs,
-  Text,
-} from '@chakra-ui/react';
+import { useEffect, useRef } from 'react';
 
 import { FileInput } from '~/components/FileInput';
 
@@ -18,39 +7,43 @@ export interface ImportSecretModalProps {
   children: React.ReactNode;
   show: boolean;
   onClose: () => void;
-  onImport: (file: File) => void|Promise<void>;
+  onImport: (file: File) => void | Promise<void>;
 }
 
 export function ImportSecretModal({ clientName, children, show, onClose, onImport }: ImportSecretModalProps) {
   const handleFileReceived = (files: File[]) => {
     const promise = onImport(files[0]);
     if (promise instanceof Promise) {
-      promise.catch(err => {
+      promise.catch((err) => {
         console.error('could not import: ', err);
       });
     }
     return promise;
   };
 
-  return (
-    <Modal isOpen={show} onClose={onClose} closeOnOverlayClick={false} scrollBehavior="inside" size="xl">
-      <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>从文件导入密钥</ModalHeader>
-        <ModalCloseButton />
-        <Flex as={ModalBody} gap={2} flexDir="column" flex={1}>
-          <Center>
-            <FileInput onReceiveFiles={handleFileReceived}>拖放或点我选择含有密钥的数据库文件</FileInput>
-          </Center>
+  const refModel = useRef<HTMLDialogElement>(null);
+  useEffect(() => {
+    if (show) {
+      refModel.current?.showModal();
+    } else {
+      refModel.current?.close();
+    }
+  }, [show]);
 
-          <Text as="div" mt={2}>
-            选择你的{clientName && <>「{clientName}」</>}客户端平台以查看对应说明：
-          </Text>
-          <Flex as={Tabs} variant="enclosed" flexDir="column" flex={1} minH={0}>
-            {children}
-          </Flex>
-        </Flex>
-      </ModalContent>
-    </Modal>
+  return (
+    <dialog ref={refModel} className="modal">
+      <div className="modal-box">
+        <form method="dialog" onSubmit={() => onClose()}>
+          <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+        </form>
+        <h3 className="font-bold text-lg">从文件导入密钥</h3>
+        <div className="py-4 flex flex-col gap-2 flex-1">
+          <FileInput onReceiveFiles={handleFileReceived}>拖放或点我选择含有密钥的数据库文件</FileInput>
+
+          <div className="mt-2">选择你的{clientName && <>「{clientName}」</>}客户端平台以查看对应说明：</div>
+          <div>{children}</div>
+        </div>
+      </div>
+    </dialog>
   );
 }

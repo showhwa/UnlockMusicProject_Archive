@@ -1,9 +1,7 @@
-import { Flex, Icon, ListItem, OrderedList, Tabs, Text } from '@chakra-ui/react';
 import { SegmentTopNavSettings } from './SegmentTopNavSettings';
 import { VQuote } from '~/components/HelpText/VQuote';
 import { SegmentAddKeyDropdown } from './SegmentAddKeyDropdown';
 import React from 'react';
-import { MdFileUpload } from 'react-icons/md';
 
 export interface SegmentKeyImportInstructionsProps {
   clientInstructions: React.ReactNode;
@@ -18,32 +16,22 @@ export function SegmentKeyImportInstructions({
 }: SegmentKeyImportInstructionsProps) {
   return (
     <>
-      <Text>导入密钥可以参考下面的步骤：</Text>
-      <OrderedList>
-        <ListItem>
+      <p className="mt-2">导入密钥可以参考下面的步骤：</p>
+      <ol className="list-decimal pl-5">
+        <li>
           <SegmentTopNavSettings />
-        </ListItem>
-        <ListItem>
+        </li>
+        <li>
           设定区域选择<VQuote>{tab}</VQuote>
-        </ListItem>
-        <ListItem>
+        </li>
+        <li>
           <SegmentAddKeyDropdown />
-        </ListItem>
-        <ListItem>
-          <Flex flexDir="row" alignItems="center">
-            {'选择 '}
-            <VQuote>
-              <Icon as={MdFileUpload} boxSize={5} mr={2} /> 从文件导入密钥…
-            </VQuote>
-          </Flex>
-        </ListItem>
-        <ListItem>
-          <Text>{keyInstructionText}</Text>
-          <Tabs display="flex" flexDir="column" border="1px solid" borderColor="gray.300" borderRadius={5}>
-            {clientInstructions}
-          </Tabs>
-        </ListItem>
-      </OrderedList>
+        </li>
+        <li>
+          <p className="mb-2">{keyInstructionText}</p>
+          {clientInstructions}
+        </li>
+      </ol>
     </>
   );
 }

@@ -1,4 +1,4 @@
-import { Link } from '@chakra-ui/react';
+import { ExtLink } from './ExtLink';
 
 export interface ProjectIssueProps {
   id: number | string;
@@ -7,9 +7,9 @@ export interface ProjectIssueProps {
 
 export function ProjectIssue({ id, title }: ProjectIssueProps) {
   return (
-    <Link isExternal target="_blank" href={`https://git.unlock-music.dev/um/um-react/issues/${id}`}>
+    <ExtLink target="_blank" href={`https://git.unlock-music.dev/um/um-react/issues/${id}`}>
       {`#${id}`}
       {title && ` - ${title}`}
-    </Link>
+    </ExtLink>
   );
 }

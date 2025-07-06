@@ -1,15 +1,12 @@
-import { Icon, Kbd } from '@chakra-ui/react';
 import { BsShift } from 'react-icons/bs';
+import { Ruby } from '../Ruby';
 
-export function ShiftKey() {
+export function ShiftKey({ className }: { className?: string }) {
   return (
-    <ruby>
-      <Kbd>
-        <Icon as={BsShift} />
-      </Kbd>
-      <rp> (</rp>
-      <rt>shift</rt>
-      <rp>)</rp>
-    </ruby>
+    <Ruby caption="shift" className={className}>
+      <kbd className="kbd">
+        <BsShift className="text-sm" />
+      </kbd>
+    </Ruby>
   );
 }

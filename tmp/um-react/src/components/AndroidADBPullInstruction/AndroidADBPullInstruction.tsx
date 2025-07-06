@@ -1,171 +1,73 @@
-import {
-  Accordion,
-  AccordionButton,
-  AccordionIcon,
-  AccordionItem,
-  AccordionPanel,
-  Box,
-  Code,
-  Heading,
-  ListItem,
-  OrderedList,
-  Text,
-  chakra,
-} from '@chakra-ui/react';
-import { ExternalLinkIcon } from '@chakra-ui/icons';
-import { Light as SyntaxHighlighter } from 'react-syntax-highlighter';
-import hljsStyleGitHub from 'react-syntax-highlighter/dist/esm/styles/hljs/github';
-
-import PowerShellAdbDumpCommandTemplate from './adb_dump.ps1?raw';
-import ShellAdbDumpCommandTemplate from './adb_dump.sh?raw';
 import { ExtLink } from '../ExtLink';
-
-const applyTemplate = (tpl: string, values: Record<string, unknown>) => {
-  return tpl.replace(/\{\{\s*(\w+)\s*\}\}/g, (_, key) => (Object.hasOwn(values, key) ? String(values[key]) : '<nil>'));
-};
+import { Ruby } from '../Ruby';
+import { useId } from 'react';
+import { RootExplorerGuide } from './RootExplorerGuide';
+import { AdbInstructionTemplate } from './AdbInstructionTemplate';
+import { HiWord } from '../HelpText/HiWord';
 
 export interface AndroidADBPullInstructionProps {
   dir: string;
   file: string;
 }
 
+const URL_AMAZE = 'https://github.com/TeamAmaze/AmazeFileManager/releases/latest';
+const URL_MT2 = 'https://mt2.cn/download/';
+
 export function AndroidADBPullInstruction({ dir, file }: AndroidADBPullInstructionProps) {
-  const psAdbDumpCommand = applyTemplate(PowerShellAdbDumpCommandTemplate, { dir, file });
-  const shAdbDumpCommand = applyTemplate(ShellAdbDumpCommandTemplate, { dir, file });
+  const androidInstructionId = useId();
 
   return (
     <>
-      <Text>
-        你需要
-        <ruby>
-          超级管理员
-          <rp> (</rp>
-          <rt>
-            <code>root</code>
-          </rt>
-          <rp>)</rp>
-        </ruby>
-        访问权限来访问安卓应用的私有数据。
-      </Text>
-      <Text>
+      <p>
+        你需要<Ruby caption="root">超级管理员</Ruby>访问权限来访问安卓应用的私有数据。
+      </p>
+      <p>
         ⚠️ 请注意，获取管理员权限通常意味着你的安卓设备
-        <chakra.span color="red.400">将失去保修资格</chakra.span>。
-      </Text>
+        <HiWord>将失去保修资格</HiWord>。
+      </p>
 
-      <Accordion allowToggle mt="2">
-        <AccordionItem>
-          <Heading as="h3" size="md">
-            <AccordionButton>
-              <Box as="span" flex="1" textAlign="left">
-                在安卓手机端操作
-              </Box>
-              <AccordionIcon />
-            </AccordionButton>
-          </Heading>
-          <AccordionPanel pb={4}>
-            <OrderedList>
-              <ListItem>
-                <Text>
-                  启动具有 <Code>root</Code> 特权的文件浏览器
-                </Text>
-              </ListItem>
-              <ListItem>
-                <Text>
-                  访问 <Code>{dir}/</Code> 目录。
-                </Text>
-              </ListItem>
-              <ListItem>
-                <Text>
-                  将文件 <Code>{file}</Code> 复制到浏览器可访问的目录。
-                  <br />
-                  （例如下载目录）
-                </Text>
-              </ListItem>
-              <ListItem>
-                <Text>提交该数据库文件。</Text>
-              </ListItem>
-            </OrderedList>
-          </AccordionPanel>
-        </AccordionItem>
-
-        <AccordionItem>
-          <Heading as="h3" size="md">
-            <AccordionButton>
-              <Box as="span" flex="1" textAlign="left">
-                在 PC 端操作（ADB / PowerShell）
-              </Box>
-              <AccordionIcon />
-            </AccordionButton>
-          </Heading>
-          <AccordionPanel pb={4}>
-            <OrderedList>
-              <ListItem>
-                <Text>
-                  确保 <Code>adb</Code> 命令可用。
-                </Text>
-                <Text>
-                  💡 如果没有，可以
-                  <ExtLink href="https://scoop.sh/#/apps?q=adb">
-                    使用 Scoop 安装 <ExternalLinkIcon />
-                  </ExtLink>
-                  。
-                </Text>
-              </ListItem>
-              <ListItem>
-                <Text>启动终端并进入 PowerShell 7 环境。</Text>
-              </ListItem>
-              <ListItem>
-                <Text>将安卓设备连接到电脑，并允许调试。</Text>
-              </ListItem>
-              <ListItem>
-                <Text>粘贴执行下述代码。若设备提示「超级用户请求」请允许：</Text>
-                <SyntaxHighlighter language="ps1" style={hljsStyleGitHub}>
-                  {psAdbDumpCommand}
-                </SyntaxHighlighter>
-              </ListItem>
-              <ListItem>
-                <Text>
-                  提交当前目录下的 <Code>{file}</Code> 文件。
-                </Text>
-              </ListItem>
-            </OrderedList>
-          </AccordionPanel>
-        </AccordionItem>
-
-        <AccordionItem>
-          <Heading as="h3" size="md">
-            <AccordionButton>
-              <Box as="span" flex="1" textAlign="left">
-                在 Linux / Mac 系统下操作（ADB / Shell）
-              </Box>
-              <AccordionIcon />
-            </AccordionButton>
-          </Heading>
-          <AccordionPanel pb={4}>
-            <OrderedList>
-              <ListItem>
-                <Text>
-                  确保 <Code>adb</Code> 命令可用。
-                </Text>
-              </ListItem>
-              <ListItem>
-                <Text>将安卓设备连接到电脑，并允许调试。</Text>
-              </ListItem>
-              <ListItem>
-                <Text>粘贴执行下述代码。若设备提示「超级用户请求」请允许：</Text>
-                <SyntaxHighlighter language="bash" style={hljsStyleGitHub}>
-                  {shAdbDumpCommand}
-                </SyntaxHighlighter>
-              </ListItem>
-              <ListItem>
-                <Text>
-                  提交当前目录下的 <Code>{file}</Code> 文件。
-                </Text>
-              </ListItem>
-            </OrderedList>
-          </AccordionPanel>
-        </AccordionItem>
-      </Accordion>
+      <div className="join join-vertical bg-base-100 mt-2 max-w-full">
+        <div className="collapse collapse-arrow join-item border-base-300 border">
+          <input type="radio" name={androidInstructionId} />
+          <div className="collapse-title font-semibold">在安卓手机端操作</div>
+          <div className="collapse-content text-sm min-w-0">
+            <ol className="list-decimal pl-4">
+              <li>
+                启动支持 <code>root</code> 特权的文件浏览器，如 <ExtLink href={URL_AMAZE}>Amaze 文件浏览器</ExtLink>、
+                <ExtLink href={URL_MT2}>MT 管理器</ExtLink> 等。
+              </li>
+              <li>
+                ※ 记得启用 root 特权！
+                <RootExplorerGuide />
+              </li>
+              <li>
+                <p>
+                  访问 <code>{dir}/</code> 目录。
+                </p>
+                <p>※ 从侧边栏选择根目录开始。</p>
+              </li>
+              <li>
+                将文件 <code>{file}</code> 复制到浏览器可访问的目录（例如下载目录）。
+              </li>
+              <li>提交该数据库文件。</li>
+            </ol>
+          </div>
+        </div>
+        <div className="collapse collapse-arrow join-item border-base-300 border">
+          <input type="radio" name={androidInstructionId} />
+          <div className="collapse-title font-semibold">在 PC 端操作（使用 ADB / PowerShell）</div>
+          <div className="collapse-content text-sm min-w-0">
+            <AdbInstructionTemplate dir={dir} file={file} platform="win32" />
+          </div>
+        </div>
+        <div className="collapse collapse-arrow join-item border-base-300 border">
+          <input type="radio" name={androidInstructionId} />
+          <div className="collapse-title font-semibold">在 Linux / Mac 系统下操作（使用 ADB / Shell）</div>
+          <div className="collapse-content text-sm min-w-0">
+            <AdbInstructionTemplate dir={dir} file={file} platform="linux" />
+          </div>
+        </div>
+      </div>
     </>
   );
 }

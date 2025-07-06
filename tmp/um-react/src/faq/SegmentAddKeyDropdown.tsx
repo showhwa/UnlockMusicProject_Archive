@@ -1,24 +1,13 @@
-import { Flex, IconButton } from '@chakra-ui/react';
-import { MdExpandMore } from 'react-icons/md';
-import { HiWord } from '~/components/HelpText/HiWord';
-import { VQuote } from '~/components/HelpText/VQuote';
+import { MdFileUpload } from 'react-icons/md';
 
 export function SegmentAddKeyDropdown() {
   return (
-    <Flex as="span" alignItems="center" flexWrap="wrap">
-      按下<VQuote>添加一条密钥</VQuote>按钮
-      <HiWord>右侧</HiWord>的
-      <IconButton
-        colorScheme="purple"
-        variant="outline"
-        size="sm"
-        icon={<MdExpandMore />}
-        ml="2"
-        borderTopLeftRadius={0}
-        borderBottomLeftRadius={0}
-        pointerEvents="none"
-        aria-label="下拉按钮"
-      />
-    </Flex>
+    <span className="inline-flex items-center flex-wrap">
+      按下
+      <button type="button" className="btn flex items-center gap-2">
+        <MdFileUpload className="text-lg" />
+        导入数据库…
+      </button>
+    </span>
   );
 }

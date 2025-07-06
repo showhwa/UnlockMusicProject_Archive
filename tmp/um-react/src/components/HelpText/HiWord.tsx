@@ -1,9 +1,3 @@
-import { Mark } from '@chakra-ui/react';
-
-export function HiWord({ children }: { children: React.ReactNode }) {
-  return (
-    <Mark bg="orange.100" borderRadius={5} px={2} mx={1}>
-      {children}
-    </Mark>
-  );
+export function HiWord({ className = '', children }: { className?: string; children: React.ReactNode }) {
+  return <mark className={`bg-orange-100 rounded-md px-2 mx-1 ${className}`}>{children}</mark>;
 }

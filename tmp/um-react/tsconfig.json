@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ESNext",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
-    "types": ["vitest/globals", "@testing-library/jest-dom"],
+    "types": ["@types/wicg-file-system-access", "vitest/globals", "@testing-library/jest-dom"],
     "module": "ESNext",
     "skipLibCheck": true,
     /* Bundler mode */

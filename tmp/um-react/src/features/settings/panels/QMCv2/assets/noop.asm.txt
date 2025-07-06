@@ -1,0 +1,16 @@
+; QQ 音乐更新 - 占位文件
+; 使用 FASM 编译即可。
+
+format PE GUI 4.0
+entry start
+
+include 'win32a.inc'
+
+section '.text' code readable executable
+  start:
+	invoke	ExitProcess, 0
+
+section '.idata' import data readable writeable
+  library kernel,'KERNEL32.DLL'
+  import kernel,\
+	 ExitProcess,'ExitProcess'

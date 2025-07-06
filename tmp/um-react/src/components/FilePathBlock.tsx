@@ -1,10 +1,9 @@
-import { Code, Text } from '@chakra-ui/react';
-import React from 'react';
+import type { ReactNode } from 'react';
 
-export function FilePathBlock({ children }: { children: React.ReactNode }) {
+export function FilePathBlock({ children }: { children: ReactNode }) {
   return (
-    <Text as="pre" whiteSpace="pre-wrap" wordBreak="break-all">
-      <Code>{children}</Code>
-    </Text>
+    <pre className="whitespace-pre-wrap break-all">
+      <code>{children}</code>
+    </pre>
   );
 }

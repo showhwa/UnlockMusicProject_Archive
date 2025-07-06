@@ -1,5 +1,5 @@
-import { Heading } from '@chakra-ui/react';
 import React from 'react';
+import { HeaderAnchor } from './HeaderAnchor';
 
 export interface HeaderProps {
   children: React.ReactNode;
@@ -7,36 +7,39 @@ export interface HeaderProps {
   className?: string;
 }
 
+const commonHeaderClasses = 'relative flex items-center pt-3 pb-1 font-bold';
+
+export function Header2({ children, className, id }: HeaderProps) {
+  return (
+    <h2 id={id} className={`${commonHeaderClasses} text-3xl border-b border-base-300 ${className}`}>
+      {id && <HeaderAnchor id={id} />}
+      {children}
+    </h2>
+  );
+}
 export function Header3({ children, className, id }: HeaderProps) {
   return (
-    <Heading
-      as="h3"
-      id={id}
-      className={className}
-      pt={3}
-      pb={1}
-      borderBottom={'1px solid'}
-      borderColor="gray.300"
-      color="gray.800"
-      size="lg"
-    >
+    <h3 id={id} className={`${commonHeaderClasses} text-2xl border-b border-base-300 ${className}`}>
+      {id && <HeaderAnchor id={id} />}
       {children}
-    </Heading>
+    </h3>
   );
 }
 
 export function Header4({ children, className, id }: HeaderProps) {
   return (
-    <Heading as="h4" id={id} className={className} pt={3} pb={1} color="gray.700" size="md">
+    <h4 id={id} className={`${commonHeaderClasses} text-xl ${className}`}>
+      {id && <HeaderAnchor id={id} />}
       {children}
-    </Heading>
+    </h4>
   );
 }
 
 export function Header5({ children, className, id }: HeaderProps) {
   return (
-    <Heading as="h5" id={id} className={className} pt={3} pb={1} color="gray.700" size="sm">
+    <h5 id={id} className={`${commonHeaderClasses} text-lg ${className}`}>
+      {id && <HeaderAnchor id={id} />}
       {children}
-    </Heading>
+    </h5>
   );
 }

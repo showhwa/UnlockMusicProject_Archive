@@ -1,6 +1,6 @@
-import { Box, Code, Heading, Image, ListItem, OrderedList, Text } from '@chakra-ui/react';
 import iosAllowBackup from './iosAllowBackup.webp';
 import { FilePathBlock } from '~/components/FilePathBlock';
+import { HiWord } from '~/components/HelpText/HiWord';
 
 const EXAMPLE_MEDIA_ID = '0011wjLv1bIkvv';
 const EXAMPLE_NAME_IOS = '333407709-0011wjLv1bIkvv-1.mgalaxy';
@@ -10,92 +10,77 @@ export function InstructionsIOSCondition({ jailbreak }: { jailbreak: boolean }) 
   const useJailbreak = jailbreak;
   const useBackup = !jailbreak;
 
-  const pathPrefix = jailbreak ? '/var/mobile/Containers/Data/Application/<随机>/' : '/AppDomain-';
+  const pathPrefix = jailbreak ? (
+    <>
+      /var/mobile/Containers/Data/Application/<HiWord className="text-nowrap">[随机字符]</HiWord>/
+    </>
+  ) : (
+    '/AppDomain-'
+  );
 
   return (
     <>
-      <Heading as="h3" size="md">
-        获取密钥数据库文件
-      </Heading>
-      <OrderedList>
+      <h4 className="text-lg font-semibold">获取密钥数据库文件</h4>
+      <ol className="list-decimal pl-4">
         {useBackup && (
-          <ListItem>
-            <Text>首先需要在 iOS 客户端的设定允许备份：</Text>
-            <Image src={iosAllowBackup}></Image>
-          </ListItem>
+          <li>
+            首先需要在 iOS 客户端的设定允许备份：
+            <br />
+            <img src={iosAllowBackup}></img>
+          </li>
         )}
-        {useBackup && (
-          <ListItem>
-            <Text>使用你喜欢的备份软件对 iOS 设备进行完整备份；</Text>
-          </ListItem>
-        )}
-        <ListItem>
-          {useBackup && <Text>打开备份文件，并导航到下述目录：</Text>}
-          {useJailbreak && <Text>访问下述目录：</Text>}
+        {useBackup && <li>使用你喜欢的备份软件对 iOS 设备进行完整备份</li>}
+        <li>
+          {useBackup && <span>打开备份文件，并导航到下述目录：</span>}
+          {useJailbreak && <span>访问下述目录：</span>}
           <FilePathBlock>{pathPrefix}com.tencent.QQMusic/Documents/mmkv/</FilePathBlock>
-        </ListItem>
-        <ListItem>
-          <Text>
-            提取或导出密钥数据库文件 <Code>filenameEkeyMap</Code>；
-          </Text>
-        </ListItem>
-        <ListItem>
-          <Text>
-            提交导出的 <Code>filenameEkeyMap</Code> 文件；
-          </Text>
-        </ListItem>
-        <ListItem>
-          <Text>按下「保存」来应用更改。</Text>
-        </ListItem>
-      </OrderedList>
+        </li>
+        <li>
+          提取或导出密钥数据库文件 <code>filenameEkeyMap</code>
+        </li>
+        <li>
+          提交导出的 <code>filenameEkeyMap</code> 文件
+        </li>
+        <li>按下「保存」来应用更改。</li>
+      </ol>
 
-      <Heading as="h3" size="md" mt="3">
-        获取离线文件
-      </Heading>
-      <Box>
-        <Text>访问下述目录：</Text>
+      <h3 className="text-lg font-semibold mt-3">获取离线文件</h3>
+      <section>
+        <p>访问下述目录：</p>
         <FilePathBlock>
           {pathPrefix}com.tencent.QQMusic/Library/Application Support/com.tencent.QQMusic/iData/iMusic
         </FilePathBlock>
-        <Text>
-          该目录又存在数个子目录，其子目录下保存的「<Code>[字符].m[字符]</Code>」文件则是最终的加密文件。
-        </Text>
-        <Text>
-          格式：<Code>[song_id]-[mid]-[随机数字].m[后缀]</Code>
-        </Text>
-        <Text>
-          &#x3000;例：<Code>{EXAMPLE_NAME_IOS}</Code>
-        </Text>
-      </Box>
+        <p>
+          该目录又存在数个子目录，其子目录下保存的「<code>[字符].m[字符]</code>」文件则是最终的加密文件。
+        </p>
+        <p>
+          格式：<code>[song_id]-[mid]-[随机数字].m[后缀]</code>
+        </p>
+        <p>
+          &#x3000;例：<code>{EXAMPLE_NAME_IOS}</code>
+        </p>
+      </section>
 
-      <Heading as="h3" size="md" mt="3">
-        解密离线文件
-      </Heading>
-      <Text>勾选设定界面的「使用近似文件名匹配」可跳过该节内容。</Text>
-      <Text>⚠ 注意：若密钥过多，匹配过程可能会造成浏览器卡顿或无响应。</Text>
-      <OrderedList>
-        <ListItem>
-          <Text>
-            提取文件的 <Code>[mid]</Code> 部分，如 <Code>{EXAMPLE_MEDIA_ID}</Code>；
-          </Text>
-        </ListItem>
-        <ListItem>
-          <Text>
-            查找密钥表，得到文件名「<Code>{EXAMPLE_NAME_DB}</Code>」；
-          </Text>
-        </ListItem>
-        <ListItem>
-          <Text>
-            将文件更名为对应的文件名，如<Code display="inline">{EXAMPLE_NAME_IOS}</Code> ➔
-            <Code display="inline">{EXAMPLE_NAME_DB}</Code>；
-          </Text>
-        </ListItem>
-        <ListItem>
-          <Text>
-            回到主界面，提交文件「<Code>{EXAMPLE_NAME_DB}</Code>」。
-          </Text>
-        </ListItem>
-      </OrderedList>
+      <h4 className="text-lg font-semibold mt-3">解密离线文件</h4>
+      <p>勾选设定界面的「使用近似文件名匹配」可跳过该节内容。</p>
+      <p>⚠ 注意：若密钥过多，匹配过程可能会造成浏览器卡顿或无响应。</p>
+      <ol className="list-decimal pl-4 mt-1">
+        <li>
+          提取文件的 <code>[mid]</code> 部分，如 <code>{EXAMPLE_MEDIA_ID}</code>
+        </li>
+        <li>
+          查找密钥表，得到文件名「<code>{EXAMPLE_NAME_DB}</code>」
+        </li>
+        <li>
+          将文件更名为对应的文件名，如
+          <br />
+          <code>{EXAMPLE_NAME_IOS}</code>
+          <br />➔ <code>{EXAMPLE_NAME_DB}</code>
+        </li>
+        <li>
+          回到主界面，提交文件「<code>{EXAMPLE_NAME_DB}</code>」。
+        </li>
+      </ol>
     </>
   );
 }

@@ -1,0 +1,67 @@
+@import 'tailwindcss';
+
+@plugin "daisyui" {
+  themes: dracula --prefersdark;
+}
+
+/* theme: https://daisyui.com/theme-generator/#theme=eJx1kuFupCAUhV-FmGyym1TCBQHt2zB67Zg6MAFNu2323ZdhGkdH_Annu9dzjnwX1lyweC1OZjS2xa54KcrSm26YQxlwxHZyPsqMSo-XtdgPOHZZ5eQ-t_dh-MLtMr7VHrsewsn5Dm80XD_TRYfX6Xw7p5N1Q8CfU-tG58vQnjFFGYe385Sgu3AyAUtgLErufWzPv5v6F2GE_Xlm-JpRkaGMAeG1okLLHS3WNL_TinBVUSlgR7fOTminZYKznQeL8-TNuCBCHyG7bZlEg-3dolfJHzRN9CepEvWaDHPbYggLLO-wrAjIGEo1a_jDeDvYtwVWqSfQDZE1FbBZjN6n__2z9haH8koSrqng8tnsPlQaYFARLiuqWJUxfTTEgYBSFEBkzOfri0OcNJJyrXchDr0JAjHMJvXVDxfj_z4aYqkhqAnUFdVPMTBu7jI4j0-JA9V8E8DE0CsXElKl0Tco2giZsXGUNbYKNYv7s24Op-IDYozWOuNqPyPSjOC3jjSkVjvszTxGZvIzvhRXjz36ED_5Xrz2Zgz47z_whE0z */
+@plugin "daisyui/theme" {
+  name: 'balanced';
+  default: true;
+  prefersdark: false;
+  color-scheme: 'light';
+  --color-base-100: oklch(98% 0 0);
+  --color-base-200: oklch(96% 0.001 286.375);
+  --color-base-300: oklch(92% 0.006 264.531);
+  --color-base-content: oklch(20% 0 0);
+  --color-primary: oklch(60% 0.118 184.704);
+  --color-primary-content: oklch(98% 0.014 180.72);
+  --color-secondary: oklch(60% 0.126 221.723);
+  --color-secondary-content: oklch(98% 0.019 200.873);
+  --color-accent: oklch(51% 0.222 16.935);
+  --color-accent-content: oklch(93% 0.032 17.717);
+  --color-neutral: oklch(37% 0 0);
+  --color-neutral-content: oklch(98% 0 0);
+  --color-info: oklch(42% 0.199 265.638);
+  --color-info-content: oklch(97% 0.014 254.604);
+  --color-success: oklch(52% 0.154 150.069);
+  --color-success-content: oklch(97% 0.021 166.113);
+  --color-warning: oklch(66% 0.179 58.318);
+  --color-warning-content: oklch(98% 0.022 95.277);
+  --color-error: oklch(57% 0.245 27.325);
+  --color-error-content: oklch(97% 0.013 17.38);
+  --radius-selector: 0.5rem;
+  --radius-field: 0.5rem;
+  --radius-box: 0.5rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 1;
+  --noise: 1;
+}
+@theme {
+  --font-display:
+    system-ui, Sarasa UI SC, Source Han Sans CN, Noto Sans CJK SC, sans-serif, Apple Color Emoji, Segoe UI Emoji;
+  --font-mono:
+    ui-monospace, Consolas, Sarasa Mono CJK SC, Sarasa UI SC, Source Han Sans CN, Noto Sans CJK SC, Microsoft YaHei UI,
+    monospace, Apple Color Emoji, Segoe UI Emoji;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  &:hover > a[data-anchor] {
+    opacity: 0.75;
+  }
+}

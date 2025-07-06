@@ -14,5 +14,5 @@ test('should be able to render a list of 3 items', () => {
   });
 
   expect(screen.getAllByTestId('file-row')).toHaveLength(3);
-  expect(screen.getByText('Für Alice')).toBeInTheDocument();
+  expect(screen.getByText('ready')).toBeInTheDocument();
 });

@@ -11,7 +11,7 @@
 
 1. 确保 rust 已经安装。[参考说明](https://www.rust-lang.org/tools/install)。
 2. [下载 `um-react.zip`](https://git.unlock-music.dev/um/um-react/releases/latest) 并放入当前目录。
-3. 执行 `cargo build --bin um-react-wry-stub --release` 构建模板可执行文件。
+3. 执行 `cargo build --bin um-react-wry-stub --features="stub-pkgs" --release` 构建模板可执行文件。
 4. 执行 `cargo run --bin builder -- -t target/release/um-react-wry-stub.exe -o um-react@v1.2.3.exe` 构建最终的单文件。
 
 ## 更新资源文件 `um-react.zip`

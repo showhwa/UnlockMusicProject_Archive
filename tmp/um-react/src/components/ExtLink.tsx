@@ -1,12 +1,15 @@
 import type { AnchorHTMLAttributes } from 'react';
-import { ExternalLinkIcon } from '@chakra-ui/icons';
-import { Link } from '@chakra-ui/react';
+import { FiExternalLink } from 'react-icons/fi';
 
-export function ExtLink({ children, ...props }: AnchorHTMLAttributes<HTMLAnchorElement>) {
+export type ExtLinkProps = AnchorHTMLAttributes<HTMLAnchorElement> & {
+  icon?: boolean;
+};
+
+export function ExtLink({ className, icon = true, children, ...props }: ExtLinkProps) {
   return (
-    <Link isExternal {...props} rel="noreferrer noopener nofollow">
+    <a rel="noreferrer noopener nofollow" target="_blank" className={`link ${className}`} {...props}>
       {children}
-      <ExternalLinkIcon />
-    </Link>
+      {icon && <FiExternalLink className="inline size-sm ml-1" />}
+    </a>
   );
 }

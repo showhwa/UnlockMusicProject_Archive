@@ -1,163 +1,75 @@
-import {
-  Box,
-  Button,
-  Center,
-  chakra,
-  Flex,
-  HStack,
-  Icon,
-  IconButton,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Portal,
-  Spacer,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
-  Text,
-  useBreakpointValue,
-  useToast,
-  VStack,
-} from '@chakra-ui/react';
-import { PanelQMCv2Key } from './panels/PanelQMCv2Key';
-import { useState, type FC } from 'react';
-import { MdExpandMore, MdMenu, MdOutlineSettingsBackupRestore } from 'react-icons/md';
 import { useAppDispatch, useAppSelector } from '~/hooks';
 import { commitStagingChange, discardStagingChanges } from './settingsSlice';
-import { PanelKWMv2Key } from './panels/PanelKWMv2Key';
 import { selectIsSettingsNotSaved } from './settingsSelector';
-import { PanelQingTing } from './panels/PanelQingTing';
-import { PanelKGGKey } from '~/features/settings/panels/PanelKGGKey.tsx';
-
-const TABS: { name: string; Tab: FC }[] = [
-  { name: 'QMCv2 密钥', Tab: PanelQMCv2Key },
-  { name: 'KWMv2 密钥', Tab: PanelKWMv2Key },
-  { name: 'KGG 密钥', Tab: PanelKGGKey },
-  { name: '蜻蜓 FM', Tab: PanelQingTing },
-  {
-    name: '其它／待定',
-    Tab: () => <Text>这里空空如也～</Text>,
-  },
-];
+import { Outlet } from 'react-router';
+import { SETTINGS_TABS } from '~/features/settings/settingsTabs.tsx';
+import { MdOutlineSettingsBackupRestore } from 'react-icons/md';
+import { toast } from 'react-toastify';
+import { ResponsiveNav } from '../nav/ResponsiveNav';
+import { TabNavLink } from '../nav/TabNavLink';
 
 export function Settings() {
-  const toast = useToast();
   const dispatch = useAppDispatch();
-  const isLargeWidthDevice =
-    useBreakpointValue({
-      base: false,
-      lg: true,
-    }) ?? false;
 
-  const [tabIndex, setTabIndex] = useState(0);
-  const handleTabChange = (idx: number) => {
-    setTabIndex(idx);
-  };
   const handleResetSettings = () => {
     dispatch(discardStagingChanges());
 
-    toast({
-      status: 'info',
-      title: '未储存的设定已舍弃',
-      description: '已还原到更改前的状态。',
-      isClosable: true,
-    });
+    toast.info(() => (
+      <div>
+        <h3 className="text-lg font-bold">未储存的设定已舍弃</h3>
+        <p className="text-sm">已还原到更改前的状态。</p>
+      </div>
+    ));
   };
   const handleApplySettings = () => {
     dispatch(commitStagingChange());
-    toast({
-      status: 'success',
-      title: '设定已应用',
-      isClosable: true,
-    });
+    toast.success('设定已应用');
   };
   const isSettingsNotSaved = useAppSelector(selectIsSettingsNotSaved);
 
   return (
-    <Flex flexDir="column" flex={1}>
-      <Menu>
-        <MenuButton
-          as={Button}
-          leftIcon={<MdMenu />}
-          rightIcon={<MdExpandMore />}
-          colorScheme="gray"
-          variant="outline"
-          w="full"
-          flexShrink={0}
-          hidden={isLargeWidthDevice}
-          mb="4"
-        >
-          {TABS[tabIndex].name}
-        </MenuButton>
-        <Portal>
-          <MenuList w="100px">
-            {TABS.map(({ name }, i) => (
-              <MenuItem key={name} onClick={() => setTabIndex(i)}>
+    <div className="flex flex-col flex-1 container w-full">
+      <ResponsiveNav
+        className="grow h-full overflow-auto"
+        contentClassName="flex flex-col overflow-auto"
+        navigationClassName="overflow-x-auto pb-[2px] md:pb-0 h-full items-start [&]:md:flex"
+        navigation={
+          <div role="tablist" className="tabs gap-1 flex-nowrap md:flex-col grow items-center">
+            {Object.entries(SETTINGS_TABS).map(([id, { name }]) => (
+              <TabNavLink key={id} to={`/settings/${id}`}>
                 {name}
-              </MenuItem>
+              </TabNavLink>
             ))}
-          </MenuList>
-        </Portal>
-      </Menu>
-
-      <Tabs
-        orientation={isLargeWidthDevice ? 'vertical' : 'horizontal'}
-        align="start"
-        variant="line-i"
-        display="flex"
-        flex={1}
-        index={tabIndex}
-        onChange={handleTabChange}
+          </div>
+        }
       >
-        <TabList hidden={!isLargeWidthDevice} minW="8em" width="8em" textAlign="right" justifyContent="center">
-          {TABS.map(({ name }) => (
-            <Tab key={name}>{name}</Tab>
-          ))}
-        </TabList>
+        <Outlet />
+      </ResponsiveNav>
 
-        <TabPanels>
-          {TABS.map(({ name, Tab }) => (
-            <Flex as={TabPanel} flex={1} flexDir="column" h="100%" key={name}>
-              <Flex h="100%" flex={1} minH={0}>
-                <Tab />
-              </Flex>
+      <footer className="flex flex-row gap-2 w-full p-2 border-t border-base-200 bg-base-100">
+        <div className="grow inline-flex items-center">
+          {isSettingsNotSaved ? (
+            <span>
+              有未储存的更改，<span className="text-red-600">设定将在保存后生效</span>
+            </span>
+          ) : (
+            <span className="text-base-700">设定将在保存后生效</span>
+          )}
+        </div>
 
-              <VStack mt="4" alignItems="flex-start" w="full">
-                <Flex flexDir="row" gap="2" w="full">
-                  <Center>
-                    {isSettingsNotSaved ? (
-                      <Box color="gray">
-                        有未储存的更改{' '}
-                        <chakra.span color="red" wordBreak="keep-all">
-                          设定将在保存后生效
-                        </chakra.span>
-                      </Box>
-                    ) : (
-                      <Box color="gray">设定将在保存后生效</Box>
-                    )}
-                  </Center>
-                  <Spacer />
-                  <HStack gap="2" justifyContent="flex-end">
-                    <IconButton
-                      icon={<Icon as={MdOutlineSettingsBackupRestore} />}
-                      onClick={handleResetSettings}
-                      colorScheme="red"
-                      variant="ghost"
-                      title="放弃未储存的更改，将设定还原未储存前的状态。"
-                      aria-label="放弃未储存的更改"
-                    />
-                    <Button onClick={handleApplySettings}>保存</Button>
-                  </HStack>
-                </Flex>
-              </VStack>
-            </Flex>
-          ))}
-        </TabPanels>
-      </Tabs>
-    </Flex>
+        <div className="flex flex-row gap-2">
+          <button
+            className="btn btn-sm btn-ghost text-error"
+            onClick={handleResetSettings}
+            title="放弃未储存的更改，将设定还原未储存前的状态。"
+          >
+            <MdOutlineSettingsBackupRestore className="size-4" />
+          </button>
+          <button className="btn btn-sm btn-primary" onClick={handleApplySettings}>
+            保存
+          </button>
+        </div>
+      </footer>
+    </div>
   );
 }

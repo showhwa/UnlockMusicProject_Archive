@@ -1,25 +1,5 @@
-import {
-  Box,
-  Button,
-  ButtonGroup,
-  Code,
-  Flex,
-  HStack,
-  Heading,
-  Icon,
-  IconButton,
-  List,
-  Menu,
-  MenuButton,
-  MenuDivider,
-  MenuItem,
-  MenuList,
-  Text,
-  useToast,
-} from '@chakra-ui/react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { MdAdd, MdDeleteForever, MdExpandMore, MdFileUpload } from 'react-icons/md';
 
 import { ImportSecretModal } from '~/components/ImportSecretModal';
 import { parseAndroidKuwoEKey, parseIosKuwoEKey } from '~/util/mmkv/kuwo';
@@ -29,9 +9,11 @@ import { selectStagingKWMv2Keys } from '../settingsSelector';
 import { KWMv2EKeyItem } from './KWMv2/KWMv2EKeyItem';
 import type { StagingKWMv2Key } from '../keyFormats';
 import { KWMv2AllInstructions } from './KWMv2/KWMv2AllInstructions';
+import { AddKey } from '~/components/AddKey';
+import { KeyListContainer } from '~/components/KeyListContainer';
+import { toastImportResult } from '~/util/toastImportResult';
 
 export function PanelKWMv2Key() {
-  const toast = useToast();
   const dispatch = useDispatch();
   const kwm2Keys = useSelector(selectStagingKWMv2Keys);
   const [showImportModal, setShowImportModal] = useState(false);
@@ -46,70 +28,35 @@ export function PanelKWMv2Key() {
       keys = parseIosKuwoEKey(new DataView(await file.arrayBuffer()));
     }
 
-    if (keys?.length === 0) {
-      toast({
-        title: '未导入密钥',
-        description: '选择的密钥数据库文件未发现任何可用的密钥。',
-        isClosable: true,
-        status: 'warning',
-      });
-    } else if (keys) {
+    if (keys && keys.length > 0) {
       dispatch(kwm2ImportKeys(keys));
       setShowImportModal(false);
-      toast({
-        title: `导入完成，共导入了 ${keys.length} 个密钥。`,
-        description: '记得按下「保存」来应用。',
-        isClosable: true,
-        status: 'success',
-      });
-    } else {
-      toast({
-        title: `不支持的文件：${file.name}`,
-        isClosable: true,
-        status: 'error',
-      });
     }
+    toastImportResult(file.name, keys);
   };
 
+  const refKeyContainer = useRef<HTMLDivElement>(null);
   return (
-    <Flex minH={0} flexDir="column" flex={1}>
-      <Heading as="h2" size="lg">
-        酷我解密密钥（KwmV2）
-      </Heading>
+    <div className="container flex flex-col grow min-h-0 w-full">
+      <h2 className="text-2xl font-bold">酷我解密密钥（KwmV2）</h2>
+      <p>
+        酷我安卓版本的「臻品音质」已经换用 V2 版，表现为加密文件的后缀名为 <code>mflac</code> 或 <code>mgg</code>。
+      </p>
+      <p>该格式需要提取密钥后才能正常解密。</p>
 
-      <Text>
-        酷我安卓版本的「臻品音质」已经换用 V2 版，后缀名为 <Code>mflac</Code> 或沿用旧的 <Code>kwm</Code>。{''}
-        该格式需要提取密钥后才能正常解密。
-      </Text>
+      <h3 className="mt-2 text-xl font-bold">密钥管理</h3>
+      <AddKey
+        addKey={addKey}
+        refContainer={refKeyContainer}
+        importKeyFromFile={() => setShowImportModal(true)}
+        clearKeys={clearAll}
+      />
 
-      <HStack pb={2} pt={2}>
-        <ButtonGroup isAttached colorScheme="purple" variant="outline">
-          <Button onClick={addKey} leftIcon={<Icon as={MdAdd} />}>
-            添加一条密钥
-          </Button>
-          <Menu>
-            <MenuButton as={IconButton} icon={<MdExpandMore />}></MenuButton>
-            <MenuList>
-              <MenuItem onClick={() => setShowImportModal(true)} icon={<Icon as={MdFileUpload} boxSize={5} />}>
-                从文件导入密钥…
-              </MenuItem>
-              <MenuDivider />
-              <MenuItem color="red" onClick={clearAll} icon={<Icon as={MdDeleteForever} boxSize={5} />}>
-                清空密钥
-              </MenuItem>
-            </MenuList>
-          </Menu>
-        </ButtonGroup>
-      </HStack>
-
-      <Box flex={1} minH={0} overflow="auto" pr="4">
-        <List spacing={3}>
-          {kwm2Keys.map(({ id, ekey, quality, rid }, i) => (
-            <KWMv2EKeyItem key={id} id={id} ekey={ekey} quality={quality} rid={rid} i={i} />
-          ))}
-        </List>
-        {kwm2Keys.length === 0 && <Text>还没有添加密钥。</Text>}
-      </Box>
+      <KeyListContainer ref={refKeyContainer} keys={kwm2Keys}>
+        {kwm2Keys.map(({ id, ekey, quality, rid }, i) => (
+          <KWMv2EKeyItem key={id} id={id} ekey={ekey} quality={quality} rid={rid} i={i} />
+        ))}
+      </KeyListContainer>
 
       <ImportSecretModal
         clientName="酷我音乐"
@@ -119,6 +66,6 @@ export function PanelKWMv2Key() {
       >
         <KWMv2AllInstructions />
       </ImportSecretModal>
-    </Flex>
+    </div>
   );
 }

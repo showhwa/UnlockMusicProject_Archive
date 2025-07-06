@@ -1,5 +1,4 @@
-import { Box, Text } from '@chakra-ui/react';
-import { UnlockIcon } from '@chakra-ui/icons';
+import { FiUnlock } from 'react-icons/fi';
 
 import { useAppDispatch } from '~/hooks';
 import { addNewFile, processFile } from '~/features/file-listing/fileListingSlice';
@@ -12,7 +11,7 @@ export function SelectFile() {
     console.debug(
       'react-dropzone/onDropAccepted(%o, %o)',
       files.length,
-      files.map((x) => x.name)
+      files.map((x) => x.name),
     );
 
     for (const file of files) {
@@ -26,7 +25,7 @@ export function SelectFile() {
           id: fileId,
           blobURI,
           fileName,
-        })
+        }),
       );
       dispatch(processFile({ fileId }));
     }
@@ -34,19 +33,13 @@ export function SelectFile() {
 
   return (
     <FileInput multiple onReceiveFiles={handleFileReceived}>
-      <Box pb={3}>
-        <UnlockIcon boxSize={8} />
-      </Box>
-      <Text as="div" textAlign="center">
+      <FiUnlock className="size-8 mb-4" />
+      <p className="text-center">
         拖放或
-        <Text as="span" color="teal.400">
-          点我选择
-        </Text>
+        <span className="text-teal-700 font-semibold">点我选择</span>
         需要解密的文件
-        <Text fontSize="sm" opacity="50%">
-          在浏览器内对文件进行解锁，零上传
-        </Text>
-      </Text>
+      </p>
+      <p className="text-sm opacity-50 m-0">在浏览器内对文件进行解锁，零上传</p>
     </FileInput>
   );
 }

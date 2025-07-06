@@ -1,26 +1,14 @@
-import {
-  Box,
-  Code,
-  Flex,
-  FormControl,
-  FormHelperText,
-  FormLabel,
-  Heading,
-  Input,
-  ListItem,
-  Text,
-  UnorderedList,
-} from '@chakra-ui/react';
-
 import { useAppDispatch, useAppSelector } from '~/hooks';
 import { ExtLink } from '~/components/ExtLink';
-import { ChangeEvent, ClipboardEvent } from 'react';
+import { ChangeEvent, ClipboardEvent, useId } from 'react';
 import { VQuote } from '~/components/HelpText/VQuote';
 import { selectStagingQtfmAndroidKey } from '../settingsSelector';
 import { qtfmAndroidUpdateKey } from '../settingsSlice';
 import { workerClientBus } from '~/decrypt-worker/client.ts';
 import { GetQingTingFMDeviceKeyPayload } from '~/decrypt-worker/types.ts';
 import { DECRYPTION_WORKER_ACTION_NAME } from '~/decrypt-worker/constants.ts';
+import { Ruby } from '~/components/Ruby';
+import { HiWord } from '~/components/HelpText/HiWord';
 
 const QTFM_DEVICE_ID_URL = 'https://github.com/parakeet-rs/qtfm-device-id/releases/latest';
 
@@ -64,64 +52,76 @@ export function PanelQingTing() {
     setSecretKey(e.target.value);
   };
 
+  const idSecretKey = useId();
+
   return (
-    <Flex minH={0} flexDir="column" flex={1}>
-      <Heading as="h2" size="lg">
-        <VQuote>蜻蜓 FM</VQuote>
-        设备密钥
-      </Heading>
+    <div className="min-h-0 flex-col grow px-1">
+      <h2 className="text-2xl font-bold mb-4">蜻蜓 FM</h2>
 
-      <Text>
+      <p>
         <VQuote>蜻蜓 FM</VQuote>的安卓版本需要获取设备密钥，并以此来生成解密密钥。
-      </Text>
-      <Box mt={3} mb={3}>
-        <FormControl>
-          <FormLabel>设备密钥</FormLabel>
-          <Input type="text" onPaste={handleDataPaste} value={secretKey} onChange={handleDataInput} />
-          <FormHelperText>
-            {'粘贴含有设备密钥的信息的内容时将自动提取密钥（如通过 '}
+      </p>
+
+      <div className="my-4">
+        <fieldset className="fieldset">
+          <legend className="fieldset-legend text-lg">
+            <label htmlFor={idSecretKey}>设备密钥</label>
+          </legend>
+          <input
+            id={idSecretKey}
+            type="text"
+            className="input font-mono"
+            onPaste={handleDataPaste}
+            value={secretKey}
+            onChange={handleDataInput}
+          />
+          <p className="label flex-wrap">
+            粘贴含有设备密钥的信息的内容时将自动提取密钥（如通过
             <ExtLink href={QTFM_DEVICE_ID_URL}>
-              <Code>qtfm-device-id</Code>
+              <code>qtfm-device-id</code>
             </ExtLink>
-            {' 获取的设备信息）。'}
-          </FormHelperText>
-        </FormControl>
-      </Box>
+            获取的设备信息），不需要 root。
+          </p>
+        </fieldset>
+      </div>
 
-      <Heading as="h3" size="md" pt={3} pb={2}>
-        注意事项
-      </Heading>
-      <UnorderedList>
-        <ListItem>
-          <Text>
+      <h3 className="text-xl font-bold my-2">注意事项</h3>
+      <ul className="list-disc pl-6">
+        <li>
+          <p>
             下载的文件位于
-            <Code>[内部储存]/Android/data/fm.qingting.qtradio/files/Music/</Code>
-          </Text>
-
-          <UnorderedList>
-            <ListItem>
-              <Text>
+            <VQuote>
+              <code className="break-words">
+                <HiWord>[内部储存]</HiWord>/<wbr />
+                Android/
+                <wbr />
+                data/
+                <wbr />
+                fm.qingting.qtradio/
+                <wbr />
+                files/Music/
+              </code>
+            </VQuote>
+          </p>
+          <ul className="list-disc pl-6">
+            <li>
+              <p>
                 你可能需要使用有
-                <ruby>
-                  特权
-                  <rp> (</rp>
-                  <rt>root</rt>
-                  <rp>)</rp>
-                </ruby>
+                <Ruby caption="root">特权</Ruby>
                 的文件浏览器访问。
-              </Text>
-            </ListItem>
-          </UnorderedList>
-        </ListItem>
-        <ListItem>
-          <Text>
-            音频文件文件名为「<Code>.p~!</Code>」前缀。
-          </Text>
-        </ListItem>
-        <ListItem>
-          <Text>因为解密密钥与文件名相关，因此解密前请不要更改文件名。</Text>
-        </ListItem>
-      </UnorderedList>
-    </Flex>
+              </p>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <p>
+            音频文件文件名为「<code>.p~!</code>」前缀。
+          </p>
+        </li>
+        <li>
+          <p>因为解密密钥与文件名相关，因此解密前请不要更改文件名。</p>
+        </li>
+      </ul>
+    </div>
   );
 }

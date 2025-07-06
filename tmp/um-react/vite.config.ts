@@ -8,8 +8,10 @@ import wasm from 'vite-plugin-wasm';
 import replace from '@rollup/plugin-replace';
 import topLevelAwait from 'vite-plugin-top-level-await';
 import { VitePWA } from 'vite-plugin-pwa';
+import tailwindcss from '@tailwindcss/vite';
 
 import { tryCommand } from './support/command';
+import { base64Loader } from './support/b64-loader';
 
 const projectRoot = url.fileURLToPath(new URL('.', import.meta.url));
 const pkg = JSON.parse(fs.readFileSync(projectRoot + '/package.json', 'utf-8'));
@@ -38,11 +40,12 @@ export default defineConfig({
       ],
     },
   },
-  base: './',
   optimizeDeps: {
     exclude: ['@unlock-music/crypto', 'sql.js'],
   },
   plugins: [
+    tailwindcss(),
+    base64Loader,
     replace({
       preventAssignment: true,
       values: {
@@ -92,13 +95,14 @@ export default defineConfig({
     },
   },
   build: {
+    minify: true,
     rollupOptions: {
       output: {
         manualChunks: {
-          reacts: ['react', 'react-dom', 'react-dropzone', 'react-promise-suspense', 'react-redux', '@reduxjs/toolkit'],
-          chakra: ['@chakra-ui/react', '@emotion/react', '@emotion/styled', 'framer-motion'],
-          icons: ['react-icons', '@chakra-ui/icons'],
-          utility: ['radash', 'nanoid', 'react-syntax-highlighter'],
+          core: ['react', 'react-dom'],
+          router: ['react-router'],
+          store: ['react-redux', '@reduxjs/toolkit'],
+          extras: ['react-dropzone', 'react-toastify'],
         },
       },
     },

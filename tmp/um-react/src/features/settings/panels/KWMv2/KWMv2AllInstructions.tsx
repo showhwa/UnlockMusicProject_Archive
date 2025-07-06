@@ -1,30 +1,16 @@
-import { Tab, TabList, TabPanel, TabPanels } from '@chakra-ui/react';
 import { AndroidADBPullInstruction } from '~/components/AndroidADBPullInstruction/AndroidADBPullInstruction';
 import { InstructionsPC } from './InstructionsPC';
 import { InstructionsIOS } from './InstructionsIOS';
+import { InstructionsTabs, InstructionTab } from '~/components/InstructionsTabs';
 
 export function KWMv2AllInstructions() {
-  return (
-    <>
-      <TabList>
-        <Tab>安卓</Tab>
-        <Tab>iOS</Tab>
-        <Tab>Windows</Tab>
-      </TabList>
-      <TabPanels flex={1} overflow="auto">
-        <TabPanel>
-          <AndroidADBPullInstruction
-            dir="/data/data/cn.kuwo.player/files/mmkv"
-            file="cn.kuwo.player.mmkv.defaultconfig"
-          />
-        </TabPanel>
-        <TabPanel>
-          <InstructionsIOS />
-        </TabPanel>
-        <TabPanel>
-          <InstructionsPC />
-        </TabPanel>
-      </TabPanels>
-    </>
-  );
+  const ANDROID_DIR = '/data/data/cn.kuwo.player/files/mmkv';
+  const ANDROID_FILE = 'cn.kuwo.player.mmkv.defaultconfig';
+  const tabs: InstructionTab[] = [
+    { id: 'android', label: '安卓', content: <AndroidADBPullInstruction dir={ANDROID_DIR} file={ANDROID_FILE} /> },
+    { id: 'ios', label: 'iOS', content: <InstructionsIOS /> },
+    { id: 'windows', label: 'Windows', content: <InstructionsPC /> },
+  ];
+
+  return <InstructionsTabs tabs={tabs} />;
 }

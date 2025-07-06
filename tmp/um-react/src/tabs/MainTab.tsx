@@ -1,4 +1,4 @@
-import { Alert, AlertIcon, Box, Button, Flex, Text, VStack } from '@chakra-ui/react';
+import { RiErrorWarningLine } from 'react-icons/ri';
 import { SelectFile } from '../components/SelectFile';
 
 import { FileListing } from '~/features/file-listing/FileListing';
@@ -14,29 +14,32 @@ export function MainTab() {
   };
 
   return (
-    <Box h="full" w="full" pt="4">
-      <VStack gap="3">
+    <div className="size-full max-w-[80%] self-center pt-4">
+      <div className="gap-3 flex flex-col">
         {isSettingsNotSaved && (
-          <Alert borderRadius={7} maxW={400} status="warning">
-            <AlertIcon />
-            <Flex flexDir="row" alignItems="center" flexGrow={1} justifyContent="space-between">
-              <Text m={0}>
-                有尚未储存的设置，
-                <br />
-                设定将在保存后生效
-              </Text>
-              <Button type="button" ml={3} size="md" onClick={onClickSaveSettings}>
+          <div role="alert" className="alert alert-warning gap-2">
+            <span className="md:flex flex-row items-center gap-1">
+              <RiErrorWarningLine className="size-6" />
+              <span className="font-bold hidden md:inline">警告</span>
+            </span>
+            <div>
+              <span className="block font-bold md:hidden">警告</span>
+              <span>有尚未储存的设置，</span>
+              <span className="inline-block">设定将在保存后生效。</span>
+            </div>
+            <div>
+              <button type="button" className="btn btn-primary btn-sm" onClick={onClickSaveSettings}>
                 立即储存
-              </Button>
-            </Flex>
-          </Alert>
+              </button>
+            </div>
+          </div>
         )}
         <SelectFile />
 
-        <Box w="full">
+        <div className="w-full mt-4">
           <FileListing />
-        </Box>
-      </VStack>
-    </Box>
+        </div>
+      </div>
+    </div>
   );
 }

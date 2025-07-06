@@ -5,9 +5,11 @@ import type { RootState } from '~/store';
 import { DECRYPTION_WORKER_ACTION_NAME, type DecryptionResult } from '~/decrypt-worker/constants';
 import type {
   DecryptCommandOptions,
-  FetchMusicExNamePayload, ParseKugouHeaderPayload, ParseKugouHeaderResponse,
+  FetchMusicExNamePayload,
+  ParseKugouHeaderPayload,
+  ParseKugouHeaderResponse,
   ParseKuwoHeaderPayload,
-  ParseKuwoHeaderResponse
+  ParseKuwoHeaderResponse,
 } from '~/decrypt-worker/types';
 import { decryptionQueue, workerClientBus } from '~/decrypt-worker/client';
 import { DecryptErrorType } from '~/decrypt-worker/util/DecryptError';
@@ -15,8 +17,9 @@ import {
   selectKugouKey,
   selectKWMv2Key,
   selectQMCv2KeyByFileName,
-  selectQtfmAndroidKey
+  selectQtfmAndroidKey,
 } from '../settings/settingsSelector';
+import { cleanFilename } from '~/util/cleanFilename';
 
 export enum ProcessState {
   QUEUED = 'QUEUED',
@@ -40,6 +43,7 @@ export interface AudioMetadata {
 
 export interface DecryptedAudioFile {
   fileName: string;
+  cleanName: string;
   raw: string; // blob uri
   ext: string;
   decrypted: string; // blob uri
@@ -106,6 +110,7 @@ export const fileListingSlice = createSlice({
     addNewFile: (state, { payload }: PayloadAction<{ id: string; fileName: string; blobURI: string }>) => {
       state.files[payload.id] = {
         fileName: payload.fileName,
+        cleanName: cleanFilename(payload.fileName),
         raw: payload.blobURI,
         decrypted: '',
         ext: '',

@@ -9,15 +9,48 @@ use std::path::Path;
 #[cfg(target_os = "windows")]
 use tao::platform::windows::WindowBuilderExtWindows;
 
+use http::header::{CONTENT_LENGTH, CONTENT_TYPE};
+use once_cell::sync::Lazy;
 use tao::{
     event::{Event, WindowEvent},
     event_loop::{ControlFlow, EventLoop},
     window::{Icon, WindowBuilder},
 };
-use wry::{http::header::CONTENT_TYPE, WebContext, WebViewBuilder};
+use wry::{WebContext, WebViewBuilder};
 use zip::ZipArchive;
 
 static APP_UUID: &str = "39abaebb-57b1-4c12-ab88-321fd7a93354";
+
+static COMMON_MIMETYPES: Lazy<HashMap<&'static str, &'static str>> = Lazy::new(|| {
+    let mut m = HashMap::new();
+    m.insert("html", "text/html");
+    m.insert("htm", "text/html");
+    m.insert("js", "application/javascript");
+    m.insert("mjs", "application/javascript");
+    m.insert("json", "application/json");
+    m.insert("jpg", "image/jpeg");
+    m.insert("jpeg", "image/jpeg");
+    m.insert("png", "image/png");
+    m.insert("gif", "image/gif");
+    m.insert("svg", "image/svg+xml");
+    m.insert("webp", "image/webp");
+    m.insert("woff", "font/woff");
+    m.insert("woff2", "font/woff2");
+    m.insert("avif", "image/avif");
+    m.insert("ttf", "font/ttf");
+    m.insert("otf", "font/otf");
+    m.insert("eot", "application/vnd.ms-fontobject");
+    m.insert("css", "text/css");
+    m.insert("wasm", "application/wasm");
+    m.insert("ico", "image/vnd.microsoft.icon");
+    m
+});
+
+fn get_mimetype(ext: &str) -> &'static str {
+    COMMON_MIMETYPES
+        .get(ext)
+        .unwrap_or(&"application/octet-stream")
+}
 
 fn parse_zip<R: Read + Seek>(reader: R) -> HashMap<String, Vec<u8>> {
     let mut archive = ZipArchive::new(reader).expect("Failed to open ZIP archive");
@@ -85,44 +118,26 @@ fn main() -> wry::Result<()> {
     };
 
     let event_loop = EventLoop::new();
-    let window = WindowBuilder::new()
+
+    let window_builder = WindowBuilder::new()
         .with_title(format!("um-react-wry 桌面客户端 - {}", version_suffix))
         .with_maximized(true);
 
     #[cfg(target_os = "windows")]
-    let window = window.with_taskbar_icon(Some(load_icon(include_bytes!("um-react@192.webp"))));
+    let window_builder = window_builder.with_taskbar_icon(Some(load_icon(include_bytes!("um-react@192.webp"))));
 
-    let window = window.build(&event_loop).unwrap();
+    let window = window_builder.build(&event_loop).unwrap();
 
     #[cfg(any(target_os = "windows", target_os = "linux"))]
     window.set_window_icon(Some(load_icon(include_bytes!("um-react@16.webp"))));
 
-    #[cfg(any(
-        target_os = "windows",
-        target_os = "macos",
-        target_os = "ios",
-        target_os = "android"
-    ))]
-    let builder = WebViewBuilder::new(&window);
-
-    #[cfg(not(any(
-        target_os = "windows",
-        target_os = "macos",
-        target_os = "ios",
-        target_os = "android"
-    )))]
-    let builder = {
-        use tao::platform::unix::WindowExtUnix;
-        use wry::WebViewBuilderExtUnix;
-        let vbox = window.default_vbox().unwrap();
-        WebViewBuilder::new_gtk(vbox)
-    };
-
     let mut web_ctx = WebContext::new(Some(tmp_data_dir));
+    #[cfg(any(target_os = "windows", target_os = "macos"))]
+    let builder = WebViewBuilder::new_with_web_context(&mut web_ctx);
+
     let _webview = builder
-        .with_web_context(&mut web_ctx)
-        .with_url("umr://app/index.html")?
-        .with_custom_protocol("umr".into(), move |request| {
+        .with_url("umr://app/")
+        .with_custom_protocol("umr".into(), move |_id, request| {
             match get_umr_resource(request, &zip_content) {
                 Ok(r) => r.map(Into::into),
                 Err(e) => http::Response::builder()
@@ -133,7 +148,8 @@ fn main() -> wry::Result<()> {
                     .map(Into::into),
             }
         })
-        .build()?;
+        .build(&window)
+        .unwrap();
 
     event_loop.run(move |event, _, control_flow| {
         *control_flow = ControlFlow::Wait;
@@ -165,20 +181,17 @@ fn get_umr_resource(
         .or_else(|| zip_content.get("index.html"))
         .ok_or("file not found in zip")?;
 
-    let mimetype = if path.ends_with(".html") || path.ends_with("/") {
+    let mimetype = if path.ends_with("/") {
         "text/html"
-    } else if path.ends_with(".js") {
-        "application/javascript"
-    } else if path.ends_with(".wasm") {
-        "application/wasm"
-    } else if path.ends_with(".ico") {
-        "image/vnd.microsoft.icon"
     } else {
-        "application/octet-stream"
+        let ext = path.rsplit('.').next().unwrap_or("bin").to_lowercase();
+        get_mimetype(&ext)
     };
 
     http::Response::builder()
         .header(CONTENT_TYPE, mimetype)
+        .header(CONTENT_LENGTH, file_body.len())
+        .header("X-Server", "um-react-wry-stub")
         .body(file_body.clone())
         .map_err(Into::into)
 }

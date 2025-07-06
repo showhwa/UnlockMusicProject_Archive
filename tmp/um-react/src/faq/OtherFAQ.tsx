@@ -1,139 +1,109 @@
-import { Alert, AlertIcon, Code, Container, Flex, Img, ListItem, Text, UnorderedList } from '@chakra-ui/react';
 import { ExtLink } from '~/components/ExtLink';
-import { Header4 } from '~/components/HelpText/Headers';
-import { VQuote } from '~/components/HelpText/VQuote';
+import { Header2, Header3, Header4 } from '~/components/HelpText/Headers';
 import { ProjectIssue } from '~/components/ProjectIssue';
-import LdPlayerSettingsScreen from './assets/ld_settings_misc.webp';
+
+import { NavLink } from 'react-router';
 
 export function OtherFAQ() {
   return (
     <>
-      <Header4>解密后没有封面等信息</Header4>
-      <Text>该项目进行解密处理。如果加密前的资源没有内嵌元信息或封面，解密的文件也没有。</Text>
-      <Text>请使用第三方工具进行编辑或管理元信息。</Text>
+      <Header2>其它问题</Header2>
+      <Header3 id="metadata">解密后没有封面等信息</Header3>
+      <p>该项目进行解密处理。如果加密前的资源没有内嵌元信息或封面，解密的文件也没有。</p>
+      <p>请使用第三方工具进行编辑或管理元信息。</p>
 
-      <Header4>批量下载</Header4>
-      <Text>
+      <Header3 id="batch-dl">批量下载</Header3>
+      <p>
         {'暂时没有实现，不过你可以在 '}
         <ProjectIssue id={34} title="[UI] 全部下载功能" />
         {' 以及 '}
         <ProjectIssue id={43} title="批量下载" />
         {' 追踪该问题。'}
-      </Text>
+      </p>
 
-      <Header4>安卓: 浏览器支持说明</Header4>
-      <Text>⚠️ 手机端浏览器支持有限，请使用最新版本的 Chrome 或 Firefox 官方浏览器。</Text>
-      <Text>已知有问题的浏览器：</Text>
-      <UnorderedList>
-        <ListItem>Via 浏览器</ListItem>
-        <ListItem>夸克浏览器</ListItem>
-        <ListItem>UC 浏览器</ListItem>
-      </UnorderedList>
-      <Text>可能会遇到的问题包括：</Text>
-      <UnorderedList>
-        <ListItem>网页白屏</ListItem>
-        <ListItem>无法下载解密后内容</ListItem>
-        <ListItem>下载的文件名错误</ListItem>
-      </UnorderedList>
+      <Header3 id="android-browsers">安卓: 浏览器支持说明</Header3>
+      <p>⚠️ 手机端浏览器支持有限，请使用最新版本的 Chrome 或 Firefox 官方浏览器。</p>
+      <div className="flex flex-col md:flex-row gap-2 md:gap-8">
+        <div>
+          <Header4>已知有问题的浏览器</Header4>
+          <ul className="list-disc list-inside pl-2">
+            <li>Via 浏览器</li>
+            <li>夸克浏览器</li>
+            <li>UC 浏览器</li>
+          </ul>
+        </div>
 
-      <Header4>安卓: root 相关说明</Header4>
-      <Text>
+        <div>
+          <Header4>可能会遇到的问题包括</Header4>
+          <ul className="list-disc list-inside pl-2">
+            <li>网页白屏</li>
+            <li>无法下载解密后内容</li>
+            <li>下载的文件名错误</li>
+          </ul>
+        </div>
+      </div>
+
+      <Header3 id="android-root">安卓 root</Header3>
+      <p>
         对安卓设备获取 root 特权通常会破坏系统的完整性并导致部分功能无法使用。
-        例如部分厂商的安卓设备会在解锁后丧失保修资格，或导致无法使用 NFC 移动支付功能等限制。
-      </Text>
-      <Text>如果希望不破坏系统完整性，你可以考虑使用模拟器。</Text>
-      <Text>
-        目前常见的带有 root 特权支持的的安卓模拟器方案，分别是雷电模拟器（※ 官方版有内置广告）和微软在 Windows 11
-        开始支援的
-        <ExtLink href="https://learn.microsoft.com/zh-cn/windows/android/wsa/">
-          <ruby>
-            适用于 Android™ 的 Windows 子系统 (WSA)
-            <rp> (</rp>
-            <rt>
-              <code>Windows Subsystem for Android</code>
-            </rt>
-            <rp>)</rp>
-          </ruby>
-        </ExtLink>
+        例如部分厂商的安卓设备会在解锁后丧失保修资格，或导致无法使用 NFC 移动支付等限制。
+      </p>
+      <p className="my-2">
+        如果希望不破坏系统完整性，你可以考虑在电脑上使用
+        <NavLink className="link link-info" to="/questions/android-emu">
+          安卓模拟器
+        </NavLink>
         。
-      </Text>
+      </p>
 
-      <Container p={2}>
-        <Alert status="warning" borderRadius={5}>
-          <AlertIcon />
-          <Flex flexDir="column">
-            <Text>
-              <strong>注意</strong>：根据应用的风控策略，使用模拟器登录的账号<strong>有可能会导致账号被封锁</strong>
-              {'；使用前请自行评估风险。'}
-            </Text>
-          </Flex>
-        </Alert>
-      </Container>
-
-      <UnorderedList>
-        <ListItem>
-          <Text>
-            {'WSA 可以参考 '}
-            <ExtLink href="https://github.com/LSPosed/MagiskOnWSALocal">MagiskOnWSALocal</ExtLink>
-            {' 的说明操作。'}
-          </Text>
-        </ListItem>
-        <ListItem>
-          <Text>
-            雷电模拟器可以在<VQuote>模拟器设置</VQuote> → <VQuote>其他设置</VQuote>中启用 root 特权。
-          </Text>
-          <Img borderRadius={5} border="1px solid #ccc" src={LdPlayerSettingsScreen}></Img>
-        </ListItem>
-      </UnorderedList>
-
-      <Header4>相关项目</Header4>
-      <UnorderedList>
-        <ListItem>
-          <Text>
-            <ExtLink href="https://github.com/CarlGao4/um-react-electron">
+      <Header3 id="projects">相关项目</Header3>
+      <ul className="list-disc pl-6">
+        <li>
+          <p>
+            <ExtLink className="mr-2" href="https://github.com/CarlGao4/um-react-electron">
               <strong>
-                <Code>um-react-electron</Code>
+                <code>um-react-electron</code>
               </strong>
             </ExtLink>
-            ：利用 Electron 框架打包的本地版，提供适用于 Windows、Linux 和 Mac 平台的可执行文件。
-          </Text>
-          <UnorderedList>
-            <ListItem>
-              <Text>
+            利用 Electron 框架打包的本地版，提供适用于 Windows、Linux 和 Mac 平台的可执行文件。
+          </p>
+          <ul className="list-disc pl-6">
+            <li>
+              <p>
                 <ExtLink href="https://github.com/CarlGao4/um-react-electron/releases/latest">GitHub 下载</ExtLink>
-              </Text>
-            </ListItem>
-          </UnorderedList>
-        </ListItem>
-        <ListItem>
-          <Text>
-            <ExtLink href="https://git.unlock-music.dev/um/um-react-wry">
+              </p>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <p>
+            <ExtLink className="mr-2" href="https://git.unlock-music.dev/um/um-react-wry">
               <strong>
-                <Code>um-react-wry</Code>
+                <code>um-react-wry</code>
               </strong>
             </ExtLink>
-            : 使用 WRY 框架封装的 Win64 单文件（需要
+            使用 WRY 框架封装的 Win64 单文件（需要
             <ExtLink href="https://go.microsoft.com/fwlink/p/?LinkId=2124703">安装 Edge WebView2 运行时</ExtLink>
             {'，Win10+ 操作系统自带）'}
-          </Text>
-          <UnorderedList>
-            <ListItem>
-              <Text>
+          </p>
+          <ul className="list-disc pl-6">
+            <li>
+              <p>
                 <ExtLink href="https://git.unlock-music.dev/um/um-react/releases/latest">仓库下载</ExtLink>
                 {' | 寻找文件名为 '}
-                <Code>um-react-win64-</Code> 开头的附件
-              </Text>
-            </ListItem>
-          </UnorderedList>
-        </ListItem>
-      </UnorderedList>
+                <code>um-react-win64-</code> 开头的附件
+              </p>
+            </li>
+          </ul>
+        </li>
+      </ul>
 
-      <Header4>有更多问题？</Header4>
-      <Text>
-        {'欢迎进入 '}
-        <ExtLink href={'https://t.me/unlock_music_chat'}>Telegram “音乐解锁-交流” 交流群</ExtLink>
-        {' 一起探讨。'}
-      </Text>
+      <Header3 id="more-questions">有更多问题？</Header3>
+      <p className="flex flex-row gap-1">
+        欢迎加入
+        <ExtLink href={'https://t.me/unlock_music_chat'}>“音乐解锁-交流” 交流群</ExtLink>
+        一起讨论。
+      </p>
     </>
   );
 }

@@ -6,20 +6,21 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-wry = { version = "0.35.1", optional = true }
-tao = { version = "0.24", default-features = false, optional = true, features = [
+wry = { version = "0.52", optional = true }
+tao = { version = "0.34", default-features = false, optional = true, features = [
     "rwh_05",
+    "rwh_06",
 ] }
-image = { version = "0.24", default-features = true, optional = true, features = [
+image = { version = "0.25", default-features = true, optional = true, features = [
     "webp",
     "ico",
 ] }
 
-zip = { version = "0.6.6" }
-http = { version = "0.2" }
-bytes = { version = "1.5.0" }
-clap = { version = "4.4.12", features = ["derive"] }
-dirs = { version = "5.0.1" }
+zip = { version = "4.2" }
+http = { version = "1.3" }
+clap = { version = "4.5", features = ["derive"] }
+dirs = { version = "6.0" }
+once_cell = { version = "1.21" }
 
 [build-dependencies]
 winres = "0.1"
@@ -40,3 +41,4 @@ path = "src/builder.rs"
 opt-level = "z"
 debug = false
 lto = true
+strip = true

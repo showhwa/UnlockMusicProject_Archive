@@ -1,6 +1,7 @@
 import { DecryptedAudioFile, ProcessState } from '../../fileListingSlice';
 
 export const untouchedFile: DecryptedAudioFile = {
+  cleanName: 'ready',
   fileName: 'ready.bin',
   raw: 'blob://localhost/file-a',
   decrypted: '',
@@ -13,6 +14,7 @@ export const untouchedFile: DecryptedAudioFile = {
 
 export const completedFile: DecryptedAudioFile = {
   fileName: 'hello-b.bin',
+  cleanName: 'hello-b',
   raw: 'blob://localhost/file-b',
   decrypted: 'blob://localhost/file-b-decrypted',
   ext: 'flac',
@@ -30,6 +32,7 @@ export const completedFile: DecryptedAudioFile = {
 
 export const fileWithError: DecryptedAudioFile = {
   fileName: 'hello-c.bin',
+  cleanName: 'hello-c',
   raw: 'blob://localhost/file-c',
   decrypted: 'blob://localhost/file-c-decrypted',
   ext: 'flac',

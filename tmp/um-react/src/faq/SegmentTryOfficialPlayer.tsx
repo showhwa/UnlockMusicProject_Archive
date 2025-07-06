@@ -1,12 +1,10 @@
-import { Alert, AlertIcon, Container } from '@chakra-ui/react';
+import { RiErrorWarningLine } from 'react-icons/ri';
 
-export function SegmentTryOfficialPlayer() {
+export function SegmentTryOfficialPlayer({ className = '' }: { className?: string }) {
   return (
-    <Container p={2} my={2} pt={0}>
-      <Alert status="info" borderRadius={5}>
-        <AlertIcon />
-        尝试用下载音乐的设备播放一次看看，如果官方客户端都无法播放，那解锁肯定会失败哦。
-      </Alert>
-    </Container>
+    <div className={`alert alert-warning my-2 ${className}`}>
+      <RiErrorWarningLine className="text-2xl" />
+      <p>尝试用下载音乐的设备播放一次看看，如果官方客户端都无法播放，那解锁肯定会失败哦。</p>
+    </div>
   );
 }

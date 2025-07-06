@@ -6,3 +6,8 @@ module 'virtual:pwa-register' {
    */
   declare function registerSW(_opts: unknown): () => void;
 }
+
+declare module '*?base64' {
+  const content: string;
+  export default content;
+}
