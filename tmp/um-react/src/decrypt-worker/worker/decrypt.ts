@@ -6,7 +6,7 @@ import { DecipherFactory, DecipherInstance, Status } from '~/decrypt-worker/Deci
 import { UnsupportedSourceFile } from '~/decrypt-worker/util/DecryptError.ts';
 import { ready as umCryptoReady } from '@unlock-music/crypto';
 import { go } from '~/util/go.ts';
-import { detectAudioExtension } from '~/decrypt-worker/util/audioType.ts';
+import { getMimeTypeFromExt, detectAudioExtension } from '~/decrypt-worker/util/audioType.ts';
 
 class DecryptCommandHandler {
   private readonly label: string;
@@ -75,7 +75,7 @@ class DecryptCommandHandler {
       audioExt = 'm4a';
     }
 
-    return { decrypted: URL.createObjectURL(toBlob(result.data)), ext: audioExt };
+    return { decrypted: URL.createObjectURL(toBlob(result.data, getMimeTypeFromExt(audioExt))), ext: audioExt };
   }
 }
 
