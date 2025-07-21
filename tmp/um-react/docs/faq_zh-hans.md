@@ -69,7 +69,7 @@
 
 - WSA 可以参考 [MagiskOnWSALocal](https://github.com/LSPosed/MagiskOnWSALocal) 的说明操作。
 - 雷电模拟器可以在「模拟器设置」 → 「其他设置」中启用 root 特权。
-  ![雷电模拟器 其他设置](../src/faq/assets/ld_settings_misc.webp)
+  ![雷电模拟器 其他设置](../src/faq/assets/ld_settings_misc@2x.webp)
 
 ### Via 等浏览器无法正常解密/下载
 
@@ -86,10 +86,6 @@
 - 网页白屏
 - 无法下载解密后内容
 - 下载的文件名错误
-
-### 新版解锁网站没有批量下载
-
-目前没有做。抱歉。
 
 ## 仍有问题？
 

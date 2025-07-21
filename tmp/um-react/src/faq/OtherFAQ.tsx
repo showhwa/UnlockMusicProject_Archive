@@ -1,6 +1,5 @@
 import { ExtLink } from '~/components/ExtLink';
 import { Header2, Header3, Header4 } from '~/components/HelpText/Headers';
-import { ProjectIssue } from '~/components/ProjectIssue';
 
 import { NavLink } from 'react-router';
 
@@ -11,15 +10,6 @@ export function OtherFAQ() {
       <Header3 id="metadata">解密后没有封面等信息</Header3>
       <p>该项目进行解密处理。如果加密前的资源没有内嵌元信息或封面，解密的文件也没有。</p>
       <p>请使用第三方工具进行编辑或管理元信息。</p>
-
-      <Header3 id="batch-dl">批量下载</Header3>
-      <p>
-        {'暂时没有实现，不过你可以在 '}
-        <ProjectIssue id={34} title="[UI] 全部下载功能" />
-        {' 以及 '}
-        <ProjectIssue id={43} title="批量下载" />
-        {' 追踪该问题。'}
-      </p>
 
       <Header3 id="android-browsers">安卓: 浏览器支持说明</Header3>
       <p>⚠️ 手机端浏览器支持有限，请使用最新版本的 Chrome 或 Firefox 官方浏览器。</p>
