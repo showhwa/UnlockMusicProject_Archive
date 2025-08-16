@@ -43,23 +43,42 @@ func (m *ncmMetaMusic) GetAlbumImageURL() string {
 	return m.AlbumPic
 }
 
-func (m *ncmMetaMusic) GetArtists() []string {
-	m.logger.Debug("ncm artists", zap.Any("artists", m.Artist))
 
-	var artists []string = nil
-	if jsonArtists, ok := m.Artist.([][]string); ok {
-		for _, artist := range jsonArtists {
-			for _, name := range artist {
-				artists = append(artists, name)
+func (m *ncmMetaMusic) GetArtists() []string {
+	m.logger.Debug("ncm artists raw", zap.Any("artists", m.Artist))
+	var artists []string
+	switch v := m.Artist.(type) {
+
+	// Case 1: Handles the format [['artistA'], ['artistB']]
+	case [][]string:
+		for _, artistSlice := range v {
+			artists = append(artists, artistSlice...)
+		}
+
+	// Case 2: Handles the simple format "artistA"
+	// Ref: https://git.unlock-music.dev/um/cli/issues/78
+	case string:
+		artists = []string{v}
+
+	// Case 3: Handles the mixed-type format [['artistA', 12345], ['artistB', 67890]]
+	// This is the key fix for correctly parsing artist info from certain files.
+	case []interface{}:
+		for _, item := range v {
+			if innerSlice, ok := item.([]interface{}); ok {
+				if len(innerSlice) > 0 {
+					// Assume the first element is the artist's name.
+					if artistName, ok := innerSlice[0].(string); ok {
+						artists = append(artists, artistName)
+					}
+				}
 			}
 		}
-	} else if artist, ok := m.Artist.(string); ok {
-		// #78: artist is a string type.
-		// https://git.unlock-music.dev/um/cli/issues/78
-		artists = []string{artist}
-	} else {
+
+	default:
+		// Log a warning if the artist type is unexpected and not handled.
 		m.logger.Warn("unexpected artist type", zap.Any("artists", m.Artist))
 	}
+
 	return artists
 }
 
