@@ -46,7 +46,8 @@ for project in projects:
         if session.head(repo).status_code == 200:
             tar_name = f"code/{formatted_date}/{project}.tar.zst"
             os.system(f'git clone {repo} {project}')
-            os.system(f"find . -type f -exec sed -i 's|{domain}|https://git\.unlock-music\.dev|g' {{}} \;")
+            # os.system(f"find . -type f -exec sed -i 's|{domain}|https://git\.unlock-music\.dev|g' {{}} \;")
+            os.system(f"find . -type f -exec sed -i 's|{domain}|https://git\.um-react\.app|g' {{}} \;")
             os.system(f'tar -I zstd -cf {tar_name} {project}')
             os.system(f'rm -rf {project}/.git')
             os.system(f"mv {project} tmp/")
@@ -64,3 +65,4 @@ if not error_log:
 else:
     with open("error_log.txt", "w", encoding="utf-8") as file:
         file.write(error_log)
+
