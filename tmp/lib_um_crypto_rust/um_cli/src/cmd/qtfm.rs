@@ -48,8 +48,8 @@ impl ArgsQingTingFM {
         let iv = make_decipher_iv(&file_name)?;
         if cli.verbose {
             eprintln!(" file_name: {}", file_name);
-            eprintln!("device_key: {}", hex::encode(&device_key));
-            eprintln!("   file_iv: {}", hex::encode(&iv));
+            eprintln!("device_key: {}", hex::encode(device_key));
+            eprintln!("   file_iv: {}", hex::encode(iv));
         }
 
         let decipher = Decipher::new(&device_key, &iv);

@@ -1,7 +1,7 @@
 import type { StagingKWMv2Key } from '~/features/settings/keyFormats';
 import { MMKVParser } from '../MMKVParser';
 
-export function parseAndroidKuwoEKey(view: DataView): Omit<StagingKWMv2Key, 'id'>[] {
+export function parseAndroidKuwoEKey(view: DataView<ArrayBuffer>): Omit<StagingKWMv2Key, 'id'>[] {
   const mmkv = new MMKVParser(view);
   const result: Omit<StagingKWMv2Key, 'id'>[] = [];
   while (!mmkv.eof) {
@@ -21,7 +21,7 @@ export function parseAndroidKuwoEKey(view: DataView): Omit<StagingKWMv2Key, 'id'
   return result;
 }
 
-export function parseIosKuwoEKey(view: DataView): Omit<StagingKWMv2Key, 'id'>[] {
+export function parseIosKuwoEKey(view: DataView<ArrayBuffer>): Omit<StagingKWMv2Key, 'id'>[] {
   const mmkv = new MMKVParser(view);
   const result: Omit<StagingKWMv2Key, 'id'>[] = [];
   while (!mmkv.eof) {

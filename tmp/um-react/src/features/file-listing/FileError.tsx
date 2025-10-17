@@ -26,14 +26,10 @@ export function FileError({ error, code }: FileErrorProps) {
 
   const copyError = () => {
     if (error) {
-      navigator.clipboard
-        .writeText(applyTemplate(ERROR_TEMPLATE, { summary, error }))
-        .then(() => {
-          toast.success('错误信息已复制到剪贴板');
-        })
-        .catch((e) => {
-          toast.error(`复制错误信息失败: ${e}`);
-        });
+      navigator.clipboard.writeText(applyTemplate(ERROR_TEMPLATE, { summary, error })).then(
+        () => toast.success('错误信息已复制到剪贴板'),
+        (e) => toast.error(`复制错误信息失败: ${e as Error}`),
+      );
     }
   };
 

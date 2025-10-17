@@ -8,7 +8,7 @@ import (
 	"reflect"
 	"testing"
 
-	"unlock-music.dev/cli/algo/common"
+	"git.um-react.app/um/cli/algo/common"
 )
 
 func loadTestDataQmcDecoder(filename string) ([]byte, []byte, error) {

@@ -53,7 +53,7 @@ export function PanelQMCv2Key() {
       toastImportResult(file.name, keys);
     } catch (e) {
       console.error('error during import: ', e);
-      alert(`导入数据库时发生错误：${e}`);
+      alert(`导入数据库时发生错误：${e as Error}`);
     }
   };
 

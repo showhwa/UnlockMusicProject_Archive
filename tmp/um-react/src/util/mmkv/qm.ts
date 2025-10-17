@@ -1,6 +1,6 @@
 import { MMKVParser } from '../MMKVParser';
 
-export function parseAndroidQmEKey(view: DataView): Map<string, string> {
+export function parseAndroidQmEKey(view: DataView<ArrayBuffer>): Map<string, string> {
   const mmkv = new MMKVParser(view);
   const result = new Map<string, string>();
   while (!mmkv.eof) {

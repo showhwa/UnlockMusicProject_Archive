@@ -31,6 +31,7 @@ class DecryptCommandHandler {
       const [result, error] = await go(this.tryDecryptWith(decipher));
       if (!error) {
         if (result) {
+          console.debug(`[${decipher.cipherName}] Decryption OK`);
           return result;
         }
         errors.push(`${decipher.cipherName}: no response`);

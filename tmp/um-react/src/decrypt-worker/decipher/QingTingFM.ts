@@ -18,20 +18,23 @@ export class QignTingFMDecipher implements DecipherInstance {
       };
     }
 
-    const qtfm = new QingTingFM(key, iv);
     const audioBuffer = new Uint8Array(buffer);
-    for (const [block, i] of chunkBuffer(audioBuffer)) {
-      qtfm.decrypt(block, i);
+    const qtfm = new QingTingFM(key, iv);
+    try {
+      for (const [block, i] of chunkBuffer(audioBuffer)) {
+        qtfm.decrypt(block, i);
+      }
+    } finally {
+      qtfm.free();
     }
-
-    return {
+    return Promise.resolve({
       cipherName: this.cipherName,
       status: Status.OK,
       data: audioBuffer,
-    };
+    });
   }
 
-  public static make() {
+  public static make(this: void) {
     return new QignTingFMDecipher();
   }
 }

@@ -1,6 +1,6 @@
 # Unlock Music 音乐解锁
 
-[![Build Status](https://git.unlock-music.dev/um/web/actions/workflows/build.yml/badge.svg)][ci]
+[![Build Status](https://git.um-react.app/um/web/actions/workflows/build.yml/badge.svg)][ci]
 
 - 在浏览器中解锁加密的音乐文件。 Unlock encrypted music file in the browser.
 - Unlock Music 项目是以学习和技术研究的初衷创建的，修改、再分发时请遵循[授权协议]。
@@ -11,10 +11,10 @@
 > **WARNING**
 > 在本站 fork 不会起到备份的作用，只会浪费服务器储存空间。如无必要请勿 fork 该仓库。
 
-[授权协议]: https://git.unlock-music.dev/um/web/src/branch/main/LICENSE
-[unlock-music/cli]: https://git.unlock-music.dev/um/cli
+[授权协议]: https://git.um-react.app/um/web/src/branch/main/LICENSE
+[unlock-music/cli]: https://git.um-react.app/um/cli
 [`@unlock_music_chat`]: https://t.me/unlock_music_chat
-[ci]: https://git.unlock-music.dev/um/web/actions?workflow=build.yml
+[ci]: https://git.um-react.app/um/web/actions?workflow=build.yml
 
 ## 特性
 
@@ -49,7 +49,7 @@
   - :warning: 本地使用请下载`legacy版本`（`modern版本`只能通过 **http(s)协议** 访问）
 - 解压缩后即可部署或本地使用（**请勿直接运行源代码**）
 
-[release]: https://git.unlock-music.dev/um/web/releases/latest
+[release]: https://git.um-react.app/um/web/releases/latest
 
 ### 自行构建
 

@@ -16,7 +16,7 @@
 
 - 进入上层目录：`cd ..`
 - 克隆 `lib_um_crypto_rust` 仓库
-  - `git clone https://git.unlock-music.dev/um/lib_um_crypto_rust.git`
+  - `git clone https://git.um-react.app/um/lib_um_crypto_rust.git`
 - 进入 SDK 目录：`cd lib_um_crypto_rust ; cd um_wasm_loader`
 - 安装所有 Node 以来：`pnpm i`
 - 构建：`pnpm build`

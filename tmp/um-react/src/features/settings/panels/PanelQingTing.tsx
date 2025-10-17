@@ -9,6 +9,7 @@ import { GetQingTingFMDeviceKeyPayload } from '~/decrypt-worker/types.ts';
 import { DECRYPTION_WORKER_ACTION_NAME } from '~/decrypt-worker/constants.ts';
 import { Ruby } from '~/components/Ruby';
 import { HiWord } from '~/components/HelpText/HiWord';
+import { toast } from 'react-toastify';
 
 const QTFM_DEVICE_ID_URL = 'https://github.com/parakeet-rs/qtfm-device-id/releases/latest';
 
@@ -28,23 +29,20 @@ export function PanelQingTing() {
       return;
     }
 
-    const dataMap = Object.create(null);
+    const dataMap = Object.create(null) as GetQingTingFMDeviceKeyPayload;
     for (const [, key, value] of plainText.matchAll(/^(PRODUCT|DEVICE|MANUFACTURER|BRAND|BOARD|MODEL): (.+)/gim)) {
-      dataMap[key.toLowerCase()] = value;
+      dataMap[key.toLowerCase() as keyof GetQingTingFMDeviceKeyPayload] = value;
     }
     const { product, device, manufacturer, brand, board, model } = dataMap;
 
     if (product && device && manufacturer && brand && board && model) {
       e.preventDefault();
       workerClientBus
-        .request<string, GetQingTingFMDeviceKeyPayload>(
-          DECRYPTION_WORKER_ACTION_NAME.QINGTING_FM_GET_DEVICE_KEY,
-          dataMap,
-        )
-        .then(setSecretKey)
-        .catch((err) => {
-          alert(`生成设备密钥时发生错误: ${err}`);
-        });
+        .request<
+          string,
+          GetQingTingFMDeviceKeyPayload
+        >(DECRYPTION_WORKER_ACTION_NAME.QINGTING_FM_GET_DEVICE_KEY, dataMap)
+        .then(setSecretKey, (err) => toast.error(`生成设备密钥时发生错误: ${err}`));
     }
   };
 

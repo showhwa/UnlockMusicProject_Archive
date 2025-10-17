@@ -28,7 +28,7 @@ impl MetadataParser for PcV1Legacy {
         let ekey = payload
             .iter()
             .take_while(|&&b| b != 0)
-            .map(|&b| b)
+            .copied()
             .collect::<Vec<_>>();
         let ekey = String::from_utf8_lossy(ekey.as_slice());
         if !is_base64(ekey.as_bytes()) {

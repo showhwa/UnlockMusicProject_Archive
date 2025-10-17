@@ -3,8 +3,9 @@ import '@testing-library/jest-dom';
 // FIXME: Use something like jsdom-worker?
 //   see: https://github.com/developit/jsdom-worker
 if (!global.Worker) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
   (global as any).Worker = class MockWorker {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     events: Record<string, (e: unknown) => void> = Object.create(null);
 
     onmessage = undefined;

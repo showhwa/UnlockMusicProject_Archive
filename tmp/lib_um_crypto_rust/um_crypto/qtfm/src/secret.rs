@@ -28,7 +28,7 @@ pub fn make_device_secret<S: AsRef<[u8]>>(
     let device_id_hash_code_hex = device_id_hash_code_hex.as_bytes();
 
     let mut device_key = [0u8; 0x10];
-    device_key[..device_id_hash_code_hex.len()].copy_from_slice(&device_id_hash_code_hex);
+    device_key[..device_id_hash_code_hex.len()].copy_from_slice(device_id_hash_code_hex);
     for (key, salt) in device_key.iter_mut().zip(DEVICE_KEY_SALT) {
         *key = salt.wrapping_add(*key);
     }

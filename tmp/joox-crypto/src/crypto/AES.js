@@ -44,7 +44,7 @@ function decryptAESBlock(key, block) {
     {
       mode: ModeECB,
       padding: PKCS7,
-    }
+    },
   );
   return Uint8ArrayEncoder.stringify(result);
 }

@@ -11,7 +11,7 @@ Joox 加密处理库。
 在项目目录加入 `.npmrc`：
 
 ```ini
-@unlock-music:registry=https://git.unlock-music.dev/api/packages/um/npm/
+@unlock-music:registry=https://git.um-react.app/api/packages/um/npm/
 ```
 
 然后安装：
@@ -23,7 +23,7 @@ npm i --save @unlock-music/joox-crypto
 使用：
 
 ```js
-const jooxFactory = require('@unlock-music-gh/joox-crypto');
+const jooxFactory = require('@unlock-music/joox-crypto');
 
 const data = new Uint8Array(...);
 const decryptor = jooxFactory(data, '00000000000000000000000000000000');

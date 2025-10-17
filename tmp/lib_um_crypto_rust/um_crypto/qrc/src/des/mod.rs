@@ -1,5 +1,5 @@
 mod constants;
-mod des;
+mod des_impl;
 mod utils;
 
-pub use des::{DESMode, QrcDes};
+pub use des_impl::{DESMode, QrcDes};

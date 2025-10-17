@@ -3,9 +3,9 @@ package kgm
 import (
 	"fmt"
 
-	"unlock-music.dev/cli/algo/common"
-	"unlock-music.dev/cli/algo/kgm/pc_kugou_db"
-	"unlock-music.dev/cli/algo/qmc"
+	"git.um-react.app/um/cli/algo/common"
+	"git.um-react.app/um/cli/algo/kgm/pc_kugou_db"
+	"git.um-react.app/um/cli/algo/qmc"
 )
 
 func newKgmCryptoV5(header *header, kggDatabasePath string) (common.StreamDecoder, error) {

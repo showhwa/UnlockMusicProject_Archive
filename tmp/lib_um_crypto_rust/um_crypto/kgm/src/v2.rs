@@ -9,7 +9,7 @@ pub struct DecipherV2 {
 impl DecipherV2 {
     pub fn new(header: &Header) -> Result<Self, KugouError> {
         let mut key = [0u8; 4];
-        key.copy_from_slice(get_slot_key(&header)?);
+        key.copy_from_slice(get_slot_key(header)?);
         Ok(Self { key })
     }
 

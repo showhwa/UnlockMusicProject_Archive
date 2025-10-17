@@ -9,7 +9,7 @@
 在项目根目录下，建立或更改 `.npmrc` 文件，确保下述行存在：
 
 ```
-@unlock-music:registry=https://git.unlock-music.dev/api/packages/um/npm/
+@unlock-music:registry=https://git.um-react.app/api/packages/um/npm/
 ```
 
 使用你喜欢的包管理器安装，例如 `npm` 或 `pnpm`：

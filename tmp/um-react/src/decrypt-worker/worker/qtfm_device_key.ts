@@ -11,5 +11,5 @@ export async function workerGetQtfmDeviceKey({
   board,
 }: GetQingTingFMDeviceKeyPayload) {
   const buffer = QingTingFM.getDeviceKey(device, brand, model, product, manufacturer, board);
-  return hex(buffer);
+  return Promise.resolve(hex(buffer));
 }

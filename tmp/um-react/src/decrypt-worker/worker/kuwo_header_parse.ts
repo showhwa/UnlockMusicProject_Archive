@@ -1,4 +1,4 @@
-import {  ParseKuwoHeaderPayload, ParseKuwoHeaderResponse } from '~/decrypt-worker/types.ts';
+import { ParseKuwoHeaderPayload, ParseKuwoHeaderResponse } from '~/decrypt-worker/types.ts';
 import { KuwoHeader } from '@unlock-music/crypto';
 
 export const workerParseKuwoHeader = async ({ blobURI }: ParseKuwoHeaderPayload): Promise<ParseKuwoHeaderResponse> => {

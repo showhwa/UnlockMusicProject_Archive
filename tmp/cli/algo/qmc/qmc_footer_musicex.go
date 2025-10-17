@@ -42,24 +42,25 @@ func NewMusicExTag(f io.ReadSeeker) (*MusicExTagV1, error) {
 	tag := &MusicExTagV1{
 		TagSize:    binary.LittleEndian.Uint32(buffer[0x00:0x04]),
 		TagVersion: binary.LittleEndian.Uint32(buffer[0x04:0x08]),
-		TagMagic:   buffer[0x04:0x0C],
+		TagMagic:   buffer[0x08:],
 	}
 
 	if !bytes.Equal(tag.TagMagic, []byte("musicex\x00")) {
 		return nil, errors.New("MusicEx magic mismatch")
 	}
 	if tag.TagVersion != 1 {
-		return nil, errors.New(fmt.Sprintf("unsupported musicex tag version. expecting 1, got %d", tag.TagVersion))
+		return nil, fmt.Errorf("unsupported musicex tag version. expecting 1, got %d", tag.TagVersion)
 	}
 
 	if tag.TagSize < 0xC0 {
-		return nil, errors.New(fmt.Sprintf("unsupported musicex tag size. expecting at least 0xC0, got 0x%02x", tag.TagSize))
+		return nil, fmt.Errorf("unsupported musicex tag size. expecting at least 0xC0, got 0x%02x", tag.TagSize)
 	}
 
 	buffer = make([]byte, tag.TagSize)
+	f.Seek(-int64(tag.TagSize), io.SeekEnd)
 	bytesRead, err = f.Read(buffer)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("MusicExV1: Read error %w", err)
 	}
 	if uint32(bytesRead) != tag.TagSize {
 		return nil, fmt.Errorf("MusicExV1: read %d bytes (expected %d)", bytesRead, tag.TagSize)

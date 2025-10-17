@@ -55,7 +55,7 @@ export function persistSettings(store: AppStore, storageKey = DEFAULT_STORAGE_KE
   let lastSettings: unknown;
 
   try {
-    const loadedSettings: ProductionSettings = JSON.parse(localStorage.getItem(storageKey) ?? '');
+    const loadedSettings = JSON.parse(localStorage.getItem(storageKey) ?? '') as ProductionSettings;
     if (loadedSettings) {
       const mergedSettings = mergeSettings(loadedSettings);
       store.dispatch(setProductionChanges(mergedSettings));

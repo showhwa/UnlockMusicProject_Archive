@@ -26,6 +26,34 @@ jobs:
         with:
           name: site
           path: dist/
+      - name: Create Release Package
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          mkdir release/
+          python3 -m zipfile -c "release/um-react-${VERSION}.zip" dist/.
+          cp win64/dist/*.zip "release/um-react-win64-${VERSION}.zip"
+      - name: Create Draft Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: akkuman/gitea-release-action@v1
+        with:
+          draft: true
+          files: |
+            release/um-react-*.zip
+          body: |
+            上个版本：[v0.0.0](https://git.um-react.app/um/um-react/releases/tag/v0.0.0)
+
+            ## 🐛 修正
+
+            - 修正内容
+
+            ## ✨ 新增
+
+            - 新增内容
+
+            ## 🔧 维护
+
+            - 维护内容
       - name: Prepare for deployment
         run: |
           cp um-react.zip dist/"release-${GITHUB_SHA}.zip"

@@ -1,10 +1,11 @@
-mod metadata;
+mod aac;
 mod audio_type;
-mod sync_frame;
+mod metadata;
+mod mp3;
 
-use crate::sync_frame::SYNC_FRAME_TEST_SIZE;
+use crate::aac::SYNC_FRAME_TEST_SIZE;
+use aac::is_aac;
 pub use audio_type::{AudioError, AudioType};
-use sync_frame::{is_aac, is_mp3};
 
 const MAGIC_FLAC: [u8; 4] = *b"fLaC";
 const MAGIC_OGG: [u8; 4] = *b"OggS";
@@ -35,7 +36,7 @@ pub fn detect_audio_type(buffer: &[u8]) -> Result<AudioType, AudioError> {
     let magic = u32::from_be_bytes(magic);
     if is_aac(magic) {
         return Ok(AudioType::AAC);
-    } else if is_mp3(magic) {
+    } else if mp3::is_mp3(buffer) {
         return Ok(AudioType::MP3);
     }
 
@@ -61,17 +62,7 @@ pub fn detect_audio_type(buffer: &[u8]) -> Result<AudioType, AudioError> {
         };
     }
 
-    // brute force test for MP3 / AAC
-    for magic_window in buffer.windows(4).take(SYNC_FRAME_TEST_SIZE) {
-        let magic = u32::from_be_bytes(magic_window.try_into().unwrap());
-        if is_mp3(magic) {
-            return Ok(AudioType::MP3);
-        } else if is_aac(magic) {
-            return Ok(AudioType::AAC);
-        }
-    }
-
-    // Ask for more data to test for MP3 / AAC
+    // Ask for more data to test for MP3
     if buffer.len() < SYNC_FRAME_TEST_SIZE {
         return Err(AudioError::NeedMoreHeader(offset + SYNC_FRAME_TEST_SIZE));
     }
@@ -85,7 +76,7 @@ mod tests {
 
     #[test]
     fn test_mp3() {
-        let mp3_data = include_bytes!("__fixtures__/mp3_with_id3v2.bin");
+        let mp3_data = include_bytes!("__fixtures__/ffmpeg_silent.mp3");
         let result = detect_audio_type(mp3_data).expect("failed to parse mp3");
         assert_eq!(result, AudioType::MP3);
     }
@@ -109,6 +100,13 @@ mod tests {
         let mut mp3_data = [0; 4096];
         mp3_data[0..4].copy_from_slice(&[0xff; 4]);
         let result = detect_audio_type(&mp3_data).expect("failed to parse mp3");
+        assert_eq!(result, AudioType::Unknown);
+    }
+
+    #[test]
+    fn test_mp3_invalid_2() {
+        let mp3_data = include_bytes!("__fixtures__/junk.bin");
+        let result = detect_audio_type(mp3_data).expect("failed to parse mp3");
         assert_eq!(result, AudioType::Unknown);
     }
 }

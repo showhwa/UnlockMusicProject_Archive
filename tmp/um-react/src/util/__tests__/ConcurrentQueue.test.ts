@@ -2,7 +2,7 @@ import { ConcurrentQueue } from '../ConcurrentQueue';
 import { nextTickAsync } from '../nextTick';
 
 class SimpleQueue<T, R = void> extends ConcurrentQueue<T> {
-  handler(_item: T): Promise<R> {
+  handler(this: void, _item: T): Promise<R> {
     throw new Error('Method not overridden');
   }
 }

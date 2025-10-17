@@ -26,17 +26,17 @@ export class NetEaseCloudMusicDecipher implements DecipherInstance {
       for (const [block, offset] of chunkBuffer(audioBuffer)) {
         ncm.decrypt(block, offset);
       }
-      return {
+      return Promise.resolve({
         status: Status.OK,
         cipherName: this.cipherName,
         data: audioBuffer,
-      };
+      });
     } finally {
       ncm.free();
     }
   }
 
-  public static make() {
+  public static make(this: void) {
     return new NetEaseCloudMusicDecipher();
   }
 }

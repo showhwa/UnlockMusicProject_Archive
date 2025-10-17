@@ -5,7 +5,7 @@ export class MMKVParser {
   private offset = 4;
   private length: number;
 
-  constructor(private view: DataView) {
+  constructor(private view: DataView<ArrayBuffer>) {
     const payloadLength = view.getUint32(0, true);
     this.length = 4 + payloadLength;
 

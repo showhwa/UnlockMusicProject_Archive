@@ -1,10 +1,11 @@
 package ncm
 
 import (
-	"go.uber.org/zap"
 	"strings"
 
-	"unlock-music.dev/cli/algo/common"
+	"go.uber.org/zap"
+
+	"git.um-react.app/um/cli/algo/common"
 )
 
 type ncmMeta interface {
@@ -42,7 +43,6 @@ func newNcmMetaMusic(logger *zap.Logger) *ncmMetaMusic {
 func (m *ncmMetaMusic) GetAlbumImageURL() string {
 	return m.AlbumPic
 }
-
 
 func (m *ncmMetaMusic) GetArtists() []string {
 	m.logger.Debug("ncm artists raw", zap.Any("artists", m.Artist))

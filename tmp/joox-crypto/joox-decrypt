@@ -5,7 +5,7 @@ const fs = require("fs");
 if (process.argv.length < 5) {
   console.info(
     "Usage: %s <uuidv2> <encrypted_path> <decrypted_path>",
-    process.argv[1]
+    process.argv[1],
   );
   return;
 }

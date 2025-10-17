@@ -18,18 +18,18 @@ export class KuwoMusicDecipher implements DecipherInstance {
       for (const [block, offset] of chunkBuffer(audioBuffer)) {
         kwm.decrypt(block, offset);
       }
-      return {
+      return Promise.resolve({
         status: Status.OK,
         cipherName: this.cipherName,
         data: audioBuffer,
-      };
+      });
     } finally {
       kwm?.free();
       header?.free();
     }
   }
 
-  public static make() {
+  public static make(this: void) {
     return new KuwoMusicDecipher();
   }
 }

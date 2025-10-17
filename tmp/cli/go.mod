@@ -1,6 +1,6 @@
-module unlock-music.dev/cli
+module git.um-react.app/um/cli
 
-go 1.23.3
+go 1.25.1
 
 require (
 	github.com/fsnotify/fsnotify v1.8.0
@@ -8,12 +8,13 @@ require (
 	github.com/go-flac/flacvorbis v0.2.0
 	github.com/go-flac/go-flac v1.0.0
 	github.com/samber/lo v1.47.0
+	github.com/unlock-music/go-mmkv v0.1.2
 	github.com/urfave/cli/v2 v2.27.5
 	go.uber.org/zap v1.27.0
 	golang.org/x/crypto v0.29.0
 	golang.org/x/exp v0.0.0-20250305212735-054e65f0b394
 	golang.org/x/text v0.20.0
-	unlock-music.dev/mmkv v0.1.0
+	modernc.org/sqlite v1.37.0
 )
 
 require (
@@ -27,9 +28,7 @@ require (
 	github.com/xrash/smetrics v0.0.0-20240521201337-686a1a2994c1 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/sys v0.31.0 // indirect
-	google.golang.org/protobuf v1.35.2 // indirect
 	modernc.org/libc v1.62.1 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.9.1 // indirect
-	modernc.org/sqlite v1.37.0 // indirect
 )

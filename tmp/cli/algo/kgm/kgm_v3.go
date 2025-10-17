@@ -4,7 +4,7 @@ import (
 	"crypto/md5"
 	"fmt"
 
-	"unlock-music.dev/cli/algo/common"
+	"git.um-react.app/um/cli/algo/common"
 )
 
 // kgmCryptoV3 is kgm file crypto v3

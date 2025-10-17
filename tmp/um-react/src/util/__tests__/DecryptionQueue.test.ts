@@ -17,7 +17,7 @@ test('should be able to forward request to worker client bus', async () => {
   const bus = new WorkerClientBus<DECRYPTION_WORKER_ACTION_NAME>(null as never);
   vi.spyOn(bus, 'request').mockImplementation(
     async (actionName: DECRYPTION_WORKER_ACTION_NAME, payload: unknown): Promise<unknown> => {
-      return { actionName, payload };
+      return Promise.resolve({ actionName, payload });
     },
   );
 

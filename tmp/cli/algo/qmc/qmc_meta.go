@@ -8,9 +8,9 @@ import (
 
 	"github.com/samber/lo"
 
-	"unlock-music.dev/cli/algo/common"
-	"unlock-music.dev/cli/algo/qmc/client"
-	"unlock-music.dev/cli/internal/ffmpeg"
+	"git.um-react.app/um/cli/algo/common"
+	"git.um-react.app/um/cli/algo/qmc/client"
+	"git.um-react.app/um/cli/internal/ffmpeg"
 )
 
 func (d *Decoder) GetAudioMeta(ctx context.Context) (common.AudioMeta, error) {

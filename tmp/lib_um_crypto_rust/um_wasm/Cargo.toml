@@ -1,10 +1,11 @@
 [package]
 name = "um_wasm"
-version = "0.1.10"
+version = "0.1.12"
 authors = ["鲁树人 <lu.shuren@um-react.app>"]
 edition = "2018"
-description = "um_crypo in WebAssembly"
-repository = "https://git.unlock-music.dev/lsr/lib_um_crypto_rust.git"
+description = "um_crypo in Rust & WebAssembly"
+homepage = "https://git.um-react.app/um/lib_um_crypto_rust"
+repository = "https://git.um-react.app/um/lib_um_crypto_rust.git"
 license = "Apache-2.0 + MIT"
 
 [lib]

@@ -96,9 +96,9 @@ impl Header {
 }
 
 fn get_challenge_data(magic_header: &[u8; 0x10]) -> Result<[u8; 0x10], KugouError> {
-    match magic_header {
-        &KGM_HEADER => Ok(KGM_TEST_DATA),
-        &VPR_HEADER => Ok(VPR_TEST_DATA),
+    match *magic_header {
+        KGM_HEADER => Ok(KGM_TEST_DATA),
+        VPR_HEADER => Ok(VPR_TEST_DATA),
         _ => Err(KugouError::NotKGMFile)?,
     }
 }

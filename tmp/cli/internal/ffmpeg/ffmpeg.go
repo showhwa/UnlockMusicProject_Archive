@@ -4,14 +4,15 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"go.uber.org/zap"
 	"io"
 	"os"
 	"os/exec"
 	"strings"
 
-	"unlock-music.dev/cli/algo/common"
-	"unlock-music.dev/cli/internal/utils"
+	"go.uber.org/zap"
+
+	"git.um-react.app/um/cli/algo/common"
+	"git.um-react.app/um/cli/internal/utils"
 )
 
 func ExtractAlbumArt(ctx context.Context, rd io.Reader) (*bytes.Buffer, error) {

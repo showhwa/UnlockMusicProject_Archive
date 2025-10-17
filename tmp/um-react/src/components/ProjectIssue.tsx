@@ -7,7 +7,7 @@ export interface ProjectIssueProps {
 
 export function ProjectIssue({ id, title }: ProjectIssueProps) {
   return (
-    <ExtLink target="_blank" href={`https://git.unlock-music.dev/um/um-react/issues/${id}`}>
+    <ExtLink target="_blank" href={`https://git.um-react.app/um/um-react/issues/${id}`}>
       {`#${id}`}
       {title && ` - ${title}`}
     </ExtLink>

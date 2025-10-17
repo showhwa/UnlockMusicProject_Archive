@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 
 import { FileInput } from '~/components/FileInput';
+import { InSecretImportModalContext } from '~/context/InSecretImportModal';
 
 export interface ImportSecretModalProps {
   clientName?: React.ReactNode;
@@ -12,13 +13,12 @@ export interface ImportSecretModalProps {
 
 export function ImportSecretModal({ clientName, children, show, onClose, onImport }: ImportSecretModalProps) {
   const handleFileReceived = (files: File[]) => {
-    const promise = onImport(files[0]);
-    if (promise instanceof Promise) {
-      promise.catch((err) => {
+    const importResult = onImport(files[0]);
+    if (importResult instanceof Promise) {
+      importResult.catch((err) => {
         console.error('could not import: ', err);
       });
     }
-    return promise;
   };
 
   const refModel = useRef<HTMLDialogElement>(null);
@@ -31,7 +31,7 @@ export function ImportSecretModal({ clientName, children, show, onClose, onImpor
   }, [show]);
 
   return (
-    <dialog ref={refModel} className="modal">
+    <dialog ref={refModel} className="modal" onClose={onClose}>
       <div className="modal-box">
         <form method="dialog" onSubmit={() => onClose()}>
           <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
@@ -41,7 +41,9 @@ export function ImportSecretModal({ clientName, children, show, onClose, onImpor
           <FileInput onReceiveFiles={handleFileReceived}>拖放或点我选择含有密钥的数据库文件</FileInput>
 
           <div className="mt-2">选择你的{clientName && <>「{clientName}」</>}客户端平台以查看对应说明：</div>
-          <div>{children}</div>
+          <InSecretImportModalContext.Provider value={true}>
+            <div>{children}</div>
+          </InSecretImportModalContext.Provider>
         </div>
       </div>
     </dialog>

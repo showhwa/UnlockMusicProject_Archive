@@ -2,83 +2,89 @@ import { DecryptedAudioFile, ProcessState, selectFiles } from '~/features/file-l
 import { FaDownload } from 'react-icons/fa';
 import { useAppSelector } from '~/hooks';
 import { toast } from 'react-toastify';
+import { SimpleQueue } from '~/util/SimpleQueue';
 
 export function DownloadAll() {
   const files = useAppSelector(selectFiles);
-  const onClickDownloadAll = async () => {
-    console.time('DownloadAll'); //开始计时
-    const fileCount = Object.keys(files).length;
+  const downloadAllAsync = async () => {
+    const fileList = Object.values(files);
+    const fileCount = fileList.length;
     if (fileCount === 0) {
       toast.warning('未添加文件');
       return;
     }
 
-    //判断所有文件是否处理完成
-    const allComplete = Object.values(files).every((file) => file.state !== ProcessState.PROCESSING);
+    // 判断所有文件是否处理完成
+    const allComplete = fileList.every((file) => file.state !== ProcessState.PROCESSING);
     if (!allComplete) {
       toast.warning('请等待所有文件解密完成');
       return;
     }
 
-    //过滤处理失败的文件
-    const completeFiles = Object.values(files).filter((file) => file.state === ProcessState.COMPLETE);
+    // 过滤处理失败的文件
+    const completeFiles = fileList.filter((file) => file.state === ProcessState.COMPLETE);
 
-    //开始下载
-    let dir: FileSystemDirectoryHandle | undefined;
+    // 准备下载
+    let dir: FileSystemDirectoryHandle | null = null;
     try {
       dir = await window.showDirectoryPicker({ mode: 'readwrite' });
     } catch (e) {
-      console.error(e);
       if (e instanceof Error && e.name === 'AbortError') {
-        return;
+        return; // user cancelled
       }
+      console.error(e);
     }
     toast.warning('开始下载，请稍候');
-
+    const queue = new SimpleQueue(8);
     const promises = Object.values(completeFiles).map(async (file) => {
-      console.log(`开始下载: ${file.fileName}`);
       try {
-        if (dir) {
-          await DownloadNew(dir, file);
-        } else {
-          await DownloadOld(file);
-        }
-        console.log(`成功下载: ${file.fileName}`);
+        await queue.enter();
+        await downloadFile(file, dir);
       } catch (e) {
         console.error(`下载失败: ${file.fileName}`, e);
-        toast.error(`出现错误: ${e}`);
+        toast.error(`出现错误: ${e as Error}`);
         throw e;
+      } finally {
+        queue.leave();
       }
     });
-    await Promise.allSettled(promises).then((f) => {
-      const success = f.filter((result) => result.status === 'fulfilled').length;
-      if (success === fileCount) {
-        toast.success(`成功下载: ${success}/${fileCount}首`);
-      } else {
-        toast.warning(`成功下载: ${success}/${fileCount}首`);
-      }
-    });
-    console.timeEnd('DownloadAll'); //停止计时
+
+    const promiseResults = await Promise.allSettled(promises);
+    const success = promiseResults.filter((result) => result.status === 'fulfilled').length;
+    const level = success === fileCount ? 'success' : success === 0 ? 'error' : 'warning';
+    toast[level](`成功下载: ${success}/${fileCount}首`);
   };
 
+  function onDownloadAll() {
+    downloadAllAsync().catch((e) => {
+      // this should not happen
+      console.error('下载全部出现错误', e);
+    });
+  }
+
   return (
-    <button className="btn btn-primary" id="downloadAll" onClick={onClickDownloadAll} title="下载全部">
+    <button className="btn btn-primary" id="downloadAll" onClick={onDownloadAll} title="下载全部">
       <FaDownload />
     </button>
   );
 }
 
-async function DownloadNew(dir: FileSystemDirectoryHandle, file: DecryptedAudioFile) {
-  const fileHandle = await dir.getFileHandle(file.cleanName + '.' + file.ext, { create: true });
-  const writable = await fileHandle.createWritable();
-  await fetch(file.decrypted).then((res) => res.body?.pipeTo(writable));
-}
-
-async function DownloadOld(file: DecryptedAudioFile) {
-  const a = document.createElement('a');
-  a.href = file.decrypted;
-  a.download = file.cleanName + '.' + file.ext;
-  document.body.append(a);
-  a.click();
-  a.remove();
+async function downloadFile(file: DecryptedAudioFile, dir: FileSystemDirectoryHandle | null) {
+  if (dir) {
+    const fileHandle = await dir.getFileHandle(file.cleanName + '.' + file.ext, { create: true });
+    const fileStream = await fileHandle.createWritable();
+    try {
+      const res = await fetch(file.decrypted);
+      await res.body?.pipeTo(fileStream);
+    } catch {
+      await fileStream.abort();
+    }
+  } else {
+    const anchor = document.createElement('a');
+    anchor.href = file.decrypted;
+    anchor.download = file.cleanName + '.' + file.ext;
+    document.body.append(anchor);
+    anchor.click();
+    anchor.remove();
+  }
 }

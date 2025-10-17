@@ -103,7 +103,7 @@ export async function Decrypt(file: FileInfo, config: Record<string, any>): Prom
       rt_data = await XimalayaDecrypt(file.raw, raw.name, raw.ext);
       break;
     case 'mflach': //QQ Music New Flac
-      throw '网页版无法解锁，请使用<a target="_blank" href="https://git.unlock-music.dev/um/cli">CLI版本</a>'
+      throw '网页版无法解锁，请使用<a target="_blank" href="https://git.um-react.app/um/cli">CLI版本</a>';
     default:
       throw '不支持此文件格式';
   }

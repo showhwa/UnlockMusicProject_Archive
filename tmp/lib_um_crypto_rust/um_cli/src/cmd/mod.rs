@@ -13,16 +13,16 @@ pub mod xmly;
 #[derive(Subcommand)]
 pub enum Commands {
     #[command(name = "ncm")]
-    NCM(ncm::ArgsNCM),
+    Ncm(ncm::ArgsNCM),
 
     #[command(name = "kgm")]
-    KGM(kgm::ArgsKGM),
+    Kgm(kgm::ArgsKGM),
 
     #[command(name = "mg3d")]
     Migu3D(mg3d::ArgsMigu3D),
 
     #[command(name = "joox")]
-    JOOX(joox::ArgsJoox),
+    Joox(joox::ArgsJoox),
 
     #[command(name = "qmc1")]
     QMCv1(qmc1::ArgsQMCv1),
@@ -30,11 +30,11 @@ pub enum Commands {
     QMCv2(qmc2::ArgsQMCv2),
 
     #[command(name = "qtfm")]
-    QTFM(qtfm::ArgsQingTingFM),
+    QtFM(qtfm::ArgsQingTingFM),
 
     #[command(name = "xiami")]
     Xiami(xiami::ArgsXiami),
 
     #[command(name = "xmly")]
-    XMLY(xmly::ArgsXimalaya),
+    Xmly(xmly::ArgsXimalaya),
 }

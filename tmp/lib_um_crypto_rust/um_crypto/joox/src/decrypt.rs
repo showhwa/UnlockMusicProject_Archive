@@ -23,7 +23,7 @@ impl JooxDecipher for Header {
 
         let (buffer, _) = buffer
             .split_at_mut_checked(buffer_size)
-            .ok_or_else(|| JooxError::OutputBufferTooSmall(buffer_size))?;
+            .ok_or(JooxError::OutputBufferTooSmall(buffer_size))?;
 
         let result = (&self.aes_engine)
             .decrypt_padded_mut::<Pkcs7>(buffer)

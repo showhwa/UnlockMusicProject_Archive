@@ -15,21 +15,21 @@ import (
 	"strings"
 	"time"
 
+	"git.um-react.app/um/cli/algo/common"
+	_ "git.um-react.app/um/cli/algo/kgm"
+	_ "git.um-react.app/um/cli/algo/kwm"
+	_ "git.um-react.app/um/cli/algo/ncm"
+	"git.um-react.app/um/cli/algo/qmc"
+	_ "git.um-react.app/um/cli/algo/tm"
+	_ "git.um-react.app/um/cli/algo/xiami"
+	_ "git.um-react.app/um/cli/algo/ximalaya"
+	"git.um-react.app/um/cli/internal/ffmpeg"
+	"git.um-react.app/um/cli/internal/sniff"
+	"git.um-react.app/um/cli/internal/utils"
 	"github.com/fsnotify/fsnotify"
 	"github.com/urfave/cli/v2"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"unlock-music.dev/cli/algo/common"
-	_ "unlock-music.dev/cli/algo/kgm"
-	_ "unlock-music.dev/cli/algo/kwm"
-	_ "unlock-music.dev/cli/algo/ncm"
-	"unlock-music.dev/cli/algo/qmc"
-	_ "unlock-music.dev/cli/algo/tm"
-	_ "unlock-music.dev/cli/algo/xiami"
-	_ "unlock-music.dev/cli/algo/ximalaya"
-	"unlock-music.dev/cli/internal/ffmpeg"
-	"unlock-music.dev/cli/internal/sniff"
-	"unlock-music.dev/cli/internal/utils"
 )
 
 var AppVersion = "custom"
@@ -44,13 +44,13 @@ func main() {
 	app := cli.App{
 		Name:     "Unlock Music CLI",
 		HelpName: "um",
-		Usage:    "Unlock your encrypted music file https://git.unlock-music.dev/um/cli",
+		Usage:    "Unlock your encrypted music file https://git.um-react.app/um/cli",
 		Version:  fmt.Sprintf("%s (%s,%s/%s)", AppVersion, runtime.Version(), runtime.GOOS, runtime.GOARCH),
 		Flags: []cli.Flag{
 			&cli.StringFlag{Name: "input", Aliases: []string{"i"}, Usage: "path to input file or dir", Required: false},
 			&cli.StringFlag{Name: "output", Aliases: []string{"o"}, Usage: "path to output dir", Required: false},
-			&cli.StringFlag{Name: "qmc-mmkv", Aliases: []string{"db"}, Usage: "path to qmc mmkv (.crc file also required)", Required: false},
-			&cli.StringFlag{Name: "qmc-mmkv-key", Aliases: []string{"key"}, Usage: "mmkv password (16 ascii chars)", Required: false},
+			&cli.StringFlag{Name: "qmc-mmkv", Aliases: []string{"db"}, Usage: "path to QQMusic mmkv path", Required: false},
+			&cli.StringFlag{Name: "qmc-mmkv-key", Aliases: []string{"key"}, Usage: "QQMusic mmkv password (16 ascii chars)", Required: false},
 			&cli.StringFlag{Name: "kgg-db", Usage: "path to kgg db (win32 kugou v11)", Required: false},
 			&cli.BoolFlag{Name: "remove-source", Aliases: []string{"rs"}, Usage: "remove source file", Required: false, Value: false},
 			&cli.BoolFlag{Name: "skip-noop", Aliases: []string{"n"}, Usage: "skip noop decoder", Required: false, Value: true},
@@ -63,7 +63,7 @@ func main() {
 		},
 
 		Action:          appMain,
-		Copyright:       fmt.Sprintf("Copyright (c) 2020 - %d Unlock Music https://git.unlock-music.dev/um/cli/src/branch/master/LICENSE", time.Now().Year()),
+		Copyright:       fmt.Sprintf("Copyright (c) 2020 - %d Unlock Music https://git.um-react.app/um/cli/src/branch/main/LICENSE", time.Now().Year()),
 		HideHelpCommand: true,
 		UsageText:       "um [-o /path/to/output/dir] [--extra-flags] [-i] /path/to/input",
 	}
@@ -176,13 +176,10 @@ func appMain(c *cli.Context) (err error) {
 		return errors.New("output should be a writable directory")
 	}
 
-	if mmkv := c.String("qmc-mmkv"); mmkv != "" {
-		// If key is not set, the mmkv vault will be treated as unencrypted.
-		key := c.String("qmc-mmkv-key")
-		err := qmc.OpenMMKV(mmkv, key, logger)
-		if err != nil {
-			return err
-		}
+	// QMC: Load keys
+	qmcKeys, err := qmc.LoadMMKVOrDefault(c.String("qmc-mmkv"), c.String("qmc-mmkv-key"), logger)
+	if err != nil {
+		return err
 	}
 
 	kggDbPath := c.String("kgg-db")
@@ -194,11 +191,18 @@ func appMain(c *cli.Context) (err error) {
 		logger:          logger,
 		inputDir:        inputDir,
 		outputDir:       output,
-		kggDbPath:       kggDbPath,
 		skipNoopDecoder: c.Bool("skip-noop"),
 		removeSource:    c.Bool("remove-source"),
 		updateMetadata:  c.Bool("update-metadata"),
 		overwriteOutput: c.Bool("overwrite"),
+
+		crypto: common.CryptoParams{
+			// KuGou
+			KggDbPath: kggDbPath,
+
+			// QQMusic
+			QmcKeys: qmcKeys,
+		},
 	}
 
 	if inputStat.IsDir() {
@@ -219,12 +223,12 @@ type processor struct {
 	inputDir  string
 	outputDir string
 
-	kggDbPath string
-
 	skipNoopDecoder bool
 	removeSource    bool
 	updateMetadata  bool
 	overwriteOutput bool
+
+	crypto common.CryptoParams
 }
 
 func (p *processor) watchDir(inputDir string) error {
@@ -352,11 +356,11 @@ func (p *processor) process(inputFile string, allDec []common.DecoderFactory) er
 	logger := logger.With(zap.String("source", inputFile))
 
 	pDec, decoderFactory, err := p.findDecoder(allDec, &common.DecoderParams{
-		Reader:          file,
-		Extension:       filepath.Ext(inputFile),
-		FilePath:        inputFile,
-		Logger:          logger,
-		KggDatabasePath: p.kggDbPath,
+		Reader:       file,
+		Extension:    filepath.Ext(inputFile),
+		FilePath:     inputFile,
+		Logger:       logger,
+		CryptoParams: p.crypto,
 	})
 	if err != nil {
 		return err

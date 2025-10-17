@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io"
 
-	"unlock-music.dev/cli/algo/common"
+	"git.um-react.app/um/cli/algo/common"
 )
 
 type Decoder struct {
@@ -19,7 +19,7 @@ type Decoder struct {
 }
 
 func NewDecoder(p *common.DecoderParams) common.Decoder {
-	return &Decoder{rd: p.Reader, KggDatabasePath: p.KggDatabasePath}
+	return &Decoder{rd: p.Reader, KggDatabasePath: p.CryptoParams.KggDbPath}
 }
 
 // Validate checks if the file is a valid Kugou (.kgm, .vpr, .kgma) file.

@@ -1,7 +1,8 @@
 {
   "name": "@unlock-music/joox-crypto",
+  "packageManager": "pnpm@10.15.1",
   "type": "commonjs",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Crypto library to decrypt joox encrypted music files.",
   "main": "src/index.js",
   "types": "src/index.d.ts",
@@ -12,7 +13,7 @@
     "test": "jest -w 50% src",
     "prepare": "simple-git-hooks"
   },
-  "repository": "https://git.unlock-music.dev/um/joox-crypto.git",
+  "repository": "https://git.um-react.app/um/joox-crypto.git",
   "keywords": [
     "joox"
   ],
@@ -32,7 +33,7 @@
     "*.{js,css,md}": "prettier --write"
   },
   "simple-git-hooks": {
-    "pre-commit": "npx lint-staged",
-    "pre-push": "npm test"
+    "pre-commit": "pnpm exec lint-staged",
+    "pre-push": "pnpm run test"
   }
 }

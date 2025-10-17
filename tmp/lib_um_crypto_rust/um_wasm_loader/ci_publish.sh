@@ -6,5 +6,5 @@ if [[ ! "$GITHUB_REF" =~ ^refs/tags/ ]]; then
     exit 0
 fi
 
-echo '//git.unlock-music.dev/api/packages/um/npm/:_authToken=${NPM_TOKEN}' > $HOME/.npmrc
+pnpm config set -- '//git.um-react.app/api/packages/um/npm/:_authToken' "${NPM_TOKEN}"
 pnpm publish --access=public --no-git-checks

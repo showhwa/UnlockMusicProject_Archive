@@ -48,7 +48,7 @@ impl ArgsNCM {
     fn write_cover(&self, cli: &Cli, ncm: &NCMFile) -> anyhow::Result<()> {
         if let Some(cover_path) = &self.cover {
             if let Some(cover) = &ncm.image1 {
-                File::create(cover_path)?.write_all(&cover)?;
+                File::create(cover_path)?.write_all(cover)?;
                 if cli.verbose {
                     let cover_path = cover_path.display();
                     let len = cover.len();

@@ -52,7 +52,8 @@
       :table-data="tableData"
       @download="saveFile"
       @edit="editFile"
-      @play="changePlaying" />
+      @play="changePlaying"
+    />
   </div>
 </template>
 
@@ -115,11 +116,7 @@ export default {
       console.error(errInfo, filename);
       this.$notify.error({
         title: '出现问题',
-        message:
-          errInfo +
-          '，' +
-          filename +
-          '，参考<a target="_blank" href="https://git.unlock-music.dev/um/web/wiki/使用提示">使用提示</a>',
+        message: errInfo + '，' + filename + '。',
         dangerouslyUseHTMLString: true,
         duration: 6000,
       });

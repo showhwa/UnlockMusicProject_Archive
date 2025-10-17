@@ -9,10 +9,10 @@ export function RootExplorerGuide() {
       <div className="flex flex-col items-start gap-4 @md:flex-row">
         <div>
           <Header5 className="[&]:mt-0 [&]:pt-0">Amaze 文件浏览器</Header5>
-          <ul className="ml-2 list-disc list-inside">
+          <ul className="ml-2 list-disc">
             <li>
-              <div className="inline-flex items-center gap-1">
-                点触主界面左上角的 <FiMenu /> 打开侧边栏
+              <div className="inline-flex items-center flex-wrap">
+                点触主界面左上角的 <FiMenu className="m-1" /> 打开侧边栏
               </div>
             </li>
             <li>
@@ -41,16 +41,16 @@ export function RootExplorerGuide() {
         </div>
         <div>
           <Header5 className="[&]:mt-0 [&]:pt-0">MT 管理器</Header5>
-          <ul className="ml-2 list-disc list-inside">
+          <ul className="ml-2 list-disc">
             <li>
-              <div className="inline-flex items-center gap-1">
-                点触主界面左上角的 <FiMenu /> 打开侧边栏
+              <div className="inline-flex items-center flex-wrap">
+                点触主界面左上角的 <FiMenu className="m-1" /> 打开侧边栏
               </div>
             </li>
             <li>
-              <div className="inline-flex items-center">
+              <div className="inline-flex items-center flex-wrap">
                 点触侧边栏右上方的 <FiMoreVertical className="ml-1" />
-                ，点触<VQuote>设置</VQuote>
+                弹出菜单，点触<VQuote>设置</VQuote>
               </div>
             </li>
             <li>

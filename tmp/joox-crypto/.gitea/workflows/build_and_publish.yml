@@ -1,0 +1,31 @@
+name: Build and Publish
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "*"
+jobs:
+  build_and_publish:
+    name: Build and Publish (on release)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: 🛎️ Checkout
+        uses: actions/checkout@v4
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v4.0.0
+        with:
+          standalone: true
+          run_install: |
+            - args: [--frozen-lockfile, --strict-peer-dependencies]
+      - name: Set up npm auth
+        if: startsWith(gitea.ref, 'refs/tags/v')
+        run: npm config set -- '//git.um-react.app/api/packages/um/npm/:_authToken' "${NPM_TOKEN}"
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: 🚀 Publish Package
+        if: startsWith(gitea.ref, 'refs/tags/v')
+        run: npm publish --access public

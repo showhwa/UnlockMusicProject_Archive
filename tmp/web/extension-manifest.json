@@ -15,7 +15,7 @@
   "permissions": ["storage"],
   "offline_enabled": true,
   "options_page": "index.html",
-  "homepage_url": "https://git.unlock-music.dev/um/web",
+  "homepage_url": "https://git.um-react.app/um/web",
   "action": {
     "default_icon": "img/icons/favicon-32x32.png",
     "default_popup": "./popup.html"

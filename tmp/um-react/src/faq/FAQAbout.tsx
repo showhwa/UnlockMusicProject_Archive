@@ -9,31 +9,31 @@ export function FAQAboutProject() {
       <Header3 id="failed">um-react 是什么</Header3>
       <p>
         um-react 是由
-        <a className="mx-1 link link-info" href="https://git.unlock-music.dev/um">
+        <a className="mx-1 link link-info" href="https://git.um-react.app/um">
           Unlock Music
         </a>
         基于 React 框架制作的一款用于移除已购音乐的加密保护的小工具，使用
-        <a className="mx-1 link link-info" href="https://git.unlock-music.dev/um/um-react/src/branch/main/LICENSE">
+        <a className="mx-1 link link-info" href="https://git.um-react.app/um/um-react/src/branch/main/LICENSE">
           MIT
         </a>
         授权协议。
       </p>
       <p>
         它的解密核心由 <FaRust className="inline" />
-        <a className="mx-1 link link-info" href="https://git.unlock-music.dev/um/lib_um_crypto_rust">
+        <a className="mx-1 link link-info" href="https://git.um-react.app/um/lib_um_crypto_rust">
           <code>lib_um_crypto_rust</code>
         </a>
         驱动，使用
         <a
           className="mx-1 link link-info"
-          href="https://git.unlock-music.dev/um/lib_um_crypto_rust/src/branch/main/LICENSE_MIT"
+          href="https://git.um-react.app/um/lib_um_crypto_rust/src/branch/main/LICENSE_MIT"
         >
           MIT
         </a>
         +
         <a
           className="mx-1 link link-info"
-          href="https://git.unlock-music.dev/um/lib_um_crypto_rust/src/branch/main/LICENSE_APACHE"
+          href="https://git.um-react.app/um/lib_um_crypto_rust/src/branch/main/LICENSE_APACHE"
         >
           Apache
         </a>

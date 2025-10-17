@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io"
 
-	"unlock-music.dev/cli/internal/sniff"
+	"git.um-react.app/um/cli/internal/sniff"
 )
 
 type RawDecoder struct {

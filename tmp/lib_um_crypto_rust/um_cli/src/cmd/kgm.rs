@@ -48,7 +48,7 @@ impl ArgsKGM {
         let mut file_input = File::open(&self.input)?;
         let mut header = [0u8; 0x40];
         file_input.read_exact(&mut header)?;
-        let kgm_header = Header::from_buffer(&mut header)?;
+        let kgm_header = Header::from_buffer(header)?;
         let decipher = Decipher::new(&kgm_header)?;
         file_input.seek(SeekFrom::Start(kgm_header.offset_to_data as u64))?;
 

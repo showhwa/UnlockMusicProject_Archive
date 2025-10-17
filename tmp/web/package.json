@@ -7,7 +7,7 @@
   "description": "Unlock encrypted music file in browser.",
   "repository": {
     "type": "git",
-    "url": "https://git.unlock-music.dev/um/web"
+    "url": "https://git.um-react.app/um/web.git"
   },
   "private": true,
   "scripts": {
@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@babel/preset-typescript": "^7.16.5",
-    "@unlock-music/joox-crypto": "^0.0.1",
+    "@unlock-music/joox-crypto": "^0.0.2",
     "@xhacker/kgmwasm": "^1.0.0",
     "@xhacker/qmcwasm": "^1.0.0",
     "base64-js": "^1.5.1",

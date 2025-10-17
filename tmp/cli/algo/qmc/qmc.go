@@ -6,14 +6,13 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"runtime"
 	"strconv"
 	"strings"
 
 	"go.uber.org/zap"
 
-	"unlock-music.dev/cli/algo/common"
-	"unlock-music.dev/cli/internal/sniff"
+	"git.um-react.app/um/cli/algo/common"
+	"git.um-react.app/um/cli/internal/sniff"
 )
 
 type Decoder struct {
@@ -133,14 +132,15 @@ func (d *Decoder) searchKey() (err error) {
 	}
 	fileSize := int(fileSizeM4) + 4
 
-	//goland:noinspection GoBoolExpressions
-	if runtime.GOOS == "darwin" && !strings.HasPrefix(d.params.Extension, ".qmc") {
-		d.decodedKey, err = readKeyFromMMKV(d.params.FilePath, d.logger)
+	if key, ok := d.params.CryptoParams.QmcKeys.Get(d.params.FilePath); ok {
+		d.logger.Debug("QQMusic Mac Legacy file", zap.String("file", d.params.FilePath), zap.String("key", key))
+		d.decodedKey, err = deriveKey([]byte(key))
 		if err == nil {
 			d.audioLen = fileSize
-			return
+		} else {
+			d.decodedKey = nil
+			d.logger.Warn("could not derive key, skip", zap.Error(err))
 		}
-		d.logger.Warn("read key from mmkv failed", zap.Error(err))
 	}
 
 	suffixBuf := make([]byte, 4)
@@ -153,25 +153,34 @@ func (d *Decoder) searchKey() (err error) {
 		return d.readRawMetaQTag()
 	case "STag":
 		return errors.New("qmc: file with 'STag' suffix doesn't contains media key")
+	// speculative guess for "musicex\0"
 	case "cex\x00":
 		footer, err := NewMusicExTag(d.raw)
 		if err != nil {
 			return err
 		}
 		d.audioLen = fileSize - int(footer.TagSize)
-		d.decodedKey, err = readKeyFromMMKVCustom(footer.MediaFileName)
-		if err != nil {
-			return err
+		if key, ok := d.params.CryptoParams.QmcKeys.Get(footer.MediaFileName); ok {
+			d.logger.Debug("searchKey: using key from MediaFileName", zap.String("MediaFileName", footer.MediaFileName), zap.String("key", key))
+			d.decodedKey, err = deriveKey([]byte(key))
+		} else if d.decodedKey == nil {
+			return errors.New("searchKey: no key found for musicex tag")
 		}
-		return nil
+		return err
 	default:
-		size := binary.LittleEndian.Uint32(suffixBuf)
+		// if we already have a key from legacy mmkv, use it
+		if d.decodedKey != nil {
+			return nil
+		}
 
+		// try to use suffix as key length
+		size := binary.LittleEndian.Uint32(suffixBuf)
 		if size <= 0xFFFF && size != 0 { // assume size is key len
 			return d.readRawKey(int64(size))
 		}
 
-		// try to use default static cipher
+		// try to use default static cipher,
+		//   or the key read from the legacy mmkv
 		d.audioLen = fileSize
 		return nil
 	}

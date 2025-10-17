@@ -5,8 +5,24 @@ import (
 	"path/filepath"
 	"strings"
 
+	"git.um-react.app/um/cli/internal/utils"
 	"go.uber.org/zap"
 )
+
+type QMCKeys map[string]string
+
+type CryptoParams struct {
+	// KuGou kgg database path
+	KggDbPath string
+
+	// QMC Crypto config
+	QmcKeys QMCKeys
+}
+
+func (k QMCKeys) Get(key string) (string, bool) {
+	value, ok := k[utils.NormalizeUnicode(key)]
+	return value, ok
+}
 
 type DecoderParams struct {
 	Reader    io.ReadSeeker // required
@@ -16,8 +32,7 @@ type DecoderParams struct {
 
 	Logger *zap.Logger // required
 
-	// KuGou
-	KggDatabasePath string
+	CryptoParams CryptoParams
 }
 type NewDecoderFunc func(p *DecoderParams) Decoder
 

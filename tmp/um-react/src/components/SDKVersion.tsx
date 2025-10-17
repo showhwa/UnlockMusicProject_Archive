@@ -11,7 +11,7 @@ export function SDKVersion() {
   const refDialog = useRef<HTMLDialogElement>(null);
   const [sdkVersion, setSdkVersion] = useState('...');
   useEffect(() => {
-    getSDKVersion().then(setSdkVersion);
+    getSDKVersion().then(setSdkVersion, () => setSdkVersion('N/A'));
   }, []);
 
   return (

@@ -1,5 +1,4 @@
-import { Light as SyntaxHighlighter } from 'react-syntax-highlighter';
-import hljsStyleGitHub from 'react-syntax-highlighter/dist/esm/styles/hljs/github';
+import { CodeHighlight } from '../CodeHighlight';
 import { ExtLink } from '../ExtLink';
 import PowerShellAdbDumpCommandTemplate from './adb_dump.ps1?raw';
 import ShellAdbDumpCommandTemplate from './adb_dump.sh?raw';
@@ -45,9 +44,7 @@ export function AdbInstructionTemplate({ dir, file, platform }: AdbInstructionTe
       <li>将安卓设备连接到电脑。</li>
       <li>
         <p>粘贴执行下述代码执行。若设备提示「是否允许 USB 调试」或「超级用户请求」，选择允许：</p>
-        <SyntaxHighlighter language={language} style={hljsStyleGitHub}>
-          {command}
-        </SyntaxHighlighter>
+        <CodeHighlight language={language}>{command}</CodeHighlight>
         <br />※ 安卓模拟器可能需要额外操作，如
         <ExtLink className="text-nowrap" href="https://g.126.fm/04jewvw">
           网易 MuMu 模拟器

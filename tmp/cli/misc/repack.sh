@@ -47,4 +47,5 @@ fi
 
 echo 'Creating checksum...'
 sha256sum *.zip *.tar.gz >sha256sum.txt
+ls -alh *.zip *.tar.gz sha256sum.txt
 popd

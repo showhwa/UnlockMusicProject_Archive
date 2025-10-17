@@ -19,14 +19,14 @@ export class QQMusicV1Decipher implements DecipherInstance {
     for (const [block, offset] of chunkBuffer(audioBuffer)) {
       decryptQMC1(block, offset);
     }
-    return {
+    return Promise.resolve({
       status: Status.OK,
       cipherName: this.cipherName,
       data: audioBuffer,
-    };
+    });
   }
 
-  public static create() {
+  public static create(this: void) {
     return new QQMusicV1Decipher();
   }
 }
@@ -62,25 +62,28 @@ export class QQMusicV2Decipher implements DecipherInstance {
       throw new Error('EKey required');
     }
 
-    const qmc2 = new QMC2(ekey);
     const audioBuffer = buffer.slice(0, buffer.byteLength - footer.size);
-    for (const [block, offset] of chunkBuffer(audioBuffer)) {
-      qmc2.decrypt(block, offset);
+    const qmc2 = new QMC2(ekey);
+    try {
+      for (const [block, offset] of chunkBuffer(audioBuffer)) {
+        qmc2.decrypt(block, offset);
+      }
+    } finally {
+      qmc2.free();
     }
-    qmc2.free();
 
-    return {
+    return Promise.resolve({
       status: Status.OK,
       cipherName: this.cipherName,
       data: audioBuffer,
-    };
+    });
   }
 
-  public static createWithUserKey() {
+  public static createWithUserKey(this: void) {
     return new QQMusicV2Decipher(true);
   }
 
-  public static createWithEmbeddedEKey() {
+  public static createWithEmbeddedEKey(this: void) {
     return new QQMusicV2Decipher(false);
   }
 }

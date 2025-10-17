@@ -28,15 +28,15 @@ pub struct Cli {
 
 fn run_command(cli: &Cli) -> Result<i32> {
     match &cli.command {
-        Some(Commands::JOOX(cmd)) => cmd.run(&cli),
-        Some(Commands::KGM(cmd)) => cmd.run(&cli),
-        Some(Commands::Migu3D(cmd)) => cmd.run(&cli),
-        Some(Commands::NCM(cmd)) => cmd.run(&cli),
-        Some(Commands::QMCv1(cmd)) => cmd.run(&cli),
-        Some(Commands::QMCv2(cmd)) => cmd.run(&cli),
-        Some(Commands::QTFM(cmd)) => cmd.run(&cli),
-        Some(Commands::Xiami(cmd)) => cmd.run(&cli),
-        Some(Commands::XMLY(cmd)) => cmd.run(&cli),
+        Some(Commands::Joox(cmd)) => cmd.run(cli),
+        Some(Commands::Kgm(cmd)) => cmd.run(cli),
+        Some(Commands::Migu3D(cmd)) => cmd.run(cli),
+        Some(Commands::Ncm(cmd)) => cmd.run(cli),
+        Some(Commands::QMCv1(cmd)) => cmd.run(cli),
+        Some(Commands::QMCv2(cmd)) => cmd.run(cli),
+        Some(Commands::QtFM(cmd)) => cmd.run(cli),
+        Some(Commands::Xiami(cmd)) => cmd.run(cli),
+        Some(Commands::Xmly(cmd)) => cmd.run(cli),
         None => {
             // https://github.com/clap-rs/clap/issues/3857#issuecomment-1161796261
             todo!("implement a sensible default command, similar to um/cli");

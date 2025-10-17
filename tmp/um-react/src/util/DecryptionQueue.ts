@@ -5,7 +5,10 @@ import { ConcurrentQueue } from './ConcurrentQueue';
 import { WorkerClientBus } from './WorkerEventBus';
 
 export class DecryptionQueue extends ConcurrentQueue<DecryptCommandPayload, DecryptionResult> {
-  constructor(private workerClientBus: WorkerClientBus<DECRYPTION_WORKER_ACTION_NAME>, maxQueue?: number) {
+  constructor(
+    private workerClientBus: WorkerClientBus<DECRYPTION_WORKER_ACTION_NAME>,
+    maxQueue?: number,
+  ) {
     super(maxQueue);
   }
 

@@ -11,3 +11,9 @@ declare module '*?base64' {
   const content: string;
   export default content;
 }
+
+declare module '*&mac-command' {
+  export const tarball: string;
+  export const commandName: string;
+  export const tarName: string;
+}

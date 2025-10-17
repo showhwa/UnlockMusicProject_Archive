@@ -27,7 +27,10 @@ export function SelectFile() {
           fileName,
         }),
       );
-      dispatch(processFile({ fileId }));
+
+      dispatch(processFile({ fileId })).catch((err) => {
+        console.log(`failed to add file (id=${fileId}, name=${fileName}, err=${err as Error})`);
+      });
     }
   };
 

@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"io"
 
-	"unlock-music.dev/cli/algo/common"
+	"git.um-react.app/um/cli/algo/common"
 )
 
 var (

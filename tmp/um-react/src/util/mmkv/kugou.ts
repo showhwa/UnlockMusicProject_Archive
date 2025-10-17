@@ -1,7 +1,7 @@
 import type { StagingKugouKey } from '~/features/settings/keyFormats';
 import { MMKVParser } from '../MMKVParser';
 
-export function parseAndroidKugouMMKV(view: DataView): Omit<StagingKugouKey, 'id'>[] {
+export function parseAndroidKugouMMKV(view: DataView<ArrayBuffer>): Omit<StagingKugouKey, 'id'>[] {
   const mmkv = new MMKVParser(view);
   const result: Omit<StagingKugouKey, 'id'>[] = [];
   while (!mmkv.eof) {

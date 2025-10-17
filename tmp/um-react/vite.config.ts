@@ -12,6 +12,7 @@ import tailwindcss from '@tailwindcss/vite';
 
 import { tryCommand } from './support/command';
 import { base64Loader } from './support/b64-loader';
+import { macCommandLoader } from './support/mac-command-loader';
 
 const projectRoot = url.fileURLToPath(new URL('.', import.meta.url));
 const pkg = JSON.parse(fs.readFileSync(projectRoot + '/package.json', 'utf-8'));
@@ -32,6 +33,7 @@ export default defineConfig({
       // strict: false,
 
       allow: [
+        'index.html',
         'src',
         'node_modules',
 
@@ -46,6 +48,7 @@ export default defineConfig({
   plugins: [
     tailwindcss(),
     base64Loader,
+    macCommandLoader,
     replace({
       preventAssignment: true,
       values: {

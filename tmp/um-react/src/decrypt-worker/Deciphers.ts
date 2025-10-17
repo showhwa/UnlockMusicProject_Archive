@@ -25,7 +25,7 @@ export interface DecipherNotOK {
 export interface DecipherOK {
   status: Status.OK;
   message?: string;
-  data: Uint8Array;
+  data: Uint8Array<ArrayBuffer>;
   overrideExtension?: string;
   cipherName: string;
 }

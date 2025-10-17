@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"io"
 
-	"unlock-music.dev/cli/algo/common"
-	"unlock-music.dev/cli/internal/sniff"
+	"git.um-react.app/um/cli/algo/common"
+	"git.um-react.app/um/cli/internal/sniff"
 )
 
 type Decoder struct {

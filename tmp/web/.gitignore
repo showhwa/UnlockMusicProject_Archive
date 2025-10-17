@@ -3,6 +3,7 @@ node_modules
 /dist
 /build
 /coverage
+/build
 
 # local env files
 .env.local
