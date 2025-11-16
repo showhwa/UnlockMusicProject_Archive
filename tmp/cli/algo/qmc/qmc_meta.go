@@ -61,7 +61,7 @@ func (d *Decoder) getMetaBySongID(ctx context.Context) error {
 
 func (d *Decoder) searchMetaOnline(ctx context.Context, original common.AudioMeta) error {
 	c := client.NewQQMusicClient() // todo: use global client
-	keyword := lo.WithoutEmpty(append(
+	keyword := lo.Compact(append(
 		[]string{original.GetTitle(), original.GetAlbum()},
 		original.GetArtists()...),
 	)

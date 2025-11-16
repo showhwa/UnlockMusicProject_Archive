@@ -2,14 +2,15 @@ package ffmpeg
 
 import (
 	"context"
-	"go.uber.org/zap"
 	"mime"
+	"slices"
 	"strings"
+
+	"go.uber.org/zap"
 
 	"github.com/go-flac/flacpicture"
 	"github.com/go-flac/flacvorbis"
 	"github.com/go-flac/go-flac"
-	"golang.org/x/exp/slices"
 )
 
 func updateMetaFlac(_ context.Context, outPath string, m *UpdateMetadataParams, logger *zap.Logger) error {

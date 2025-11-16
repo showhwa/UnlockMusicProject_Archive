@@ -3,8 +3,7 @@ package sniff
 import (
 	"bytes"
 	"encoding/binary"
-
-	"golang.org/x/exp/slices"
+	"slices"
 )
 
 type Sniffer interface {
