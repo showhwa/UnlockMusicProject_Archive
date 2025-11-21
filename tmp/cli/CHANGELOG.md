@@ -7,10 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [v0.2.18] - 2025-09-15
+## [v0.2.18] - 2025-11-16
 
 ### Changed
-- Fix `musicex\0` tag parsing.
+- QMC2: Fix `musicex\0` tag parsing.
+- MMKV: Improved tolerance for corrupted MMKV file parsing.
+- Updated project dependencies.
 
 ## [v0.2.17] - 2025-09-09 ⚠️ **(Broken Release)**
 
