@@ -8,7 +8,7 @@ require (
 	github.com/go-flac/flacvorbis v0.2.0
 	github.com/go-flac/go-flac v1.0.0
 	github.com/samber/lo v1.52.0
-	github.com/unlock-music/go-mmkv v0.1.3
+	github.com/unlock-music/go-mmkv v0.1.4
 	github.com/urfave/cli/v2 v2.27.7
 	go.uber.org/zap v1.27.0
 	golang.org/x/crypto v0.44.0
