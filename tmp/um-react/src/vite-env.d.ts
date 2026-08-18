@@ -17,3 +17,7 @@ declare module '*&mac-command' {
   export const commandName: string;
   export const tarName: string;
 }
+
+declare interface Window {
+  BASE_URL: string;
+}

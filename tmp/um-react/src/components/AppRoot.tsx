@@ -25,7 +25,7 @@ export function AppRoot() {
   useEffect(() => persistSettings(store), []);
 
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={window.BASE_URL || '/'}>
       <Provider store={store}>
         <div role="tablist" className="tabs tabs-border w-full justify-center border-b-2 border-base-200 box-content">
           <NavLink to="/" role="tab" className={tabClassNames}>
