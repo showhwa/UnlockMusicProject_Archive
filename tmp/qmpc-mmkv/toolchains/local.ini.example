@@ -1,0 +1,7 @@
+# Copy to toolchains/local.ini; pass AFTER mingw-w64.ini.
+[constants]
+toolchain_bin = '/opt/mingw-w64/bin'
+
+# Optional: run Windows test EXEs under Wine on Linux.
+# [binaries]
+# exe_wrapper = 'wine'

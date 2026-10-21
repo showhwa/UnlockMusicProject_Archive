@@ -11,6 +11,16 @@ import (
 
 type QMCKeys map[string]string
 
+func MergeQMCKeys(keys ...QMCKeys) QMCKeys {
+	result := make(QMCKeys)
+	for _, k := range keys {
+		for key, value := range k {
+			result[utils.NormalizeUnicode(key)] = utils.NormalizeUnicode(value)
+		}
+	}
+	return result
+}
+
 type CryptoParams struct {
 	// KuGou kgg database path
 	KggDbPath string

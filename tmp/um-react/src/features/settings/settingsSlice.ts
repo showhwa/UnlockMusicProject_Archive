@@ -21,7 +21,17 @@ import {
   StagingKugouKey,
 } from './keyFormats';
 
+export interface BatchDownloadSettings {
+  directoryPicker: boolean;
+  rememberDirectory: boolean;
+  streamingZip: boolean;
+  blobZip: boolean;
+}
+
 export interface StagingSettings {
+  general: {
+    batchDownload: BatchDownloadSettings;
+  };
   qmc2: {
     keys: StagingQMCv2Key[];
     allowFuzzyNameSearch: boolean;
@@ -38,6 +48,9 @@ export interface StagingSettings {
 }
 
 export interface ProductionSettings {
+  general: {
+    batchDownload: BatchDownloadSettings;
+  };
   qmc2: {
     keys: ProductionQMCv2Keys; // {  [fileName]: ekey  }
     allowFuzzyNameSearch: boolean;
@@ -53,6 +66,13 @@ export interface ProductionSettings {
   };
 }
 
+export const DEFAULT_BATCH_DOWNLOAD_SETTINGS: BatchDownloadSettings = {
+  directoryPicker: true,
+  rememberDirectory: true,
+  streamingZip: true,
+  blobZip: true,
+};
+
 export interface SettingsState {
   dirty: boolean;
   staging: StagingSettings;
@@ -62,12 +82,14 @@ export interface SettingsState {
 const initialState: SettingsState = {
   dirty: false,
   staging: {
+    general: { batchDownload: { ...DEFAULT_BATCH_DOWNLOAD_SETTINGS } },
     qmc2: { allowFuzzyNameSearch: true, keys: [] },
     kwm2: { keys: [] },
     qtfm: { android: '' },
     kugou: { keys: [] },
   },
   production: {
+    general: { batchDownload: { ...DEFAULT_BATCH_DOWNLOAD_SETTINGS } },
     qmc2: { allowFuzzyNameSearch: true, keys: {} },
     kwm2: { keys: {} },
     kugou: { keys: {} },
@@ -76,6 +98,9 @@ const initialState: SettingsState = {
 };
 
 const stagingToProduction = (staging: StagingSettings): ProductionSettings => ({
+  general: {
+    batchDownload: { ...staging.general.batchDownload },
+  },
   qmc2: {
     keys: stagingKeyToProduction(staging.qmc2.keys, qmc2StagingToProductionKey, qmc2StagingToProductionValue),
     allowFuzzyNameSearch: staging.qmc2.allowFuzzyNameSearch,
@@ -90,6 +115,9 @@ const stagingToProduction = (staging: StagingSettings): ProductionSettings => ({
 });
 
 const productionToStaging = (production: ProductionSettings): StagingSettings => ({
+  general: {
+    batchDownload: { ...production.general.batchDownload },
+  },
   qmc2: {
     keys: productionKeyToStaging(production.qmc2.keys, qmc2ProductionToStaging),
     allowFuzzyNameSearch: production.qmc2.allowFuzzyNameSearch,
@@ -208,6 +236,13 @@ export const settingsSlice = createSlice({
       state.staging.qtfm.android = deviceKey;
       state.dirty = true;
     },
+    updateBatchDownloadSetting(
+      state,
+      { payload: { key, value } }: PayloadAction<{ key: keyof BatchDownloadSettings; value: boolean }>,
+    ) {
+      state.staging.general.batchDownload[key] = value;
+      state.dirty = true;
+    },
     //
     discardStagingChanges: (state) => {
       state.dirty = false;
@@ -252,6 +287,7 @@ export const {
   kugouImportKeys,
 
   qtfmAndroidUpdateKey,
+  updateBatchDownloadSetting,
 
   commitStagingChange,
   discardStagingChanges,

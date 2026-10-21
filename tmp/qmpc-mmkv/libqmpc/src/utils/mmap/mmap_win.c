@@ -1,0 +1,105 @@
+#include <libqmpc/utils/mmap.h>
+
+#include <string.h>
+#include <windows.h>
+
+bool qmpc_mmap_init(qmpc_mmap_t* self, const char* path) {
+  memset(self, 0, sizeof(*self));
+
+  HANDLE file = CreateFileA(path, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+  if (file == INVALID_HANDLE_VALUE) {
+    return false;
+  }
+
+  LARGE_INTEGER file_size = {};
+  if (GetFileSizeEx(file, &file_size) == FALSE || file_size.QuadPart < 0) {
+    CloseHandle(file);
+    return false;
+  }
+
+  HANDLE mapping = NULL;
+  uint8_t* view = NULL;
+  if (file_size.QuadPart > 0) {
+    mapping = CreateFileMappingA(file, NULL, PAGE_READONLY, 0, 0, NULL);
+    if (mapping == NULL) {
+      CloseHandle(file);
+      return false;
+    }
+    view = (uint8_t*)MapViewOfFile(mapping, FILE_MAP_READ, 0, 0, 0);
+    if (view == NULL) {
+      CloseHandle(mapping);
+      CloseHandle(file);
+      return false;
+    }
+  }
+
+  self->data = view;
+  self->size = (size_t)file_size.QuadPart;
+  self->writeable_ = false;
+  self->os_file_ = file;
+  self->os_mapping_ = mapping;
+  return true;
+}
+
+bool qmpc_mmap_init_writable(qmpc_mmap_t* self, const char* path, size_t size) {
+  memset(self, 0, sizeof(*self));
+
+  HANDLE file = CreateFileA(path, GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+  if (file == INVALID_HANDLE_VALUE) {
+    return false;
+  }
+
+  HANDLE mapping = NULL;
+  uint8_t* view = NULL;
+  if (size > 0) {
+    const DWORD size_high = (DWORD)((uint64_t)size >> 32);
+    const DWORD size_low = (DWORD)(uint64_t)size;
+    mapping = CreateFileMappingA(file, NULL, PAGE_READWRITE, size_high, size_low, NULL);
+    if (mapping == NULL) {
+      CloseHandle(file);
+      return false;
+    }
+    view = (uint8_t*)MapViewOfFile(mapping, FILE_MAP_WRITE, 0, 0, size);
+    if (view == NULL) {
+      CloseHandle(mapping);
+      CloseHandle(file);
+      return false;
+    }
+  }
+
+  self->data = view;
+  self->size = size;
+  self->writeable_ = true;
+  self->os_file_ = file;
+  self->os_mapping_ = mapping;
+  return true;
+}
+
+bool qmpc_mmap_flush(qmpc_mmap_t* self) {
+  if (!self->writeable_ || self->data == NULL || self->size == 0) {
+    return true;
+  }
+
+  if (FlushViewOfFile(self->data, self->size) == FALSE) {
+    return false;
+  }
+  if (self->os_file_ != NULL && FlushFileBuffers(self->os_file_) == FALSE) {
+    return false;
+  }
+  return true;
+}
+
+void qmpc_mmap_drop(qmpc_mmap_t* self) {
+  (void)qmpc_mmap_flush(self);
+
+  if (self->data != NULL) {
+    UnmapViewOfFile(self->data);
+  }
+  if (self->os_mapping_ != NULL) {
+    CloseHandle(self->os_mapping_);
+  }
+  if (self->os_file_ != NULL) {
+    CloseHandle(self->os_file_);
+  }
+  memset(self, 0, sizeof(*self));
+}

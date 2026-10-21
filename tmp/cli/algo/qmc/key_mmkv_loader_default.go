@@ -1,4 +1,4 @@
-//go:build !darwin
+//go:build !darwin && !windows
 
 package qmc
 
@@ -7,7 +7,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func LoadMMKVOrDefault(path string, key string, logger *zap.Logger) (result common.QMCKeys, err error) {
-	// Stub: do nothing
+func LoadMMKVOrDefault(opts MMKVLoaderOptions, logger *zap.Logger) (result common.QMCKeys, err error) {
+	// No platform-default QMC keys on this OS.
 	return nil, nil
 }

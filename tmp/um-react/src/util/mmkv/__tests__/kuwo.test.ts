@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { parseAndroidKuwoEKey, parseIosKuwoEKey } from '../kuwo';
 
-const makeViewFromBuffer = (buff: Buffer) =>
+const makeViewFromBuffer = (buff: Buffer<ArrayBuffer>) =>
   new DataView(buff.buffer.slice(buff.byteOffset, buff.byteOffset + buff.byteLength));
 
 test('parse kuwo android ekey mmkv file "cn.kuwo.player.mmkv.defaultconfig"', () => {

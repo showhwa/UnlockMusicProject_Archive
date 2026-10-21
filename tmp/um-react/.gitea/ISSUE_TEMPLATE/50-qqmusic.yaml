@@ -7,7 +7,9 @@ body:
       value: |
         ### Windows 客户端
 
-        目前 Windows 客户端仅支持 19.51 或更低版本下载的歌曲文件。
+        目前 Windows 客户端支持 19.57 至 22.76（目前最新版）下载的歌曲文件，但需要导入由 [qmpc-mmkv-cli](https://git.um-react.app/um/qmpc-mmkv/releases) 提取的密钥文件 `qmpc-mmkv-v1.mmkv`。
+
+        使用 19.51 或更低版本下载的歌曲文件无需密钥。
 
         * [web.archive.org 镜像](https://web.archive.org/web/2023/https://dldir1v6.qq.com/music/clntupate/QQMusic_Setup_1951.exe)
         * [通过 Telegram 下载](https://t.me/um_lsr_ch/24)

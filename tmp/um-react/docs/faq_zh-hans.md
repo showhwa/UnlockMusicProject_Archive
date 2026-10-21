@@ -10,7 +10,7 @@
 
 #### 2、检查您的平台。
 
-日前，<mark>仅 Windows 客户端 v19.43 或以下版本</mark>下载的歌曲无需密钥，其余平台的官方正式版本均需要提取密钥。
+日前，Windows 客户端 <mark>v19.57 至 v22.76</mark>（目前最新版）下载的歌曲需要导入由 [qmpc-mmkv-cli](https://git.um-react.app/um/qmpc-mmkv/releases) 提取的密钥文件 `qmpc-mmkv-v1.mmkv`；<mark>v19.51 或更低版本</mark>下载的歌曲无需密钥。其余平台的官方正式版本均需要提取密钥。
 
 > iOS 用户提取歌曲困难，建议换用电脑操作；Android 用户提取密钥需要 root，也建议用电脑操作。
 
@@ -70,6 +70,18 @@
 - WSA 可以参考 [MagiskOnWSALocal](https://github.com/LSPosed/MagiskOnWSALocal) 的说明操作。
 - 雷电模拟器可以在「模拟器设置」 → 「其他设置」中启用 root 特权。
   ![雷电模拟器 其他设置](../src/faq/assets/ld_settings_misc@2x.webp)
+
+### 批量下载约十首后失败 / 无法全部下载
+
+Chromium 系浏览器会限制页面在短时间内通过程序触发的**多个**文件下载（常见表现为大约十个文件后静默中断，或提示「此网站正在尝试下载多个文件」）。
+
+本站的「下载全部」会按「设定 → 通用设置 → 批量下载」中勾选的顺序尝试：
+
+1. 选择输出目录，直接写入文件（推荐，Chrome / Edge）
+2. 流式生成单个 ZIP 并保存
+3. 在内存中生成 ZIP 后触发一次下载（兼容性最好）
+
+若全部失败会弹出提示。大批量转换也可使用 [命令行版本](https://git.um-react.app/um/cli)。
 
 ### Via 等浏览器无法正常解密/下载
 

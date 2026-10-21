@@ -14,7 +14,7 @@ func TestMMKVReader(t *testing.T) {
 		assert.NotNil(t, mmkv)
 		defer mmkv.Close()
 
-		r, err := NewMMKVReader(mmkv, nil, nil)
+		r, err := NewMMKVReader(mmkv, -1, nil, nil)
 		assert.NoError(t, err)
 		assert.NotNil(t, r)
 
@@ -39,7 +39,7 @@ func TestMMKVReader(t *testing.T) {
 		assert.NotNil(t, mmkv)
 		defer mmkv.Close()
 
-		r, err := NewMMKVReader(mmkv, nil, nil)
+		r, err := NewMMKVReader(mmkv, -1, nil, nil)
 		assert.NoError(t, err)
 		assert.NotNil(t, r)
 
@@ -71,7 +71,7 @@ func TestMMKVReader(t *testing.T) {
 		assert.NotNil(t, mmkv)
 		defer mmkv.Close()
 
-		r, err := NewMMKVReader(mmkv, nil, nil)
+		r, err := NewMMKVReader(mmkv, -1, nil, nil)
 		assert.NoError(t, err)
 		assert.NotNil(t, r)
 
@@ -94,9 +94,15 @@ func TestMMKVReader(t *testing.T) {
 		assert.NotNil(t, crc)
 		defer crc.Close()
 
-		r, err := NewMMKVReader(mmkv, []byte("unlock-music:key"), crc)
+		r, err := NewMMKVReader(mmkv, -1, []byte("unlock-music:key"), crc)
 		assert.NoError(t, err)
 		assert.NotNil(t, r)
+		assert.NotNil(t, r.Info)
+		assert.Equal(t, uint32(4), r.Info.Version)
+		assert.Equal(t, uint32(0x1c), r.Info.ActualSize)
+		assert.Equal(t, uint32(4), r.Info.LastActualSize)
+		assert.Equal(t, uint32(0x59c57f88), r.Info.LastCRCDigest)
+		assert.Equal(t, uint64(0), r.Info.Flags)
 
 		key1, err := r.ReadKey()
 		assert.NoError(t, err)

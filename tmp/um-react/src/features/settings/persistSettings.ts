@@ -1,7 +1,13 @@
 import { debounce } from 'radash';
 
 import type { AppStore } from '~/store';
-import { settingsSlice, setProductionChanges, ProductionSettings } from './settingsSlice';
+import {
+  settingsSlice,
+  setProductionChanges,
+  ProductionSettings,
+  DEFAULT_BATCH_DOWNLOAD_SETTINGS,
+  BatchDownloadSettings,
+} from './settingsSlice';
 import { enumObject } from '~/util/objects';
 import { getLogger } from '~/util/logUtils';
 import { parseKwm2ProductionKey } from './keyFormats';
@@ -9,8 +15,24 @@ import { deepClone } from '~/util/deepClone';
 
 const DEFAULT_STORAGE_KEY = 'um-react-settings';
 
+function mergeBatchDownload(source: Partial<BatchDownloadSettings> | undefined): BatchDownloadSettings {
+  const result = { ...DEFAULT_BATCH_DOWNLOAD_SETTINGS };
+  if (!source) {
+    return result;
+  }
+  for (const key of Object.keys(DEFAULT_BATCH_DOWNLOAD_SETTINGS) as (keyof BatchDownloadSettings)[]) {
+    if (typeof source[key] === 'boolean') {
+      result[key] = source[key];
+    }
+  }
+  return result;
+}
+
 function mergeSettings(settings: ProductionSettings): ProductionSettings {
   const draft = deepClone(settingsSlice.getInitialState().production);
+
+  draft.general.batchDownload = mergeBatchDownload(settings?.general?.batchDownload);
+
   if (settings?.qmc2) {
     const { allowFuzzyNameSearch, keys } = settings.qmc2;
     for (const [k, v] of enumObject(keys)) {

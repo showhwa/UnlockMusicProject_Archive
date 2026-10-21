@@ -1,6 +1,6 @@
 import { MMKVParser } from '../MMKVParser';
 
-const makeViewFromBuffer = (buff: Buffer) =>
+const makeViewFromBuffer = (buff: Buffer<ArrayBuffer>) =>
   new DataView(buff.buffer.slice(buff.byteOffset, buff.byteOffset + buff.byteLength));
 
 test('throw error on broken file', () => {

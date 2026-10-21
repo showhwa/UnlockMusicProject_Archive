@@ -159,5 +159,5 @@ func LoadMacKeysV10(logger *zap.Logger) (common.QMCKeys, error) {
 		return nil, err
 	}
 
-	return mmkv.Merge(append(keys1, keys2...)...), nil
+	return common.MergeQMCKeys(append(keys1, keys2...)...), nil
 }

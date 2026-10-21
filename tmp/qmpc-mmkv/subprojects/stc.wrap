@@ -1,0 +1,5 @@
+[wrap-file]
+directory = STC-5.0
+source_url = https://codeload.github.com/stclib/STC/tar.gz/refs/tags/v5.0
+source_filename = STC-5.0.tar.gz
+source_hash = d61353852b9d7ef69b56fa32edcbc7934f2153385f3778536234201ceebcc950

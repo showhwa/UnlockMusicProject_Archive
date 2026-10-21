@@ -11,6 +11,22 @@ export function OtherFAQ() {
       <p>该项目进行解密处理。如果加密前的资源没有内嵌元信息或封面，解密的文件也没有。</p>
       <p>请使用第三方工具进行编辑或管理元信息。</p>
 
+      <Header3 id="batch-download">批量下载约十首后失败 / 无法全部下载</Header3>
+      <p>
+        Chromium 系浏览器会限制页面在短时间内通过程序触发的<strong>多个</strong>
+        文件下载（常见表现为大约十个文件后静默中断，或提示「此网站正在尝试下载多个文件」）。
+      </p>
+      <p className="my-2">本站的「下载全部」会按「设定 → 通用设置 → 批量下载」中勾选的顺序尝试：</p>
+      <ol className="list-decimal pl-8 my-2">
+        <li>选择输出目录，直接写入文件（推荐，Chrome / Edge）</li>
+        <li>流式生成单个 ZIP 并保存</li>
+        <li>在内存中生成 ZIP 后触发一次下载（兼容性最好）</li>
+      </ol>
+      <p>
+        若全部失败会弹出提示。大批量转换也可使用
+        <ExtLink href="https://git.um-react.app/um/cli">命令行版本</ExtLink>。
+      </p>
+
       <Header3 id="android-browsers">安卓: 浏览器支持说明</Header3>
       <p>⚠️ 手机端浏览器支持有限，请使用最新版本的 Chrome 或 Firefox 官方浏览器。</p>
       <div className="flex flex-col md:flex-row gap-2 md:gap-8">

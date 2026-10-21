@@ -5,7 +5,7 @@ import tar from 'tar-stream';
 
 export const macCommandLoader: Plugin = {
   name: 'mac-command-loader',
-  async transform(_: unknown, id: string) {
+  async load(id: string) {
     const [path, query] = id.split('?');
     if (!query || !query.includes('mac-command')) return null;
 
@@ -23,7 +23,8 @@ export const macCommandLoader: Plugin = {
 
     const chunks: Buffer[] = [];
     for await (const chunk of tarball) {
-      chunks.push(chunk as Buffer);
+      if (!Buffer.isBuffer(chunk)) throw new TypeError('Expected a tarball Buffer chunk');
+      chunks.push(chunk);
     }
     const dataBuffer = Buffer.concat(chunks);
     const base64 = dataBuffer.toString('base64');

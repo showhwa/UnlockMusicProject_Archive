@@ -6,19 +6,18 @@ import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import wasm from 'vite-plugin-wasm';
 import replace from '@rollup/plugin-replace';
-import topLevelAwait from 'vite-plugin-top-level-await';
 import { VitePWA } from 'vite-plugin-pwa';
 import tailwindcss from '@tailwindcss/vite';
 
-import { tryCommand } from './support/command';
-import { base64Loader } from './support/b64-loader';
-import { macCommandLoader } from './support/mac-command-loader';
+import { tryCommand } from './support/command.ts';
+import { base64Loader } from './support/b64-loader.ts';
+import { macCommandLoader } from './support/mac-command-loader.ts';
 
 const projectRoot = url.fileURLToPath(new URL('.', import.meta.url));
-const pkg = JSON.parse(fs.readFileSync(projectRoot + '/package.json', 'utf-8'));
+const pkg = JSON.parse(fs.readFileSync(projectRoot + '/package.json', 'utf-8')) as { version: string };
 
 const COMMAND_GIT_VERSION = 'git describe --long --dirty --tags --always';
-const shortCommit = process.env.GIT_COMMIT || tryCommand(COMMAND_GIT_VERSION, __dirname, 'unknown');
+const shortCommit = process.env.GIT_COMMIT || tryCommand(COMMAND_GIT_VERSION, projectRoot, 'unknown');
 const version = `${pkg.version} (${shortCommit})`;
 
 // https://vitejs.dev/config/
@@ -59,7 +58,6 @@ export default defineConfig({
     }),
     react(),
     wasm(),
-    topLevelAwait(),
     VitePWA({
       registerType: 'prompt',
       workbox: {
@@ -91,22 +89,22 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      '~': path.resolve(__dirname, 'src'),
-      '@sql-wasm': path.resolve(__dirname, 'node_modules', 'sql.js', 'dist', 'sql-wasm.wasm'),
+      '~': path.resolve(projectRoot, 'src'),
+      '@sql-wasm': path.resolve(projectRoot, 'node_modules', 'sql.js', 'dist', 'sql-wasm.wasm'),
 
       // workaround for vite, workbox (PWA)
-      module: path.resolve(__dirname, 'src', 'dummy.mjs'),
+      module: path.resolve(projectRoot, 'src', 'dummy.mjs'),
     },
   },
   build: {
     minify: true,
-    rollupOptions: {
+    rolldownOptions: {
       output: {
-        manualChunks: {
-          core: ['react', 'react-dom'],
-          router: ['react-router'],
-          store: ['react-redux', '@reduxjs/toolkit'],
-          extras: ['react-dropzone', 'react-toastify'],
+        manualChunks(id) {
+          if (/\/node_modules\/(react|react-dom)\//.test(id)) return 'core';
+          if (/\/node_modules\/react-router\//.test(id)) return 'router';
+          if (/\/node_modules\/(react-redux|@reduxjs\/toolkit)\//.test(id)) return 'store';
+          if (/\/node_modules\/(react-dropzone|react-toastify)\//.test(id)) return 'extras';
         },
       },
     },
@@ -115,11 +113,12 @@ export default defineConfig({
     globals: true,
     mockReset: true,
     environment: 'jsdom',
+    pool: 'vmThreads',
     setupFiles: ['src/test-utils/setup-jest.ts'],
     // workaround: sql.js is not ESModule friendly, yet...
     deps: {
       optimizer: {
-        web: {
+        client: {
           include: ['sql.js'],
         },
       },

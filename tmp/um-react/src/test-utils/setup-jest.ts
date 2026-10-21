@@ -1,4 +1,4 @@
-import '@testing-library/jest-dom';
+import '@testing-library/jest-dom/vitest';
 
 // FIXME: Use something like jsdom-worker?
 //   see: https://github.com/developit/jsdom-worker

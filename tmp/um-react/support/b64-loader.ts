@@ -3,7 +3,7 @@ import { Plugin } from 'vite';
 
 export const base64Loader: Plugin = {
   name: 'base64-loader',
-  async transform(_: unknown, id: string) {
+  async load(id: string) {
     const [path, query] = id.split('?');
     if (query != 'base64') return null;
 

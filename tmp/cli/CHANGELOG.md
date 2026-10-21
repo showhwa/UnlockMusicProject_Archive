@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.2.20] - 2026-10-20
+
+### Added
+
+- [#2] Support `.mflac2` / `.mgg2` extensions.
+- [#7] Load QMC ekeys from QQ Music Android `player_process_db` (`--qmc-android-db`).
+- [#8] Windows: auto-fetch QMC keys via `qmpc-mmkv-cli` (`--qmpc-mmkv-cli-exe`).
+- [#5] `--ignore-known-non-music-ext` / `--no-ignore-known-non-music-ext` (default on): skip files with no extension or known non-music file.
+
+
+### Changed
+
+- [#8] User MMKV (`--qmc-mmkv`) now merges with platform default keys on all OSes.
+
 ## [v0.2.19] - 2025-11-26
 
 ### Fixed
@@ -78,3 +92,8 @@ git log --oneline --before="2024-11-05"
 ```
 
 Or view the complete commit history on the project repository for detailed information about features, fixes, and improvements in previous releases.
+
+[#2]: https://git.um-react.app/um/cli/pulls/2
+[#7]: https://git.um-react.app/um/cli/pulls/7
+[#8]: https://git.um-react.app/um/cli/pulls/8
+[v0.2.20]: https://git.um-react.app/um/cli/releases/tag/v0.2.20

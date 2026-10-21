@@ -1,0 +1,8 @@
+{
+  "clangd.arguments": [
+    "--compile-commands-dir=${workspaceFolder}/build-win",
+    "--query-driver=/usr/bin/x86_64-w64-mingw32-gcc"
+  ],
+  "C_Cpp.intelliSenseEngine": "disabled",
+  "mesonbuild.buildFolder": "buildDir"
+}

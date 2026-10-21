@@ -276,8 +276,8 @@ func init() {
 
 	// New ogg/flac:
 	extraExtsCanHaveSuffix := []string{"mgg", "mflac"}
-	// Mac also adds some extra suffix to ext:
-	extraExtSuffix := []string{"0", "1", "a", "h", "l", "m"}
+	// Mac/Android also adds some extra suffix to ext:
+	extraExtSuffix := []string{"0", "1", "2", "a", "h", "l", "m"}
 	for _, ext := range extraExtsCanHaveSuffix {
 		common.RegisterDecoder(ext, false, NewDecoder)
 		for _, suffix := range extraExtSuffix {

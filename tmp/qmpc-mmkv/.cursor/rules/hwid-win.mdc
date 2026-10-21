@@ -1,0 +1,31 @@
+---
+description: Windows HWID modules — mapping and provenance
+globs: libqmpc/src/hwid_win/**
+alwaysApply: false
+---
+
+# hwid_win
+
+Goal: match QQ Music Windows client HWID (disk + net) for MMKV key material.
+
+## HDD (`hdd/`)
+
+Ref: WinSim DiskId32 (`diskid32.cpp`), rewritten in C.
+
+| file | DiskId32 origin |
+|------|-----------------|
+| `hdd1_read_with_admin.c` | `ReadPhysicalDriveInNTWithAdminRights` |
+| `hdd3_read_without_admin.c` | `ReadPhysicalDriveInNTWithZeroRights` |
+
+DiskId32 is freeware, unwarranted; no SPDX on original. See `hdd/README.md`.
+
+## Net (`net/`)
+
+From QQ Music client RE; no public upstream.
+
+| file | role |
+|------|------|
+| `ethernet_id.c` | first ethernet/Wi-Fi MAC |
+| `netbios_id.c` | `NetWkstaTransportEnum` path |
+
+See `net/README.md`. Prefer behavior parity over cleanup that changes IDs.

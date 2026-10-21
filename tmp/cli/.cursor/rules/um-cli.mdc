@@ -1,0 +1,13 @@
+---
+description: um-cli (Unlock Music CLI) project conventions for agents
+alwaysApply: true
+---
+
+# um-cli
+
+- Module: `git.um-react.app/um/cli`. Entry: `cmd/um/main.go`. Read `AGENTS.md` before structural changes.
+- Decoders live under `algo/<vendor>/`, register via `common.RegisterDecoder` in `init()`, blank-import new packages from `cmd/um`.
+- Shared non-algo code goes in `internal/`. Pass secrets through `common.CryptoParams`, not globals.
+- Soft-fail optional key loaders (`Warn`); hard-fail only when decrypt cannot proceed. Normalize QMC map keys with `utils.NormalizeUnicode`.
+- OS-specific code: `*_windows.go` / `*_darwin.go` or explicit `//go:build` stubs (see QMC MMKV loaders, `pc_kugou_db`).
+- After flag or Go-version changes, update `README.md`. Keep changes minimal; run `go test ./...` for touched packages.

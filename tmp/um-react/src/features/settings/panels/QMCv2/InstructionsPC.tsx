@@ -3,6 +3,7 @@ import { HiWord } from '~/components/HelpText/HiWord';
 import NoopExecutable from './assets/noop.exe?base64';
 import NoopExecutableSource from './assets/noop.asm.txt?base64';
 
+const QMPC_MMKV_RELEASES_URL = 'https://git.um-react.app/um/qmpc-mmkv/releases';
 const PC_CLIENT_URL = 'https://web.archive.org/web/2023/https://dldir1v6.qq.com/music/clntupate/QQMusic_Setup_1951.exe';
 const PC_CLIENT_TG_URL = 'https://t.me/um_lsr_ch/24';
 
@@ -10,14 +11,20 @@ export function InstructionsPC() {
   return (
     <>
       <p className="mt-2">
-        使用 <span className="text-error">19.57 或更高版本</span>下载的歌曲文件
+        使用 <span className="text-primary">19.57 至 22.76</span>下载的歌曲文件
         <HiWord>需要导入密钥</HiWord>。
-        <br />
-        目前未公开密钥获取方式，因此不支持。
       </p>
 
       <p className="mt-4">
-        使用 <span className="text-primary">19.51 或更低版本</span>下载的歌曲文件
+        请从{' '}
+        <ExtLink className="link-info" href={QMPC_MMKV_RELEASES_URL}>
+          qmpc-mmkv-cli
+        </ExtLink>{' '}
+        获取工具，提取密钥文件 <code>qmpc-mmkv-v1.mmkv</code> 后在本页导入。
+      </p>
+
+      <p className="mt-4">
+        使用 <span className="text-base-content/70">19.51 或更低版本</span>下载的歌曲文件
         <HiWord>无需密钥</HiWord>。
       </p>
 

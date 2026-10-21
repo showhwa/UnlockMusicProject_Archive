@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ESNext",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
-    "types": ["@types/wicg-file-system-access", "vitest/globals", "@testing-library/jest-dom"],
+    "types": ["node", "@types/wicg-file-system-access", "vitest/globals", "@testing-library/jest-dom/vitest"],
     "module": "ESNext",
     "skipLibCheck": true,
     /* Bundler mode */
@@ -17,7 +17,6 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "baseUrl": ".",
     "esModuleInterop": true,
     "paths": {
       "~/*": ["./src/*"],

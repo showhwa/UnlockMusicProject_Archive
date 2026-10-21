@@ -1,0 +1,16 @@
+engineStrict: true
+
+patchedDependencies:
+  sql.js: patches/sql.js.patch
+
+overrides:
+  sourcemap-codec: npm:@jridgewell/sourcemap-codec@1.6.0
+
+allowBuilds:
+  '@parcel/watcher': false
+  '@swc/core': true
+  '@tailwindcss/oxide': true
+  esbuild: true
+  simple-git-hooks: true
+
+minimumReleaseAge: 0

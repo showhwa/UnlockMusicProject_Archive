@@ -17,7 +17,7 @@ export function renderWithProviders(
   ui: React.ReactElement,
   { preloadedState = {}, store = setupStore(preloadedState), ...renderOptions }: ExtendedRenderOptions = {},
 ) {
-  function Wrapper({ children }: PropsWithChildren<unknown>): JSX.Element {
+  function Wrapper({ children }: PropsWithChildren<unknown>): React.JSX.Element {
     return <Provider store={store}>{children}</Provider>;
   }
 

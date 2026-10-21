@@ -1,0 +1,10 @@
+.git
+.agents
+.codex
+build*
+dist
+toolchains/local.ini
+
+subprojects/*/
+!subprojects/*.wrap
+!subprojects/packagefiles/

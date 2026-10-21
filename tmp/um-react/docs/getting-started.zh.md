@@ -4,8 +4,8 @@
 
 ## 安装依赖
 
-- 安装 Node v16.17 或更高，推荐当前最新的 Node LTS 版本。
-- 安装/激活 `pnpm` [^1]：`corepack prepare pnpm@latest --activate`
+- 安装 Node 24.22.0；pnpm 也会根据 `package.json` 中的 `devEngines.runtime` 自动获取该版本。
+- 安装/激活项目指定的 `pnpm` [^1]：`corepack prepare pnpm@12.14.0 --activate`
 - 安装软件依赖：`pnpm i --frozen-lockfile`
 
 [^1]: 参考 pnpm 说明「[使用 Corepack 安装](https://pnpm.io/zh/installation#使用-corepack-安装)」。
@@ -33,6 +33,10 @@ pnpm build
 如果需要预览构建版本，运行 `pnpm preview` 然后打开[项目预览页面][vite-preview-url]即可。
 
 [vite-preview-url]: http://localhost:4173/
+
+### TypeScript 工具链
+
+编译和 ESLint 统一使用 TypeScript 6.x，暂不升级到 TypeScript 7。
 
 ## 打包 `.zip`
 

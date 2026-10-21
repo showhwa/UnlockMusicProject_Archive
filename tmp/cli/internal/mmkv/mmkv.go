@@ -2,6 +2,7 @@ package mmkv
 
 import (
 	"fmt"
+	"io"
 	"os"
 
 	"git.um-react.app/um/cli/algo/common"
@@ -9,16 +10,6 @@ import (
 	go_mmkv "github.com/unlock-music/go-mmkv"
 	"go.uber.org/zap"
 )
-
-func Merge(keys ...common.QMCKeys) common.QMCKeys {
-	result := make(common.QMCKeys)
-	for _, k := range keys {
-		for key, value := range k {
-			result[utils.NormalizeUnicode(key)] = utils.NormalizeUnicode(value)
-		}
-	}
-	return result
-}
 
 func LoadFromPath(path string, key string, logger *zap.Logger) (result common.QMCKeys, err error) {
 	mmkv_path := path
@@ -31,6 +22,7 @@ func LoadFromPath(path string, key string, logger *zap.Logger) (result common.QM
 	}
 	defer mr.Close()
 
+	var crc io.Reader
 	cr, err := os.Open(mmkv_crc)
 	if err != nil {
 		// crc is optional
@@ -38,14 +30,22 @@ func LoadFromPath(path string, key string, logger *zap.Logger) (result common.QM
 		key = ""
 	} else {
 		defer cr.Close()
+		crc = cr
 	}
+
+	stat, err := os.Stat(path)
+	if err != nil {
+		logger.Error("LoadMMKV: Could not stat mmkv file", zap.Error(err))
+		return nil, fmt.Errorf("LoadMMKV: stat error: %w", err)
+	}
+	mmkv_size := stat.Size()
 
 	var password []byte = nil
 	if key != "" {
 		password = make([]byte, 16)
 		copy(password, []byte(key))
 	}
-	mmkv, err := go_mmkv.NewMMKVReader(mr, password, cr)
+	mmkv, err := go_mmkv.NewMMKVReader(mr, mmkv_size, password, crc)
 	if err != nil {
 		logger.Error("LoadMMKV: failed to create reader", zap.Error(err))
 		return nil, fmt.Errorf("LoadMMKV: NewMMKVReader error: %w", err)

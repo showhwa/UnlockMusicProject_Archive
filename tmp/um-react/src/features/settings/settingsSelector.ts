@@ -66,3 +66,6 @@ export const selectKugouKey = (state: RootState, hdr: ParseKugouHeaderResponse):
 
 export const selectStagingQtfmAndroidKey = (state: RootState) => state.settings.staging.qtfm.android;
 export const selectQtfmAndroidKey = (state: RootState) => state.settings.production.qtfm.android;
+
+export const selectStagingBatchDownloadSettings = (state: RootState) => state.settings.staging.general.batchDownload;
+export const selectFinalBatchDownloadSettings = (state: RootState) => state.settings.production.general.batchDownload;

@@ -40,7 +40,7 @@
 - [x] 蜻蜓 FM (`.qta`)
   - 需要提取设备 ID。
 
-[^qm-key-pc]: QQ 音乐的 PC 客户端仅支持 v19.51 或更低版本。
+[^qm-key-pc]: QQ 音乐的 PC 客户端（v19.57 至 v22.76）需要导入由 [qmpc-mmkv-cli](https://git.um-react.app/um/qmpc-mmkv/releases) 提取的密钥文件 `qmpc-mmkv-v1.mmkv`。
 
 [^qm-key-android]: QQ 音乐的安卓客户端支持需要获取超级管理员权限后提取密钥数据库并导入后使用。
 

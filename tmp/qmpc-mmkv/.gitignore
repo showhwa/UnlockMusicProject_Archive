@@ -1,0 +1,9 @@
+/build*/
+/dist/
+/toolchains/local.ini
+
+/subprojects/.wraplock
+/subprojects/*/
+!/subprojects/packagefiles
+
+.idea/

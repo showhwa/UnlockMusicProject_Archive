@@ -1,0 +1,14 @@
+#pragma code_page(65001)
+#include <windows.h>
+#include "resource.h"
+
+1 RT_MANIFEST "app.manifest"
+
+IDD_MAIN DIALOGEX 0, 0, 240, 85
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "qmpc-mmkv"
+FONT 9, "Segoe UI"
+BEGIN
+    LTEXT "", IDC_GREETING, 12, 14, 216, 24
+    DEFPUSHBUTTON "OK", IDOK, 178, 58, 50, 14
+END

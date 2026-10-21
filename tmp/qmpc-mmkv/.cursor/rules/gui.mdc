@@ -1,0 +1,13 @@
+---
+description: Win32 GUI resources, encoding, DPI
+globs: qmpc-mmkv-gui/**
+alwaysApply: false
+---
+
+# qmpc-mmkv-gui
+
+- Win32 only. Entry `src/main.c`; link `libqmpc_dep`.
+- Dialog/layout: edit `src/app.rc`, IDs in `src/resource.h`. Keep both in sync.
+- UTF-8 in source → convert to UTF-16 before Win32 `*W` calls. `.rc` uses codepage 65001.
+- `src/app.manifest`: Per-Monitor V2; let system scale standard dialogs; old OS → System DPI aware.
+- Built only when Meson host is Windows (cross-file sets `host_machine.system=windows`).

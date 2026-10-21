@@ -1,0 +1,6 @@
+option(
+  'commit',
+  type: 'string',
+  value: 'dev',
+  description: 'Commit identifier compiled into the CLI as the QMPC_COMMIT string macro',
+)

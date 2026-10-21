@@ -1,0 +1,15 @@
+---
+description: libqmpc layout, API export, platform split
+globs: libqmpc/**
+alwaysApply: false
+---
+
+# libqmpc
+
+- Public headers: `include/libqmpc/**`. Private: `src/**`. Consumers use `libqmpc_dep`.
+- Export: `QMPC_API` in `export.h`. Build shared → `QMPC_BUILDING`; static consumers → `QMPC_STATIC` (Meson sets via `c_static_args` / `usage_args`).
+- Platform: Windows sources under `src/hwid_win/`, `*_win.c`; non-Windows `*_other.c` + `src/hwid/hwid_other.c`.
+- Deps (Meson wrap): STC (containers/`cstr`/`coption`), tiny-AES-c, md5-c. Wire in `deps/meson.build`.
+- Modules: `crypto/` (AES-CFB-128, CRC32), `mmkv/` (cipher reader), `hwid/`, `utils/`, `common_function/`.
+- Tests in `tests/`; skip when `default_library != static` (need non-exported internals).
+- Prefer STC types already in public API (`cstr`, `csview`) over inventing parallel string helpers.

@@ -1,4 +1,4 @@
-FROM node:22-slim AS build
+FROM node:24.22.0-slim AS build
 ENV PNPM_HOME="/p"
 ENV PATH="$PNPM_HOME:$PATH"
 WORKDIR /app
@@ -9,7 +9,7 @@ RUN corepack enable pnpm \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-COPY package.json pnpm-lock.yaml .npmrc ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
 RUN pnpm exec true
 COPY . .
 RUN pnpm install --frozen-lockfile

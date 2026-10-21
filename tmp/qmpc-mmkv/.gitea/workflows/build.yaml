@@ -1,0 +1,29 @@
+name: build
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest-slim
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Docker build
+        run: |
+          docker build \
+            --build-arg COMMIT="${GITHUB_SHA::7}" \
+            --output type=local,dest=dist .
+
+      - name: Package CLI
+        run: |
+          mkdir -p dist/qmpc-mmkv-cli
+          cp dist/qmpc-mmkv-cli.exe LICENSE.txt credits.txt dist/qmpc-mmkv-cli/
+
+      - name: Upload CLI artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: qmpc-mmkv-cli
+          path: dist/qmpc-mmkv-cli/

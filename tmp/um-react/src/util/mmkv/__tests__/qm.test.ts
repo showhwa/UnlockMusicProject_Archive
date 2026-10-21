@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { parseAndroidQmEKey } from '../qm';
 
-const makeViewFromBuffer = (buff: Buffer) =>
+const makeViewFromBuffer = (buff: Buffer<ArrayBuffer>) =>
   new DataView(buff.buffer.slice(buff.byteOffset, buff.byteOffset + buff.byteLength));
 
 test('parse qm mmkv file', () => {

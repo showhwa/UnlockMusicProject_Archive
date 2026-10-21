@@ -51,9 +51,13 @@ func main() {
 			&cli.StringFlag{Name: "output", Aliases: []string{"o"}, Usage: "path to output dir", Required: false},
 			&cli.StringFlag{Name: "qmc-mmkv", Aliases: []string{"db"}, Usage: "path to QQMusic mmkv path", Required: false},
 			&cli.StringFlag{Name: "qmc-mmkv-key", Aliases: []string{"key"}, Usage: "QQMusic mmkv password (16 ascii chars)", Required: false},
+			&cli.StringFlag{Name: "qmpc-mmkv-cli-exe", Usage: "path to QMPC MMKV Cli by LSR (v0.1.1+, auto-fetch QMC keys; Windows only)", Required: false, Value: "./qmpc-mmkv-cli.exe"},
+			&cli.StringFlag{Name: "qmc-android-db", Usage: "path to QQMusic Android player_process_db (dump from android: /data/data/com.tencent.qqmusic/databases/)", Required: false, Value: ""},
 			&cli.StringFlag{Name: "kgg-db", Usage: "path to kgg db (win32 kugou v11)", Required: false},
 			&cli.BoolFlag{Name: "remove-source", Aliases: []string{"rs"}, Usage: "remove source file", Required: false, Value: false},
 			&cli.BoolFlag{Name: "skip-noop", Aliases: []string{"n"}, Usage: "skip noop decoder", Required: false, Value: true},
+			&cli.BoolFlag{Name: "ignore-known-non-music-ext", Usage: "skip files with no extension or known non-music extensions (txt, mmkv, exe, dll)", Required: false, Value: true},
+			&cli.BoolFlag{Name: "no-ignore-known-non-music-ext", Usage: "do not skip known non-music extensions", Required: false, Value: false},
 			&cli.BoolFlag{Name: "verbose", Aliases: []string{"V"}, Usage: "verbose logging", Required: false, Value: false},
 			&cli.BoolFlag{Name: "update-metadata", Usage: "update metadata & album art from network", Required: false, Value: false},
 			&cli.BoolFlag{Name: "overwrite", Usage: "overwrite output file without asking", Required: false, Value: false},
@@ -176,25 +180,46 @@ func appMain(c *cli.Context) (err error) {
 		return errors.New("output should be a writable directory")
 	}
 
-	// QMC: Load keys
-	qmcKeys, err := qmc.LoadMMKVOrDefault(c.String("qmc-mmkv"), c.String("qmc-mmkv-key"), logger)
+	// QMC: Load platform keys, then merge user mmkv (--qmc-mmkv) on all platforms.
+	qmcKeys, err := qmc.LoadMMKVOrDefault(qmc.MMKVLoaderOptions{
+		CliExe: c.String("qmpc-mmkv-cli-exe"),
+	}, logger)
 	if err != nil {
 		return err
 	}
+	qmcAndroidKeysPath := c.String("qmc-android-db")
+	if qmcAndroidKeysPath == "" {
+		// By default, use the current directory's `player_process_db` file if exists.
+		// Do not complain if this file does not exist.
+		if db, err := os.Stat("player_process_db"); err == nil && !db.IsDir() {
+			qmcAndroidKeysPath = "player_process_db"
+		}
+	}
+	qmcKeys = common.MergeQMCKeys(
+		qmcKeys,
+		qmc.LoadUserMMKV(c.String("qmc-mmkv"), c.String("qmc-mmkv-key"), logger),
+		qmc.LoadAndroidDB(qmcAndroidKeysPath, logger),
+	)
 
 	kggDbPath := c.String("kgg-db")
 	if kggDbPath == "" {
 		kggDbPath = filepath.Join(os.Getenv("APPDATA"), "Kugou8", "KGMusicV3.db")
 	}
 
+	ignoreKnownNonMusicExt := c.Bool("ignore-known-non-music-ext")
+	if c.Bool("no-ignore-known-non-music-ext") {
+		ignoreKnownNonMusicExt = false
+	}
+
 	proc := &processor{
-		logger:          logger,
-		inputDir:        inputDir,
-		outputDir:       output,
-		skipNoopDecoder: c.Bool("skip-noop"),
-		removeSource:    c.Bool("remove-source"),
-		updateMetadata:  c.Bool("update-metadata"),
-		overwriteOutput: c.Bool("overwrite"),
+		logger:                 logger,
+		inputDir:               inputDir,
+		outputDir:              output,
+		skipNoopDecoder:        c.Bool("skip-noop"),
+		ignoreKnownNonMusicExt: ignoreKnownNonMusicExt,
+		removeSource:           c.Bool("remove-source"),
+		updateMetadata:         c.Bool("update-metadata"),
+		overwriteOutput:        c.Bool("overwrite"),
 
 		crypto: common.CryptoParams{
 			// KuGou
@@ -223,10 +248,11 @@ type processor struct {
 	inputDir  string
 	outputDir string
 
-	skipNoopDecoder bool
-	removeSource    bool
-	updateMetadata  bool
-	overwriteOutput bool
+	skipNoopDecoder        bool
+	ignoreKnownNonMusicExt bool
+	removeSource           bool
+	updateMetadata         bool
+	overwriteOutput        bool
 
 	crypto common.CryptoParams
 }
@@ -313,6 +339,11 @@ func (p *processor) processDir(inputDir string) error {
 }
 
 func (p *processor) processFile(filePath string) error {
+	if p.ignoreKnownNonMusicExt && isKnownNonMusicExt(filePath) {
+		p.logger.Debug("skip known non-music extension", zap.String("file", filePath))
+		return nil
+	}
+
 	p.logger.Debug("processFile", zap.String("file", filePath), zap.String("inputDir", p.inputDir))
 
 	allDec := common.GetDecoder(filePath, p.skipNoopDecoder)
