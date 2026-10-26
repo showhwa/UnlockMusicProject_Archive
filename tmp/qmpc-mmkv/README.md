@@ -48,13 +48,13 @@ docker build \
 
 ### Linux 交叉编译
 
-Meson ≥ 1.3，MinGW-w64：
+Meson ≥ 1.3，MinGW-w64，以及 `sh`、基础 Unix 工具（`mktemp`、`cat`、`mv`、`rm`）和 `xxd`：
 
 ```sh
 # Debian 13+
-sudo apt install meson ninja-build gcc-mingw-w64-x86-64 binutils-mingw-w64-x86-64
+sudo apt install meson ninja-build gcc-mingw-w64-x86-64 binutils-mingw-w64-x86-64 xxd
 # Arch
-sudo pacman -S --needed meson ninja mingw-w64-gcc mingw-w64-binutils
+sudo pacman -S --needed meson ninja mingw-w64-gcc mingw-w64-binutils xxd
 
 meson setup build-win --cross-file toolchains/mingw-w64.ini --buildtype=release
 meson compile -C build-win
@@ -71,6 +71,10 @@ meson compile -C build-custom
 ```
 
 后出现的 machine file 覆盖先出现的项（见 [Meson Machine files](https://mesonbuild.com/Machine-files.html)）。
+
+Windows 目标构建会用 `as --32` 汇编 `libqmpc/src/generated/payload32.s`，再通过 `objcopy` 和 `xxd` 生成构建目录下的 `libqmpc/src/generated/payload32.c/.h`。C 文件编入库，库内代码可通过 `#include "generated/payload32.h"` 引用 `qmpc_payload32` 和 `qmpc_payload32_len`；头文件不属于公共 API。示例仅返回 42，替换时须保证提取的 `.text` 自包含且无未解决的重定位。Linux 原生构建不生成这些文件，也不需要这些额外工具。
+
+Windows 本机构建需提供 GNU `as`、`objcopy`（例如 MinGW-w64），并将 `sh`、上述 Unix 工具和 `xxd` 加入 `PATH`（例如通过 MSYS2）。交叉编译时 `as` 和 `objcopy` 使用交叉配置中的路径。
 
 ### 静态 / 动态库
 

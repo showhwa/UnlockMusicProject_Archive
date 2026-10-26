@@ -35,12 +35,12 @@ size_t qmpc_mmkv_reader__read(qmpc_mmkv_reader_t* self, uint8_t* out, size_t len
   return total_read;
 }
 
-bool qmpc_mmkv_reader__read_u64(qmpc_mmkv_reader_t* self, uint64_t* out, isize container_len, isize* bytes_read) {
+bool qmpc_mmkv_reader__read_u64(qmpc_mmkv_reader_t* self, uint64_t* out, isize_t container_len, isize_t* bytes_read) {
   const bool unrestricted_read = container_len < 0;
   bool completed = false;
   uint64_t result = 0;
   uint32_t shift = 0;
-  isize count = 0;
+  isize_t count = 0;
 
   while (unrestricted_read || container_len) {
     uint8_t next_byte;
@@ -66,10 +66,10 @@ bool qmpc_mmkv_reader__read_u64(qmpc_mmkv_reader_t* self, uint64_t* out, isize c
   return completed;
 }
 
-bool qmpc_mmkv_reader_read_string(qmpc_mmkv_reader_t* self, cstr* out, isize max_len, isize* bytes_read) {
+bool qmpc_mmkv_reader_read_string(qmpc_mmkv_reader_t* self, cstr* out, isize_t max_len, isize_t* bytes_read) {
   const bool unrestricted_read = max_len < 0;
   uint64_t str_len, read_len;
-  isize u64_bytes_read = 0;
+  isize_t u64_bytes_read = 0;
   if (!qmpc_mmkv_reader__read_u64(self, &str_len, max_len, &u64_bytes_read)) return false;
 
   if (unrestricted_read) {
@@ -77,7 +77,7 @@ bool qmpc_mmkv_reader_read_string(qmpc_mmkv_reader_t* self, cstr* out, isize max
   } else {
     read_len = QMPC_MIN(str_len, (uint64_t)max_len - u64_bytes_read);
   }
-  if (bytes_read) *bytes_read = u64_bytes_read + (isize)read_len;
+  if (bytes_read) *bytes_read = u64_bytes_read + (isize_t)read_len;
 
   cstr_resize(out, read_len, '\0');
   if (qmpc_mmkv_reader__read(self, (uint8_t*)cstr_data(out), read_len) != read_len) {
@@ -96,7 +96,7 @@ bool qmpc_mmkv_reader_read_optional_string(qmpc_mmkv_reader_t* self, cstr* out) 
     return true;
   }
 
-  isize bytes_read = 0;
+  isize_t bytes_read = 0;
   if (!qmpc_mmkv_reader_read_string(self, out, container_len, &bytes_read)) return false;
 
   // Seek until the end of the string.

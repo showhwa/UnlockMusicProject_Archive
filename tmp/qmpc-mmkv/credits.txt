@@ -7,9 +7,8 @@ Do not edit by hand; re-run the script after updating wraps.
 ------------------------------------------------------------------------
 md5-c
   wrap:      md5-c.wrap
-  directory: md5-c-f3529b666b7ae8b80b0a9fa88ac2a91b389909c7
+  directory: md5-c-f3529b6
   license:   UNLICENSE
-  source:    https://codeload.github.com/Zunawe/md5-c/tar.gz/f3529b666b7ae8b80b0a9fa88ac2a91b389909c7
 ------------------------------------------------------------------------
 
 This is free and unencumbered software released into the public domain.
@@ -39,14 +38,13 @@ OTHER DEALINGS IN THE SOFTWARE.
 ------------------------------------------------------------------------
 stc
   wrap:      stc.wrap
-  directory: STC-5.0
+  directory: stc-v6.0-rc7
   license:   LICENSE
-  source:    https://codeload.github.com/stclib/STC/tar.gz/refs/tags/v5.0
 ------------------------------------------------------------------------
 
 MIT License
 
-Copyright (c) 2025 Tyge Løvset
+Copyright (c) 2026 Tyge Løvset
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -70,9 +68,8 @@ SOFTWARE.
 ------------------------------------------------------------------------
 tiny-aes-c
   wrap:      tiny-aes-c.wrap
-  directory: tiny-AES-c-23856752fbd139da0b8ca6e471a13d5bcc99a08d
+  directory: tiny-aes-c-2385675
   license:   unlicense.txt
-  source:    https://codeload.github.com/kokke/tiny-AES-c/tar.gz/23856752fbd139da0b8ca6e471a13d5bcc99a08d
 ------------------------------------------------------------------------
 
 This is free and unencumbered software released into the public domain.

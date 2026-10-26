@@ -20,7 +20,7 @@ static bool hex_w2a(char* result, wchar_t c) {
 static bool parse_mac(cstr* mac, const wchar_t* text) {
   uint8_t sum = 0;
   char mac_hex[12] = {};
-  for (isize i = 0; i < 12; i += 2) {
+  for (isize_t i = 0; i < 12; i += 2) {
     if (!hex_w2a(&mac_hex[i], *text++) || !hex_w2a(&mac_hex[i + 1], *text++)) {
       return false;
     }

@@ -1,4 +1,8 @@
 #include "commands.h"
+#include "libqmpc/log.h"
+#include "libqmpc/utils/str.h"
+#include "utils/args_u8.h"
+#include "utils/terminal.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -11,26 +15,14 @@
 #define QMPC_COMMIT "dev"
 #endif
 
-static void banner(FILE* stream) {
-  fputs(
-      "#\n"
-      "# This software is provided as is, without any warranty.\n"
-      "# If you would like to support the artists,              \n"
-      "#   please consider purchasing their music directly.     \n"
-      "#\n"
-      "# For more information, see:\n"
-      "#   https://git.um-react.app/um/qmpc-mmkv-cli\n"
-      "\n",
-      stream);
-}
-
 void usage(const char* program) {
   fprintf(stderr, "usage: %s [options]\n", program);
   fputs(
       "\n"
       "options:\n"
       "  -h, --help\t\tshow this help message and exit\n"
-      "  -v, --verbose\t\tenable verbose output\n"
+      "  -v, --verbose\t\tenable verbose output, short for \"--level verbose\"\n"
+      "  -l, --level\t\tset log level, one of [trace, debug, verbose, info, warning, error, fatal] (default: info)\n"
       "  -c, --command\t\tcommand to execute, one of [dump, system-id] (default: dump)\n"
       "\n"
       "When \"command\" is \"dump\", the following options are available:\n"
@@ -44,80 +36,121 @@ void usage(const char* program) {
       stderr);
 }
 
-int main(int argc, char* argv[]) {
-  fprintf(stderr, "# QMPC MMKV Cli by LSR@UnlockMusic (v%s-%s)\n", QMPC_VERSION, QMPC_COMMIT);
+int main_u8(int argc, char* argv[]) {
+  qmpc_logger_set_default_file_logger(stderr);
+
+  qmpc_log_info("QMPC MMKV CLI by LSR@UnlockMusic (v%s [%s])", QMPC_VERSION, QMPC_COMMIT);
+
   const char* command = "dump";
-  const char* output = "qmpc-mmkv-v1.mmkv";
-  const char* adapter_type = "raw";
-  const char* input = NULL;
-  const char* key = NULL;
-  bool verbose = false;
+  qmpc_command_args args = {
+      .input = nullptr,
+      .key = nullptr,
+      .output = "qmpc-mmkv-v1.mmkv",
+      .level = QMPC_LOGGER_LEVEL_DEFAULT,
+      .adapter_type = MMKV_READER_ADAPTER_TYPE_RAW,
+      .mmkv_key_method = QMPC_MMKV_KEY_METHOD_HWID,
+  };
   coption_long longopts[] = {{"verbose", coption_no_argument, 'v'},
+                             {"level", coption_required_argument, 'l'},
                              {"command", coption_required_argument, 'c'},
                              {"input", coption_required_argument, 'i'},
                              {"key", coption_required_argument, 'k'},
                              {"output", coption_required_argument, 'o'},
                              {"format", coption_required_argument, 'f'},
+                             {"method", coption_required_argument, 'm'},
                              {}};
-  const char* shortopts = "hvc:i:k:o:f:";
+  const char* shortopts = "hvc:i:k:o:f:l:m:";
   coption opt = coption_init();
   int c;
   while ((c = coption_get(&opt, argc, argv, shortopts, longopts)) != -1) {
     switch (c) {
       case 'h':
-        banner(stderr);
         usage(argv[0]);
         return 0;
       case '?':
-        printf("error: unknown option: %s\n", opt.optstr);
+        qmpc_log_error("unknown option: %s", opt.optstr);
         usage(argv[0]);
         return 1;
       case ':':
-        printf("error: missing argument for %s\n", opt.optstr);
+        qmpc_log_error("missing argument for %s", opt.optstr);
         usage(argv[0]);
         return 1;
       case 'v':
-        verbose = true;
+        args.level = QMPC_LOGGER_LEVEL_VERBOSE;
+        qmpc_logger_set_filter_level(QMPC_LOGGER_LEVEL_VERBOSE);
         break;
       case 'c':
         command = opt.arg;
         break;
       case 'o':
-        output = opt.arg;
+        args.output = opt.arg;
         break;
       case 'i':
-        input = opt.arg;
+        args.input = opt.arg;
         break;
       case 'k':
-        key = opt.arg;
+        args.key = opt.arg;
         break;
       case 'f':
-        adapter_type = opt.arg;
+        args.adapter_type = mmkv_reader_adapter_type_from_string(opt.arg);
+        break;
+      case 'l':
+        if (!(args.level = qmpc_logger_string_to_level(opt.arg))) {
+          qmpc_log_error("invalid log level (%s), using default level", opt.arg);
+          args.level = QMPC_LOGGER_LEVEL_DEFAULT;
+        }
+        qmpc_logger_set_filter_level(args.level);
+        break;
+      case 'm':
+        if (!(args.mmkv_key_method = qmpc_mmkv_key_method_from_str(opt.arg))) {
+          qmpc_log_fatal("invalid mmkv key method (%s).", opt.arg);
+          return 1;
+        }
         break;
       default:
-        fprintf(stderr, "error: unhandled option: %c-%s\n", c, opt.optstr);
+        qmpc_log_fatal("unhandled option: %c-%s", c, opt.optstr);
         return 1;
     }
   }
 
-  if (verbose) banner(stdout);
+  qmpc_log_verbose(
+      "\n"
+      "This software is provided as is, without any warranty.\n"
+      "If you would like to support the artists,              \n"
+      "  please consider purchasing their music directly.     \n"
+      "\n"
+      "For more information, see:\n"
+      "  https://git.um-react.app/um/qmpc-mmkv-cli\n");
 
-  qmpc_command_args args = {
-      .input = input,
-      .key = key,
-      .output = output,
-      .verbose = verbose,
-      .adapter_type = mmkv_reader_adapter_type_from_string(adapter_type),
-  };
+  {
+#define HANDLE_COMMAND(name, handler) \
+  if (qmpc_str_ieq(command, name)) return handler(&args);
 
-  if (strcmp(command, "dump") == 0) {
-    return qmpc_command_dump(&args);
-  } else if (strcmp(command, "system-id") == 0) {
-    return qmpc_command_system_id(&args);
-  } else {
-    printf("unknown command: %s\n", command);
-    return 1;
+    // Register commands
+    HANDLE_COMMAND("dump", qmpc_command_dump);
+    HANDLE_COMMAND("system-id", qmpc_command_system_id);
+#undef HANDLE_COMMAND
   }
 
-  return 0;
+  qmpc_log_error("unknown command: %s", command);
+  return 1;
+}
+
+int main(int argc, char* argv[]) {
+  qmpc_terminal_init();
+
+  int rc = 0;
+#if defined(_WIN32)
+  c_with(char** argv_u8 = malloc((argc + 1) * sizeof(char*)), argv_u8, free(argv_u8)) {
+    c_with(vec_cstr argv_vec = qmpc_argv_u8(argc, argv), vec_cstr_drop(&argv_vec)) {
+      c_with(char** p = argv_u8, (void)0) {
+        for (c_each(i, vec_cstr, argv_vec)) *p++ = cstr_data(i.ref);
+        rc = main_u8(argc, argv_u8);
+      }
+    }
+  }
+#else
+  rc = main_u8(argc, argv);
+#endif
+  return rc;
 }

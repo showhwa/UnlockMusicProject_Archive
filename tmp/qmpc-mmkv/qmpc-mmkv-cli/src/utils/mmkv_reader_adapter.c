@@ -20,7 +20,7 @@ static inline void strip_whitespace_cstr(cstr* str) {
   char* buf = cstr_data(str);
   char* clean = buf;
 
-  for (isize n = cstr_size(str); n != 0; n--) {
+  for (isize_t n = cstr_size(str); n != 0; n--) {
     if (isspace(*buf)) {
       buf++;
       continue;

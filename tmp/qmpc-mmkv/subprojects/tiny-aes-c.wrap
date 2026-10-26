@@ -1,7 +1,7 @@
-[wrap-file]
-directory = tiny-AES-c-23856752fbd139da0b8ca6e471a13d5bcc99a08d
-source_url = https://codeload.github.com/kokke/tiny-AES-c/tar.gz/23856752fbd139da0b8ca6e471a13d5bcc99a08d
-source_filename = tiny-AES-c-23856752fbd139da0b8ca6e471a13d5bcc99a08d.tar.gz
-source_hash = b91c219c4ff2dd4f24750130c27045e264b52d763d3b5b2cd24230334176f820
+[wrap-git]
+directory = tiny-aes-c-2385675
+url = https://github.com/kokke/tiny-AES-c.git
+revision = 23856752fbd139da0b8ca6e471a13d5bcc99a08d
+depth = 1
 patch_directory = tiny-aes-c
 diff_files = tiny-aes-c/01-include-tiny-aes-c-h.patch

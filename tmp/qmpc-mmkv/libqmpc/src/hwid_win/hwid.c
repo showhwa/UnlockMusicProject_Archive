@@ -1,4 +1,5 @@
 #include <libqmpc/hwid.h>
+#include <libqmpc/log.h>
 
 #include "hwid/hex_helper.h"
 #include "hwid_win/internal.h"
@@ -10,9 +11,7 @@
 
 cstr qmpc_hwid_disk(void) {
   for (int i = 0; i < 16; i++) {
-    c_with(cstr hdd_id = qmpc_hwid_drive_id_as_admin(i), !cstr_is_empty(&hdd_id), cstr_drop(&hdd_id)) {
-      return hdd_id;
-    }
+    c_with(cstr hdd_id = qmpc_hwid_drive_id_as_admin(i), !cstr_is_empty(&hdd_id), cstr_drop(&hdd_id)) { return hdd_id; }
   }
 
   for (int i = 0; i < 16; i++) {
@@ -20,6 +19,8 @@ cstr qmpc_hwid_disk(void) {
       return hdd_id;
     }
   }
+
+  qmpc_log_warning("No valid HDD id found.");
 
   return cstr_init();
 }
@@ -29,6 +30,7 @@ cstr qmpc_hwid_network(void) {
   if (qmpc_hwid_net_ethernet(&out) && !cstr_is_empty(&out)) return out;
   if (qmpc_hwid_net_netbios(&out) && !cstr_is_empty(&out)) return out;
   cstr_clear(&out);
+  qmpc_log_warning("No valid network id found.");
   return out;
 }
 

@@ -2,7 +2,7 @@ FROM debian:trixie-slim AS toolchain
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
        gcc libc6-dev gcc-mingw-w64-x86-64 binutils-mingw-w64-x86-64 \
-       meson ninja-build ca-certificates patch \
+       meson ninja-build ca-certificates patch xxd git-core \
     && rm -rf /var/lib/apt/lists/*
 WORKDIR /src
 

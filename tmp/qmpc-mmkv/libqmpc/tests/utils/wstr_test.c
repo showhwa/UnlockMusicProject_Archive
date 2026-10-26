@@ -13,13 +13,13 @@
   } while (0)
 
 /** Assert UTF-8 content and that cstr_size excludes the STC terminator. */
-static int expect_utf8(cstr* s, const char* expected, isize expected_size) {
+static int expect_utf8(cstr* s, const char* expected, isize_t expected_size) {
   CHECK(cstr_size(s) == expected_size);
   CHECK(strcmp(cstr_str(s), expected) == 0);
   /* STC always keeps a terminator past the logical size. */
   CHECK(cstr_str(s)[expected_size] == '\0');
   /* No embedded extra NUL inside the logical payload. */
-  for (isize i = 0; i < expected_size; ++i) CHECK(cstr_str(s)[i] != '\0');
+  for (isize_t i = 0; i < expected_size; ++i) CHECK(cstr_str(s)[i] != '\0');
   return 0;
 }
 

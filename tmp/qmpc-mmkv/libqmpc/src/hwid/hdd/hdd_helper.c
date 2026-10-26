@@ -6,11 +6,11 @@
 #include <stc/csview.h>
 
 void qmpc_flip_string(cstr* str) {
-  const isize n = cstr_size(str);
+  const isize_t n = cstr_size(str);
   // Make new str len even
   if (n & 1) cstr_append_n(str, "", 1);
 
-  isize actual_len = 0;
+  isize_t actual_len = 0;
 
   char* p = cstr_data(str);
   const char* p_end = p + n;
@@ -77,7 +77,7 @@ bool scan_printable_chars_from_hex(cstr* result, csview str) {
 
 bool scan_printable_chars(cstr* result, const csview str) {
   cstr_clear(result);
-  for (isize i = 0; i < str.size; i++) {
+  for (isize_t i = 0; i < str.size; i++) {
     if (!isprint(str.buf[i])) {
       cstr_clear(result);
       return false;
@@ -88,16 +88,16 @@ bool scan_printable_chars(cstr* result, const csview str) {
 }
 
 // ConvertToString (diskid32.cpp): ATA IDENTIFY field by word indices, on the raw byte buffer.
-cstr qmpc_cstr_from_identify(const char* str, const isize start, const isize end) {
+cstr qmpc_cstr_from_identify(const char* str, const isize_t start, const isize_t end) {
   // Indices are IDENTIFY word offsets (same as diskid32); each word is 2 LE bytes.
-  const isize len = (end - start + 1) * 2;
-  cstr result = cstr_with_n(str + start * 2, len);
+  const isize_t len = (end - start + 1) * 2;
+  cstr result = cstr_from_n(str + start * 2, len);
   qmpc_flip_string(&result);
 
   // Cut off trailing blanks (ConvertToString: index > 0, so buf[0] is never cleared).
   char* buf = cstr_data(&result);
-  isize n = cstr_size(&result);
-  for (isize index = n - 1; index > 0 && isspace((unsigned char)buf[index]); --index) --n;
+  isize_t n = cstr_size(&result);
+  for (isize_t index = n - 1; index > 0 && isspace((unsigned char)buf[index]); --index) --n;
   cstr_resize(&result, n, '\0');
   return result;
 }
@@ -118,7 +118,7 @@ static cstr encode_prop_value(const csview str, const bool flip) {
   return result;
 }
 
-cstr qmpc_flip_and_code_bytes(const char* str, const isize pos, const bool flip) {
+cstr qmpc_flip_and_code_bytes(const char* str, const isize_t pos, const bool flip) {
   if (pos <= 0) return cstr_init();
   return encode_prop_value(csview_from(str + pos), flip);
 }

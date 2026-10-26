@@ -1,7 +1,7 @@
-[wrap-file]
-directory = md5-c-f3529b666b7ae8b80b0a9fa88ac2a91b389909c7
-source_url = https://codeload.github.com/Zunawe/md5-c/tar.gz/f3529b666b7ae8b80b0a9fa88ac2a91b389909c7
-source_filename = md5-c-f3529b666b7ae8b80b0a9fa88ac2a91b389909c7.tar.gz
-source_hash = f7b3241c52af26229223e6c04f69cb81c985861cb68616687f55460d2bc2ee52
+[wrap-git]
+directory = md5-c-f3529b6
+url = https://github.com/Zunawe/md5-c.git
+revision = f3529b666b7ae8b80b0a9fa88ac2a91b389909c7
+depth = 1
 patch_directory = md5-c
 diff_files = md5-c/01-const-signed-input.patch

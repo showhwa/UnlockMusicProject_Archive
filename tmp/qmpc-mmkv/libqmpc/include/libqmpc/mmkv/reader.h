@@ -57,7 +57,7 @@ static inline void qmpc_mmkv_reader_drop(qmpc_mmkv_reader_t* self) {
  * @param[out] bytes_read The number of bytes read. Ignored if NULL.
  * @return True on success, false on failure.
  */
-bool qmpc_mmkv_reader_read_string(qmpc_mmkv_reader_t* self, cstr* out, isize max_len, isize* bytes_read);
+bool qmpc_mmkv_reader_read_string(qmpc_mmkv_reader_t* self, cstr* out, isize_t max_len, isize_t* bytes_read);
 /**
  * Reads an optional string from the reader.
  * @param self The reader.
@@ -73,7 +73,7 @@ bool qmpc_mmkv_reader_read_optional_string(qmpc_mmkv_reader_t* self, cstr* out);
  * @param[out] bytes_read The number of bytes read. Ignored if NULL.
  * @return True on success, false on failure.
  */
-bool qmpc_mmkv_reader__read_u64(qmpc_mmkv_reader_t* self, uint64_t* out, isize max_len, isize* bytes_read);
+bool qmpc_mmkv_reader__read_u64(qmpc_mmkv_reader_t* self, uint64_t* out, isize_t max_len, isize_t* bytes_read);
 /**
  * Reads data from the reader.
  * @param self The reader.

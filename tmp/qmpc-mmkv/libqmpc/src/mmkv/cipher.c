@@ -1,7 +1,9 @@
 #include "libqmpc/mmkv/cipher.h"
 #include "libqmpc/crypto/aes_cfb_128.h"
 #include "libqmpc/crypto/crc32.h"
+#include "libqmpc/log.h"
 #include "libqmpc/utils/common.h"
+#include "libqmpc/utils/fs.h"
 #include "libqmpc/utils/mmap.h"
 
 #include <stc/cstr.h>
@@ -11,8 +13,15 @@ static inline bool load_mmkv_metadata(qmpc_mmkv_crc_hdr_t* hdr, csview file_path
   bool ok = false;
   c_with(cstr metadata_path = cstr_from_sv(file_path), cstr_drop(&metadata_path)) {
     cstr_append_n(&metadata_path, ".crc", 4);
-    c_with(FILE* fp = fopen(cstr_str(&metadata_path), "rb"), fp != NULL, fclose(fp)) {
-      ok = fread(hdr, sizeof(*hdr), 1, fp) == 1;
+    c_with(FILE* fp = fopen_u8_sv(cstr_sv(&metadata_path), "rb"), fclose(fp)) {
+      if (fp != NULL) {
+        ok = fread(hdr, sizeof(*hdr), 1, fp) == 1;
+        if (!ok) {
+          qmpc_log_verbose("load_mmkv_metadata: fread(%s) failed", cstr_str(&metadata_path));
+        }
+      } else {
+        qmpc_log_verbose("load_mmkv_metadata: fopen(%s) failed", cstr_str(&metadata_path));
+      }
     }
   }
   return ok;
@@ -23,6 +32,7 @@ bool qmpc_mmkv_cipher_reader_init_from_path(qmpc_mmkv_cipher_reader_t* self, csv
 
   qmpc_mmkv_crc_hdr_t hdr;
   if (!load_mmkv_metadata(&hdr, file_path)) {
+    qmpc_log_error("qmpc_mmkv_cipher_reader: init metadata failed (file=%s)", file_path.buf);
     return false;
   }
 
@@ -38,6 +48,8 @@ bool qmpc_mmkv_cipher_reader_init_from_path(qmpc_mmkv_cipher_reader_t* self, csv
       self->mmkv_len_ = QMPC_MIN(self->mmkv_len_, self->map_.size);
       self->mmkv_view_ = self->map_.data;
       ok = true;
+    } else {
+      qmpc_log_error("qmpc_mmkv_cipher_reader: init mmap failed (file=%s)", cstr_str(&path));
     }
   }
 

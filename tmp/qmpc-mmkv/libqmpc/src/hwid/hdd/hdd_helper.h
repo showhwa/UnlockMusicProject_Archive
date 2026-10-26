@@ -46,7 +46,7 @@ bool scan_printable_chars(cstr* result, csview str);
  * Reads the raw byte buffer (no DWORD hop), flips adjacent pairs, trims trailing spaces
  * (first byte is never cleared, matching the reference).
  */
-cstr qmpc_cstr_from_identify(const char* str, isize start, isize end);
+cstr qmpc_cstr_from_identify(const char* str, isize_t start, isize_t end);
 
 /**
  * flipAndCodeBytes (diskid32.cpp): decode a STORAGE_DEVICE_DESCRIPTOR string at `pos`.
@@ -55,4 +55,4 @@ cstr qmpc_cstr_from_identify(const char* str, isize start, isize end);
  * @param pos Byte offset; `pos <= 0` yields an empty string
  * @param flip When true, swap adjacent bytes after decoding (serial numbers)
  */
-cstr qmpc_flip_and_code_bytes(const char* str, isize pos, bool flip);
+cstr qmpc_flip_and_code_bytes(const char* str, isize_t pos, bool flip);

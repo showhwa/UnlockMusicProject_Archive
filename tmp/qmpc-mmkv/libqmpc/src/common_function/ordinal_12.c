@@ -2,7 +2,9 @@
 
 #include <stc/cstr.h>
 
-cstr qmpc_mmkv_system_id_to_name(const char* system_id) {
+void qmpc_mmkv_system_id_to_name(cstr* out, const char* system_id) {
+  cstr_clear(out);
+
   static const char* g_prefixes[] = {"Driver", "Sumary", "tencent", "dllmain", "Mution", "Check", "Desktop"};
   static const char* g_exts[] = {".dat", ".db", ".bak", ".data", ".cah"};
 
@@ -16,14 +18,12 @@ cstr qmpc_mmkv_system_id_to_name(const char* system_id) {
     if (c > '9') suffix[j++] = c - 'A' + 'a';
   }
 
-  cstr mmkv_name = cstr_with_capacity(16);
-  cstr_append(&mmkv_name, prefix);
-  cstr_append(&mmkv_name, suffix);
-  cstr_append(&mmkv_name, ext);
-  return mmkv_name;
+  cstr_assign(out, prefix);
+  cstr_append(out, suffix);
+  cstr_append(out, ext);
 }
 
-cstr qmpc_mmkv_system_id_to_key(const char* system_id) {
+void qmpc_mmkv_system_id_to_key(cstr* out, const char* system_id) {
   // take first 16 characters
-  return cstr_with_n(system_id, 16);
+  cstr_assign_n(out, system_id, 16);
 }

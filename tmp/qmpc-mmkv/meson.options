@@ -4,3 +4,10 @@ option(
   value: 'dev',
   description: 'Commit identifier compiled into the CLI as the QMPC_COMMIT string macro',
 )
+
+option(
+  'disable_all_logging',
+  type: 'boolean',
+  value: false,
+  description: 'Define QMPC_DISABLE_ALL_LOGGING so qmpc_log becomes a no-op',
+)

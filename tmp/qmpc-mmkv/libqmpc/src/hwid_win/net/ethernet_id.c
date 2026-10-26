@@ -1,8 +1,7 @@
 #include "hwid/hex_helper.h"
 #include "hwid_win/net/internal.h"
+#include "libqmpc/log.h"
 
-#include <sec_api/stdio_s.h>
-#include <stc/algorithm.h>
 #include <stc/cstr.h>
 
 #include <windows.h>
@@ -74,7 +73,7 @@ static bool reg_read_dword(HKEY reg_key, const char* name, DWORD* out) {
   return RegQueryValueExA(reg_key, name, 0, &reg_type, (LPBYTE)out, &dataLen) == ERROR_SUCCESS;
 }
 
-static bool reg_read_string(HKEY reg_key, const char* name, char* out, isize len) {
+static bool reg_read_string(HKEY reg_key, const char* name, char* out, isize_t len) {
   DWORD reg_type = REG_SZ;
   DWORD dataLen = (DWORD)len;
   return RegQueryValueExA(reg_key, name, 0, &reg_type, (LPBYTE)out, &dataLen) == ERROR_SUCCESS;
@@ -103,6 +102,8 @@ static bool qmpc_net_connections_read(struct qmpc_net_connections* self, struct 
       } else {
         rank = media_sub_type != QMPC_NET_MEDIA_SUBTYPE_WIRELESS ? 3 : 1;
       }
+      qmpc_log_trace("connection %s: rank=%d, media_sub_type=%d, pnp_instance_id=%s", self->curr_->AdapterName, rank,
+                     (int)media_sub_type, pnp_instance_id);
     }
   }
 
