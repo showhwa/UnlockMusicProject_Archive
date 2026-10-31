@@ -13,6 +13,7 @@ typedef bool (*qmpc_mmkv_reader_fn_eof_t)(void* ctx);
 
 typedef struct {
   void* ctx_;
+  uint32_t expected_size_;
   qmpc_mmkv_reader_fn_read_t read_;
   qmpc_mmkv_reader_fn_eof_t eof_;
 } qmpc_mmkv_reader_source_t;

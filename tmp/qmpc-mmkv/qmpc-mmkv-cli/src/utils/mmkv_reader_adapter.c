@@ -1,16 +1,33 @@
 #include "mmkv_reader_adapter.h"
-#include <ctype.h>
+#include "libqmpc/log.h"
 #include "libqmpc/mmkv/reader.h"
-#include "stc/common.h"
-#include "stc/cstr.h"
+#include "libqmpc/utils/common.h"
+
+#include <stc/common.h>
+#include <stc/cstr.h>
 
 bool mmkv_reader_adapter_pipe__raw(mmkv_reader_adapter_t* self) {
   auto r = self->r_;
+  if (r->expected_size_ < 4) {
+    qmpc_log_error("Expected mmkv size is too small");
+    return false;
+  }
+
+  // Write the "content size"
+  uint32_t expected_size_le = qmpc_htole32(r->expected_size_ - 4);
+  if (fwrite(&expected_size_le, 1, sizeof(expected_size_le), self->w_->fp) != sizeof(expected_size_le)) {
+    qmpc_log_error("Failed to write expected mmkv size to output file");
+    return false;
+  }
+
   while (!r->eof_(r->ctx_)) {
     uint8_t buffer[4096];
     size_t read_len = r->read_(r->ctx_, buffer, sizeof(buffer));
     size_t write_len = fwrite(buffer, 1, read_len, self->w_->fp);
-    if (write_len != read_len) return false;
+    if (write_len != read_len) {
+      qmpc_log_error("Failed to write mmkv data to output file");
+      return false;
+    }
   }
   return true;
 }

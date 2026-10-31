@@ -7,7 +7,7 @@ export class MMKVParser {
 
   constructor(private view: DataView<ArrayBuffer>) {
     const payloadLength = view.getUint32(0, true);
-    this.length = 4 + payloadLength;
+    this.length = Math.min(4 + payloadLength, view.byteLength);
 
     // skip unused str
     this.readInt();

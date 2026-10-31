@@ -50,6 +50,7 @@ int qmpc_command_dump(const qmpc_command_args* args) {
 
           qmpc_mmkv_reader_source_t mmkv_source = {
               .ctx_ = &r,
+              .expected_size_ = (uint32_t)r.mmkv_len_,
               .read_ = (qmpc_mmkv_reader_fn_read_t)qmpc_mmkv_cipher_reader_read,
               .eof_ = (qmpc_mmkv_reader_fn_eof_t)qmpc_mmkv_cipher_reader_eof,
           };
