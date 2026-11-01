@@ -1,6 +1,6 @@
 import { Header2, Header3 } from '~/components/HelpText/Headers';
 import { SegmentKeyImportInstructions } from './SegmentKeyImportInstructions';
-import { KugouAllInstructions } from '~/features/settings/panels/Kugou/KugouAllInstructions.tsx';
+import { KugouAllInstructions } from '~/features/kugou/instructions/KugouAllInstructions';
 import { RiErrorWarningLine } from 'react-icons/ri';
 
 export function KugouFAQ() {

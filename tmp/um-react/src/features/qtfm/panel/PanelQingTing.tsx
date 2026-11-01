@@ -2,13 +2,12 @@ import { useAppDispatch, useAppSelector } from '~/hooks';
 import { ExtLink } from '~/components/ExtLink';
 import { ChangeEvent, ClipboardEvent, useId } from 'react';
 import { VQuote } from '~/components/HelpText/VQuote';
-import { selectStagingQtfmAndroidKey } from '../settingsSelector';
-import { qtfmAndroidUpdateKey } from '../settingsSlice';
+import { selectStagingQtfmAndroidKey } from '~/features/qtfm/keyLookup';
+import { parseQtfmDeviceInfoFromText, parseQtfmDeviceSecretFromText } from '~/features/qtfm/importKeys';
+import { QingTingNotes } from '~/features/qtfm/instructions/QingTingNotes';
+import { qtfmAndroidUpdateKey } from '~/features/settings/settingsSlice';
 import { workerClientBus } from '~/decrypt-worker/client.ts';
-import { GetQingTingFMDeviceKeyPayload } from '~/decrypt-worker/types.ts';
 import { DECRYPTION_WORKER_ACTION_NAME } from '~/decrypt-worker/constants.ts';
-import { Ruby } from '~/components/Ruby';
-import { HiWord } from '~/components/HelpText/HiWord';
 import { toast } from 'react-toastify';
 
 const QTFM_DEVICE_ID_URL = 'https://github.com/parakeet-rs/qtfm-device-id/releases/latest';
@@ -22,26 +21,18 @@ export function PanelQingTing() {
 
   const handleDataPaste = (e: ClipboardEvent<HTMLInputElement>) => {
     const plainText = e.clipboardData.getData('text/plain');
-    const matchDeviceSecret = plainText.match(/^DEVICE_SECRET: ([0-9a-fA-F]+)/m);
-    if (matchDeviceSecret) {
+    const deviceSecret = parseQtfmDeviceSecretFromText(plainText);
+    if (deviceSecret) {
       e.preventDefault();
-      setSecretKey(matchDeviceSecret[1]);
+      setSecretKey(deviceSecret);
       return;
     }
 
-    const dataMap = Object.create(null) as GetQingTingFMDeviceKeyPayload;
-    for (const [, key, value] of plainText.matchAll(/^(PRODUCT|DEVICE|MANUFACTURER|BRAND|BOARD|MODEL): (.+)/gim)) {
-      dataMap[key.toLowerCase() as keyof GetQingTingFMDeviceKeyPayload] = value;
-    }
-    const { product, device, manufacturer, brand, board, model } = dataMap;
-
-    if (product && device && manufacturer && brand && board && model) {
+    const dataMap = parseQtfmDeviceInfoFromText(plainText);
+    if (dataMap) {
       e.preventDefault();
       workerClientBus
-        .request<
-          string,
-          GetQingTingFMDeviceKeyPayload
-        >(DECRYPTION_WORKER_ACTION_NAME.QINGTING_FM_GET_DEVICE_KEY, dataMap)
+        .request(DECRYPTION_WORKER_ACTION_NAME.QINGTING_FM_GET_DEVICE_KEY, dataMap)
         .then(setSecretKey, (err) => toast.error(`生成设备密钥时发生错误: ${err}`));
     }
   };
@@ -83,43 +74,7 @@ export function PanelQingTing() {
         </fieldset>
       </div>
 
-      <h3 className="text-xl font-bold my-2">注意事项</h3>
-      <ul className="list-disc pl-6">
-        <li>
-          <p>
-            下载的文件位于
-            <VQuote>
-              <code className="break-words">
-                <HiWord>[内部储存]</HiWord>/<wbr />
-                Android/
-                <wbr />
-                data/
-                <wbr />
-                fm.qingting.qtradio/
-                <wbr />
-                files/Music/
-              </code>
-            </VQuote>
-          </p>
-          <ul className="list-disc pl-6">
-            <li>
-              <p>
-                你可能需要使用有
-                <Ruby caption="root">特权</Ruby>
-                的文件浏览器访问。
-              </p>
-            </li>
-          </ul>
-        </li>
-        <li>
-          <p>
-            音频文件文件名为「<code>.p~!</code>」前缀。
-          </p>
-        </li>
-        <li>
-          <p>因为解密密钥与文件名相关，因此解密前请不要更改文件名。</p>
-        </li>
-      </ul>
+      <QingTingNotes />
     </div>
   );
 }

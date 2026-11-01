@@ -80,13 +80,12 @@ class DecryptCommandHandler {
   }
 }
 
-export const workerDecryptHandler = async ({ id: payloadId, blobURI, options }: DecryptCommandPayload) => {
+export const workerDecryptHandler = async ({ fileId, blobURI, options }: DecryptCommandPayload) => {
   await umCryptoReady;
-  const id = payloadId.replace('://', ':');
-  const label = `decrypt(${id})`;
+  const label = `decrypt(${fileId})`;
   return withTimeGroupedLogs(label, async () => {
     const buffer = await fetch(blobURI).then((r) => r.arrayBuffer());
-    const handler = new DecryptCommandHandler(id, new Uint8Array(buffer), options);
+    const handler = new DecryptCommandHandler(fileId, new Uint8Array(buffer), options);
     return handler.decrypt(allCryptoFactories);
   });
 };

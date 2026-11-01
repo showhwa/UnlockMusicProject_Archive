@@ -1,4 +1,4 @@
-import type { StagingKWMv2Key } from '~/features/settings/keyFormats';
+import type { StagingKWMv2Key } from '~/features/kwm/types';
 import { MMKVParser } from '../MMKVParser';
 
 export function parseAndroidKuwoEKey(view: DataView<ArrayBuffer>): Omit<StagingKWMv2Key, 'id'>[] {

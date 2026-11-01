@@ -1,8 +1,8 @@
 import { PiFileAudio, PiHash } from 'react-icons/pi';
-import { kwm2DeleteKey, kwm2UpdateKey } from '../../settingsSlice';
+import { kwm2DeleteKey, kwm2UpdateKey } from '~/features/settings/settingsSlice';
 import { useAppDispatch } from '~/hooks';
 import { memo } from 'react';
-import { StagingKWMv2Key } from '../../keyFormats';
+import type { StagingKWMv2Key } from '~/features/kwm/types';
 import { KeyInput } from '~/components/KeyInput';
 
 export const KWMv2EKeyItem = memo(({ id, ekey, quality, rid, i }: StagingKWMv2Key & { i: number }) => {

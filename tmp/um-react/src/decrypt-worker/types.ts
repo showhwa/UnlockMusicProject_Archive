@@ -1,13 +1,13 @@
 export interface DecryptCommandOptions {
   fileName: string;
   qmc2Key?: string;
-  kwm2key?: string;
+  kwm2Key?: string;
   kugouKey?: string;
   qingTingAndroidKey?: string;
 }
 
 export interface DecryptCommandPayload {
-  id: string;
+  fileId: string;
   blobURI: string;
   options: DecryptCommandOptions;
 }

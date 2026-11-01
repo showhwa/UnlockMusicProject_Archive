@@ -1,6 +1,6 @@
 import { Header2, Header3 } from '~/components/HelpText/Headers';
 import { SegmentTryOfficialPlayer } from './SegmentTryOfficialPlayer';
-import { QMCv2QQMusicAllInstructions } from '~/features/settings/panels/QMCv2/QMCv2QQMusicAllInstructions';
+import { QMCv2QQMusicAllInstructions } from '~/features/qmc/instructions/QMCv2QQMusicAllInstructions';
 
 export function QQMusicFAQ() {
   return (

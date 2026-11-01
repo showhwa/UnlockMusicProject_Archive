@@ -12,7 +12,7 @@ export class KuwoMusicDecipher implements DecipherInstance {
 
     try {
       header = KuwoHeader.parse(buffer.subarray(0, 0x400));
-      kwm = new KWMDecipher(header, options.kwm2key);
+      kwm = new KWMDecipher(header, options.kwm2Key);
 
       const audioBuffer = new Uint8Array(buffer.subarray(0x400));
       for (const [block, offset] of chunkBuffer(audioBuffer)) {

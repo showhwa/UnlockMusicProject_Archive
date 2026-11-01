@@ -1,4 +1,4 @@
-import { qmc2DeleteKey, qmc2UpdateKey } from '../../settingsSlice';
+import { qmc2DeleteKey, qmc2UpdateKey } from '~/features/settings/settingsSlice';
 import { useAppDispatch } from '~/hooks';
 import { memo } from 'react';
 import { KeyInput } from '~/components/KeyInput.tsx';

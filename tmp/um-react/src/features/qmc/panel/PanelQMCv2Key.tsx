@@ -1,15 +1,12 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { qmc2AddKey, qmc2AllowFuzzyNameSearch, qmc2ClearKeys, qmc2ImportKeys } from '../settingsSlice';
-import { selectStagingQMCv2Settings } from '../settingsSelector';
+import { qmc2AddKey, qmc2AllowFuzzyNameSearch, qmc2ClearKeys, qmc2ImportKeys } from '~/features/settings/settingsSlice';
+import { selectStagingQMCv2Settings } from '~/features/qmc/keyLookup';
 import React, { useRef, useState } from 'react';
-import { QMCv2EKeyItem } from './QMCv2/QMCv2EKeyItem';
+import { QMCv2EKeyItem } from './QMCv2EKeyItem';
 import { ImportSecretModal } from '~/components/ImportSecretModal';
-import { StagingQMCv2Key } from '../keyFormats';
-import { DatabaseKeyExtractor } from '~/util/DatabaseKeyExtractor';
-import { parseAndroidQmEKey } from '~/util/mmkv/qm';
-import { getFileName } from '~/util/pathHelper';
-import { QMCv2QQMusicAllInstructions } from './QMCv2/QMCv2QQMusicAllInstructions';
-import { QMCv2DoubanAllInstructions } from './QMCv2/QMCv2DoubanAllInstructions';
+import { importQMCv2KeysFromFile } from '~/features/qmc/importKeys';
+import { QMCv2QQMusicAllInstructions } from '~/features/qmc/instructions/QMCv2QQMusicAllInstructions';
+import { QMCv2DoubanAllInstructions } from '~/features/qmc/instructions/QMCv2DoubanAllInstructions';
 import { AddKey } from '~/components/AddKey';
 import { InfoModal } from '~/components/InfoModal.tsx';
 import { Ruby } from '~/components/Ruby.tsx';
@@ -32,18 +29,7 @@ export function PanelQMCv2Key() {
 
   const handleSecretImport = async (file: File) => {
     try {
-      const fileBuffer = await file.arrayBuffer();
-
-      let keys: null | Omit<StagingQMCv2Key, 'id'>[] = null;
-
-      if (/(player_process[_.]db|music_audio_play)(\.db)?$/i.test(file.name)) {
-        const extractor = await DatabaseKeyExtractor.getInstance();
-        keys = extractor.extractQmcV2KeysFromSqliteDb(fileBuffer);
-      } else if (/MMKVStreamEncryptId|filenameEkeyMap|qmpc-mmkv-v1|(\.mmkv$)/i.test(file.name)) {
-        const fileBuffer = await file.arrayBuffer();
-        const map = parseAndroidQmEKey(new DataView(fileBuffer));
-        keys = Array.from(map.entries(), ([name, ekey]) => ({ name: getFileName(name), ekey }));
-      }
+      const keys = await importQMCv2KeysFromFile(file);
 
       if (keys && keys.length > 0) {
         dispatch(qmc2ImportKeys(keys));

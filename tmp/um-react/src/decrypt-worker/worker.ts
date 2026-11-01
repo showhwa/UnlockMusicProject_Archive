@@ -1,4 +1,5 @@
 import { WorkerServerBus } from '~/util/WorkerEventBus';
+import type { WorkerActionMap } from './actions';
 import { DECRYPTION_WORKER_ACTION_NAME } from './constants';
 import { getUmcVersion } from '@unlock-music/crypto';
 
@@ -8,7 +9,7 @@ import { workerGetQtfmDeviceKey } from '~/decrypt-worker/worker/qtfm_device_key.
 import { workerParseKuwoHeader } from '~/decrypt-worker/worker/kuwo_header_parse.ts';
 import { workerParseKugouHeader } from '~/decrypt-worker/worker/kugou_parse_header.ts';
 
-const bus = new WorkerServerBus();
+const bus = new WorkerServerBus<WorkerActionMap>();
 onmessage = bus.onmessage;
 
 bus.addEventHandler(DECRYPTION_WORKER_ACTION_NAME.DECRYPT, workerDecryptHandler);

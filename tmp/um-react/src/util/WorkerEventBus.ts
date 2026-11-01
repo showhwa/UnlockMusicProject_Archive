@@ -1,27 +1,45 @@
 import { nanoid } from 'nanoid';
 import { DecryptError } from '~/decrypt-worker/util/DecryptError';
 
+type WorkerActionEntry = { req: unknown; res: unknown };
 type WorkerServerHandler<P, R> = (payload: P) => R | Promise<R>;
 
-interface SerializedError {
+export interface SerializedError {
   message: string;
   stack?: string;
   code?: string;
+  name?: string;
 }
 
 interface WorkerClientRequestPayload<P = unknown> {
-  id: string;
+  requestId: string;
   action: string;
   payload: P;
 }
 
 interface WorkerServerResponsePayload<R = unknown> {
-  id: string;
-  result: R;
-  error: SerializedError;
+  requestId: string;
+  result: R | null;
+  error: SerializedError | null;
 }
 
-export class WorkerClientBus<T = string> {
+export function serializeError(err: unknown): SerializedError {
+  if (err instanceof DecryptError) {
+    return err.toJSON();
+  }
+  if (err instanceof Error) {
+    const withCode = err as Error & { code?: string };
+    return {
+      name: err.name,
+      message: err.message,
+      stack: err.stack,
+      code: withCode.code,
+    };
+  }
+  return { message: String(err) };
+}
+
+export class WorkerClientBus<TMap extends Record<string, WorkerActionEntry>> {
   private idPromiseMap = new Map<string, [(data: never) => void, (error: Error) => void]>();
 
   constructor(private worker: Worker) {
@@ -29,13 +47,13 @@ export class WorkerClientBus<T = string> {
   }
 
   eventHandler = (e: MessageEvent<WorkerServerResponsePayload>) => {
-    const { id, result, error } = e.data;
-    const actionPromise = this.idPromiseMap.get(id);
+    const { requestId, result, error } = e.data;
+    const actionPromise = this.idPromiseMap.get(requestId);
     if (!actionPromise) {
-      console.error('cound not fetch worker promise for action: %s', id);
+      console.error('could not fetch worker promise for request: %s', requestId);
       return;
     }
-    this.idPromiseMap.delete(id);
+    this.idPromiseMap.delete(requestId);
 
     const [resolve, reject] = actionPromise;
     if (error) {
@@ -48,47 +66,46 @@ export class WorkerClientBus<T = string> {
     }
   };
 
-  async request<R, P>(actionName: T, payload: P): Promise<R> {
+  async request<K extends keyof TMap & string>(actionName: K, payload: TMap[K]['req']): Promise<TMap[K]['res']> {
     return new Promise((resolve, reject) => {
-      const id = `request://${actionName as string}/${nanoid()}`;
-      this.idPromiseMap.set(id, [resolve, reject]);
+      const requestId = `request://${actionName}/${nanoid()}`;
+      this.idPromiseMap.set(requestId, [resolve, reject]);
       this.worker.postMessage({
-        id,
+        requestId,
         action: actionName,
         payload,
-      });
+      } satisfies WorkerClientRequestPayload);
     });
   }
 }
 
-export class WorkerServerBus {
+export class WorkerServerBus<TMap extends Record<string, WorkerActionEntry> = Record<string, WorkerActionEntry>> {
   private handlers = new Map<string, WorkerServerHandler<unknown, unknown>>();
 
-  addEventHandler<R, P>(actionName: string, handler: WorkerServerHandler<P, R>) {
-    this.handlers.set(actionName, handler as WorkerServerHandler<unknown, unknown>);
+  addEventHandler<K extends keyof TMap & string>(
+    actionName: K,
+    handler: WorkerServerHandler<TMap[K]['req'], TMap[K]['res']>,
+  ) {
+    this.handlers.set(actionName, handler);
   }
 
   onmessage = async (e: MessageEvent<WorkerClientRequestPayload>) => {
-    const { id, action, payload } = e.data;
+    const { requestId, action, payload } = e.data;
     const handler = this.handlers.get(action);
 
-    let result = null;
-    let error = null;
+    let result: unknown = null;
+    let error: SerializedError | null = null;
 
     if (!handler) {
-      error = new Error('Handler missing for action ' + action);
+      error = serializeError(new Error('Handler missing for action ' + action));
     } else {
       try {
         result = await handler(payload);
       } catch (err: unknown) {
-        if (err instanceof DecryptError) {
-          error = err.toJSON();
-        } else {
-          error = err;
-        }
+        error = serializeError(err);
       }
     }
 
-    postMessage({ id, result, error });
+    postMessage({ requestId, result, error } satisfies WorkerServerResponsePayload);
   };
 }

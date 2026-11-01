@@ -1,16 +1,11 @@
 import { getFileName } from './pathHelper';
 import { SQLDatabase, SQLStatic, loadSQL } from './sqlite';
 import { KuGou } from '@unlock-music/crypto';
+import type { StagingQMCv2Key } from '~/features/qmc/types';
+import type { StagingKugouKey } from '~/features/kugou/types';
 
-export interface QMAndroidKeyEntry {
-  name: string;
-  ekey: string;
-}
-
-export type KugouKeyEntry = {
-  audioHash: string;
-  ekey: string;
-};
+export type QMAndroidKeyEntry = Omit<StagingQMCv2Key, 'id'>;
+export type KugouKeyEntry = Omit<StagingKugouKey, 'id'>;
 
 export class DatabaseKeyExtractor {
   private static _instance: DatabaseKeyExtractor;

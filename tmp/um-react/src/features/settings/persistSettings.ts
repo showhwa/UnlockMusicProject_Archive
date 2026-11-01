@@ -10,7 +10,8 @@ import {
 } from './settingsSlice';
 import { enumObject } from '~/util/objects';
 import { getLogger } from '~/util/logUtils';
-import { parseKwm2ProductionKey } from './keyFormats';
+import { parseKwm2ProductionKey } from '~/features/kwm/types';
+import { sanitizeQtfmAndroidKey } from '~/features/qtfm/types';
 import { deepClone } from '~/util/deepClone';
 
 const DEFAULT_STORAGE_KEY = 'um-react-settings';
@@ -28,7 +29,8 @@ function mergeBatchDownload(source: Partial<BatchDownloadSettings> | undefined):
   return result;
 }
 
-function mergeSettings(settings: ProductionSettings): ProductionSettings {
+/** Normalize / sanitize loaded production settings against defaults. Exported for tests. */
+export function mergeSettings(settings: ProductionSettings): ProductionSettings {
   const draft = deepClone(settingsSlice.getInitialState().production);
 
   draft.general.batchDownload = mergeBatchDownload(settings?.general?.batchDownload);
@@ -67,7 +69,7 @@ function mergeSettings(settings: ProductionSettings): ProductionSettings {
   }
 
   if (typeof settings?.qtfm?.android === 'string') {
-    draft.qtfm.android = settings.qtfm.android.replace(/[^0-9a-fA-F]/g, '');
+    draft.qtfm.android = sanitizeQtfmAndroidKey(settings.qtfm.android);
   }
 
   return draft;

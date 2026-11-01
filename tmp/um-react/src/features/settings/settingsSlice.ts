@@ -1,25 +1,29 @@
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
-import { nanoid } from 'nanoid';
 import {
-  ProductionKWMv2Keys,
-  ProductionQMCv2Keys,
-  StagingKWMv2Key,
-  StagingQMCv2Key,
-  kwm2ProductionToStaging,
-  kwm2StagingToProductionKey,
-  kwm2StagingToProductionValue,
-  productionKeyToStaging,
+  type ProductionQMCv2Keys,
+  type StagingQMCv2Key,
   qmc2ProductionToStaging,
   qmc2StagingToProductionKey,
   qmc2StagingToProductionValue,
-  stagingKeyToProduction,
-  ProductionKugouKey,
+} from '~/features/qmc/types';
+import {
+  type ProductionKWMv2Keys,
+  type StagingKWMv2Key,
+  kwm2ProductionToStaging,
+  kwm2StagingToProductionKey,
+  kwm2StagingToProductionValue,
+} from '~/features/kwm/types';
+import {
+  type ProductionKugouKey,
+  type StagingKugouKey,
   kugouProductionToStaging,
   kugouStagingToProductionKey,
   kugouStagingToProductionValue,
-  StagingKugouKey,
-} from './keyFormats';
+} from '~/features/kugou/types';
+import { EMPTY_QTFM_SETTINGS, type ProductionQtfmSettings, type StagingQtfmSettings } from '~/features/qtfm/types';
+import { productionKeyToStaging, stagingKeyToProduction } from './keyFormats';
+import { createKeyListReducers } from './createKeyListReducers';
 
 export interface BatchDownloadSettings {
   directoryPicker: boolean;
@@ -39,12 +43,14 @@ export interface StagingSettings {
   kwm2: {
     keys: StagingKWMv2Key[];
   };
+  /**
+   * KuGou / KGG keys.
+   * UI route tab id is `kgg`; Redux / production persist key remains `kugou`.
+   */
   kugou: {
     keys: StagingKugouKey[];
   };
-  qtfm: {
-    android: string;
-  };
+  qtfm: StagingQtfmSettings;
 }
 
 export interface ProductionSettings {
@@ -58,12 +64,14 @@ export interface ProductionSettings {
   kwm2: {
     keys: ProductionKWMv2Keys; // { [`${rid}-${quality}`]: ekey }
   };
+  /**
+   * KuGou / KGG keys.
+   * UI route tab id is `kgg`; localStorage production shape key remains `kugou` (do not rename).
+   */
   kugou: {
     keys: ProductionKugouKey; // {  [fileName]: ekey  }
   };
-  qtfm: {
-    android: string;
-  };
+  qtfm: ProductionQtfmSettings;
 }
 
 export const DEFAULT_BATCH_DOWNLOAD_SETTINGS: BatchDownloadSettings = {
@@ -85,7 +93,7 @@ const initialState: SettingsState = {
     general: { batchDownload: { ...DEFAULT_BATCH_DOWNLOAD_SETTINGS } },
     qmc2: { allowFuzzyNameSearch: true, keys: [] },
     kwm2: { keys: [] },
-    qtfm: { android: '' },
+    qtfm: { ...EMPTY_QTFM_SETTINGS },
     kugou: { keys: [] },
   },
   production: {
@@ -93,11 +101,11 @@ const initialState: SettingsState = {
     qmc2: { allowFuzzyNameSearch: true, keys: {} },
     kwm2: { keys: {} },
     kugou: { keys: {} },
-    qtfm: { android: '' },
+    qtfm: { ...EMPTY_QTFM_SETTINGS },
   },
 };
 
-const stagingToProduction = (staging: StagingSettings): ProductionSettings => ({
+export const stagingToProduction = (staging: StagingSettings): ProductionSettings => ({
   general: {
     batchDownload: { ...staging.general.batchDownload },
   },
@@ -114,7 +122,7 @@ const stagingToProduction = (staging: StagingSettings): ProductionSettings => ({
   qtfm: staging.qtfm,
 });
 
-const productionToStaging = (production: ProductionSettings): StagingSettings => ({
+export const productionToStaging = (production: ProductionSettings): StagingSettings => ({
   general: {
     batchDownload: { ...production.general.batchDownload },
   },
@@ -131,6 +139,10 @@ const productionToStaging = (production: ProductionSettings): StagingSettings =>
   qtfm: production.qtfm,
 });
 
+const qmc2KeyList = createKeyListReducers('qmc2', () => ({ name: '', ekey: '' }));
+const kwm2KeyList = createKeyListReducers('kwm2', () => ({ ekey: '', quality: '', rid: '' }));
+const kugouKeyList = createKeyListReducers('kugou', () => ({ audioHash: '', ekey: '' }));
+
 export const settingsSlice = createSlice({
   name: 'settings',
   initialState,
@@ -142,96 +154,25 @@ export const settingsSlice = createSlice({
         staging: productionToStaging(payload),
       };
     },
-    //
-    qmc2AddKey(state) {
-      state.staging.qmc2.keys.push({ id: nanoid(), name: '', ekey: '' });
-      state.dirty = true;
-    },
-    qmc2ImportKeys(state, { payload }: PayloadAction<Omit<StagingQMCv2Key, 'id'>[]>) {
-      const newItems = payload.map((item) => ({ id: nanoid(), ...item }));
-      state.staging.qmc2.keys.push(...newItems);
-      state.dirty = true;
-    },
-    qmc2DeleteKey(state, { payload: { id } }: PayloadAction<{ id: string }>) {
-      const qmc2 = state.staging.qmc2;
-      qmc2.keys = qmc2.keys.filter((item) => item.id !== id);
-      state.dirty = true;
-    },
-    qmc2UpdateKey(
-      state,
-      { payload: { id, field, value } }: PayloadAction<{ id: string; field: keyof StagingQMCv2Key; value: string }>,
-    ) {
-      const keyItem = state.staging.qmc2.keys.find((item) => item.id === id);
-      if (keyItem) {
-        keyItem[field] = value;
-        state.dirty = true;
-      }
-    },
-    qmc2ClearKeys(state) {
-      state.staging.qmc2.keys = [];
-      state.dirty = true;
-    },
+    qmc2AddKey: qmc2KeyList.addKey,
+    qmc2ImportKeys: qmc2KeyList.importKeys,
+    qmc2DeleteKey: qmc2KeyList.deleteKey,
+    qmc2UpdateKey: qmc2KeyList.updateKey,
+    qmc2ClearKeys: qmc2KeyList.clearKeys,
     qmc2AllowFuzzyNameSearch(state, { payload: { enable } }: PayloadAction<{ enable: boolean }>) {
       state.staging.qmc2.allowFuzzyNameSearch = enable;
       state.dirty = true;
     },
-    // TODO: reuse the logic somehow?
-    kwm2AddKey(state) {
-      state.staging.kwm2.keys.push({ id: nanoid(), ekey: '', quality: '', rid: '' });
-      state.dirty = true;
-    },
-    kwm2ImportKeys(state, { payload }: PayloadAction<Omit<StagingKWMv2Key, 'id'>[]>) {
-      const newItems = payload.map((item) => ({ id: nanoid(), ...item }));
-      state.staging.kwm2.keys.push(...newItems);
-      state.dirty = true;
-    },
-    kwm2DeleteKey(state, { payload: { id } }: PayloadAction<{ id: string }>) {
-      const kwm2 = state.staging.kwm2;
-      kwm2.keys = kwm2.keys.filter((item) => item.id !== id);
-      state.dirty = true;
-    },
-    kwm2UpdateKey(
-      state,
-      { payload: { id, field, value } }: PayloadAction<{ id: string; field: keyof StagingKWMv2Key; value: string }>,
-    ) {
-      const keyItem = state.staging.kwm2.keys.find((item) => item.id === id);
-      if (keyItem) {
-        keyItem[field] = value;
-        state.dirty = true;
-      }
-    },
-    kwm2ClearKeys(state) {
-      state.staging.kwm2.keys = [];
-      state.dirty = true;
-    },
-    kugouAddKey(state) {
-      state.staging.kugou.keys.push({ id: nanoid(), audioHash: '', ekey: '' });
-      state.dirty = true;
-    },
-    kugouImportKeys(state, { payload }: PayloadAction<Omit<StagingKugouKey, 'id'>[]>) {
-      const newItems = payload.map((item) => ({ id: nanoid(), ...item }));
-      state.staging.kugou.keys.push(...newItems);
-      state.dirty = true;
-    },
-    kugouDeleteKey(state, { payload: { id } }: PayloadAction<{ id: string }>) {
-      const kugou = state.staging.kugou;
-      kugou.keys = kugou.keys.filter((item) => item.id !== id);
-      state.dirty = true;
-    },
-    kugouUpdateKey(
-      state,
-      { payload: { id, field, value } }: PayloadAction<{ id: string; field: keyof StagingKugouKey; value: string }>,
-    ) {
-      const keyItem = state.staging.kugou.keys.find((item) => item.id === id);
-      if (keyItem) {
-        keyItem[field] = value;
-        state.dirty = true;
-      }
-    },
-    kugouClearKeys(state) {
-      state.staging.kugou.keys = [];
-      state.dirty = true;
-    },
+    kwm2AddKey: kwm2KeyList.addKey,
+    kwm2ImportKeys: kwm2KeyList.importKeys,
+    kwm2DeleteKey: kwm2KeyList.deleteKey,
+    kwm2UpdateKey: kwm2KeyList.updateKey,
+    kwm2ClearKeys: kwm2KeyList.clearKeys,
+    kugouAddKey: kugouKeyList.addKey,
+    kugouImportKeys: kugouKeyList.importKeys,
+    kugouDeleteKey: kugouKeyList.deleteKey,
+    kugouUpdateKey: kugouKeyList.updateKey,
+    kugouClearKeys: kugouKeyList.clearKeys,
     qtfmAndroidUpdateKey(state, { payload: { deviceKey } }: PayloadAction<{ deviceKey: string }>) {
       state.staging.qtfm.android = deviceKey;
       state.dirty = true;
@@ -243,19 +184,14 @@ export const settingsSlice = createSlice({
       state.staging.general.batchDownload[key] = value;
       state.dirty = true;
     },
-    //
     discardStagingChanges: (state) => {
       state.dirty = false;
       state.staging = productionToStaging(state.production);
     },
+    /** Apply staging → production. Staging list row `id`s are kept (no productionToStaging round-trip). */
     commitStagingChange: (state) => {
-      const production = stagingToProduction(state.staging);
-      return {
-        dirty: false,
-        // Sync back to staging
-        staging: productionToStaging(production),
-        production,
-      };
+      state.production = stagingToProduction(state.staging);
+      state.dirty = false;
     },
     resetConfig: () => {
       return initialState;

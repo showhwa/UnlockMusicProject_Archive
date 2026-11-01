@@ -2,13 +2,11 @@ import { useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { ImportSecretModal } from '~/components/ImportSecretModal';
-import { parseAndroidKuwoEKey, parseIosKuwoEKey } from '~/util/mmkv/kuwo';
-
-import { kwm2AddKey, kwm2ClearKeys, kwm2ImportKeys } from '../settingsSlice';
-import { selectStagingKWMv2Keys } from '../settingsSelector';
-import { KWMv2EKeyItem } from './KWMv2/KWMv2EKeyItem';
-import type { StagingKWMv2Key } from '../keyFormats';
-import { KWMv2AllInstructions } from './KWMv2/KWMv2AllInstructions';
+import { kwm2AddKey, kwm2ClearKeys, kwm2ImportKeys } from '~/features/settings/settingsSlice';
+import { selectStagingKWMv2Keys } from '~/features/kwm/keyLookup';
+import { KWMv2EKeyItem } from './KWMv2EKeyItem';
+import { importKWMv2KeysFromFile } from '~/features/kwm/importKeys';
+import { KWMv2AllInstructions } from '~/features/kwm/instructions/KWMv2AllInstructions';
 import { AddKey } from '~/components/AddKey';
 import { KeyListContainer } from '~/components/KeyListContainer';
 import { toastImportResult } from '~/util/toastImportResult';
@@ -21,12 +19,7 @@ export function PanelKWMv2Key() {
   const addKey = () => dispatch(kwm2AddKey());
   const clearAll = () => dispatch(kwm2ClearKeys());
   const handleSecretImport = async (file: File) => {
-    let keys: Omit<StagingKWMv2Key, 'id'>[] | null = null;
-    if (/cn\.kuwo\.player\.mmkv/i.test(file.name)) {
-      keys = parseAndroidKuwoEKey(new DataView(await file.arrayBuffer()));
-    } else if (/kw_ekey/.test(file.name)) {
-      keys = parseIosKuwoEKey(new DataView(await file.arrayBuffer()));
-    }
+    const keys = await importKWMv2KeysFromFile(file);
 
     if (keys && keys.length > 0) {
       dispatch(kwm2ImportKeys(keys));

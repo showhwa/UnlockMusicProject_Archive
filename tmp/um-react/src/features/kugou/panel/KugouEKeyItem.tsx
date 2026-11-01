@@ -1,7 +1,7 @@
-import { kugouDeleteKey, kugouUpdateKey } from '../../settingsSlice';
+import { kugouDeleteKey, kugouUpdateKey } from '~/features/settings/settingsSlice';
 import { useAppDispatch } from '~/hooks';
 import { memo } from 'react';
-import { StagingKugouKey } from '../../keyFormats';
+import type { StagingKugouKey } from '~/features/kugou/types';
 import { KeyInput } from '~/components/KeyInput';
 
 export const KugouEKeyItem = memo(({ id, ekey, audioHash, i }: StagingKugouKey & { i: number }) => {

@@ -2,7 +2,7 @@ import { Header2, Header3 } from '~/components/HelpText/Headers';
 import { VQuote } from '~/components/HelpText/VQuote';
 import { SegmentTryOfficialPlayer } from './SegmentTryOfficialPlayer';
 import { HiWord } from '~/components/HelpText/HiWord';
-import { KWMv2AllInstructions } from '~/features/settings/panels/KWMv2/KWMv2AllInstructions';
+import { KWMv2AllInstructions } from '~/features/kwm/instructions/KWMv2AllInstructions';
 import { SegmentKeyImportInstructions } from './SegmentKeyImportInstructions';
 import { RiErrorWarningLine } from 'react-icons/ri';
 

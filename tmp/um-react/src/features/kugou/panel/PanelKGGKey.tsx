@@ -2,15 +2,12 @@ import { useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { ImportSecretModal } from '~/components/ImportSecretModal';
-
-import { kugouAddKey, kugouClearKeys, kugouImportKeys } from '../settingsSlice';
-import { selectStagingKugouV5Keys } from '../settingsSelector';
-import type { StagingKugouKey } from '../keyFormats';
+import { kugouAddKey, kugouClearKeys, kugouImportKeys } from '~/features/settings/settingsSlice';
+import { selectStagingKugouV5Keys } from '~/features/kugou/keyLookup';
 import { AddKey } from '~/components/AddKey.tsx';
-import { KugouEKeyItem } from '~/features/settings/panels/Kugou/KugouEKeyItem.tsx';
-import { KugouAllInstructions } from '~/features/settings/panels/Kugou/KugouAllInstructions.tsx';
-import { parseAndroidKugouMMKV } from '~/util/mmkv/kugou.ts';
-import { DatabaseKeyExtractor } from '~/util/DatabaseKeyExtractor.ts';
+import { KugouEKeyItem } from './KugouEKeyItem';
+import { KugouAllInstructions } from '~/features/kugou/instructions/KugouAllInstructions';
+import { importKugouKeysFromFile } from '~/features/kugou/importKeys';
 import { KeyListContainer } from '~/components/KeyListContainer';
 import { toastImportResult } from '~/util/toastImportResult';
 
@@ -22,13 +19,7 @@ export function PanelKGGKey() {
   const addKey = () => dispatch(kugouAddKey());
   const clearAll = () => dispatch(kugouClearKeys());
   const handleSecretImport = async (file: File) => {
-    let keys: Omit<StagingKugouKey, 'id'>[] | null = null;
-    if (/mggkey_multi_process/i.test(file.name)) {
-      keys = parseAndroidKugouMMKV(new DataView(await file.arrayBuffer()));
-    } else if (/^KGMusicV3\.db$/.test(file.name)) {
-      const extractor = await DatabaseKeyExtractor.getInstance();
-      keys = extractor.extractKugouKeyFromEncryptedDb(await file.arrayBuffer());
-    }
+    const keys = await importKugouKeysFromFile(file);
 
     if (keys && keys.length > 0) {
       dispatch(kugouImportKeys(keys));
