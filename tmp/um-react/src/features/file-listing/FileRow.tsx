@@ -2,6 +2,7 @@ import { DecryptedAudioFile, deleteFile, ProcessState } from './fileListingSlice
 import { useAppDispatch } from '~/hooks';
 import { FileError } from './FileError';
 import classNames from 'classnames';
+import { usePlatform } from '~/platform/PlatformContext';
 
 interface FileRowProps {
   id: string;
@@ -10,7 +11,9 @@ interface FileRowProps {
 
 export function FileRow({ id, file }: FileRowProps) {
   const dispatch = useAppDispatch();
+  const { capabilities } = usePlatform();
   const isDecrypted = file.state === ProcessState.COMPLETE;
+  const showDownload = capabilities.downloadTypes.length > 0;
 
   const decryptedName = file.cleanName + '.' + file.ext;
 
@@ -32,18 +35,20 @@ export function FileRow({ id, file }: FileRowProps) {
         </div>
 
         <div className="card-actions justify-end">
-          <a
-            href={file.decrypted}
-            download={decryptedName}
-            title={`下载: ${decryptedName}`}
-            className={classNames('btn', {
-              'btn-primary': file.decrypted,
-              'cursor-not-allowed pointer-events-none': !file.decrypted,
-            })}
-            data-testid="audio-download"
-          >
-            下载
-          </a>
+          {showDownload && (
+            <a
+              href={file.decrypted}
+              download={decryptedName}
+              title={`下载: ${decryptedName}`}
+              className={classNames('btn', {
+                'btn-primary': file.decrypted,
+                'cursor-not-allowed pointer-events-none': !file.decrypted,
+              })}
+              data-testid="audio-download"
+            >
+              下载
+            </a>
+          )}
           <button type="button" className="btn btn-error" onClick={() => dispatch(deleteFile({ id }))}>
             删除
           </button>

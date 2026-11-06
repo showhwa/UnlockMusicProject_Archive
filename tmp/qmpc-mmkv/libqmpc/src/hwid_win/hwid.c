@@ -1,5 +1,6 @@
 #include <libqmpc/hwid.h>
 #include <libqmpc/log.h>
+#include <libqmpc/utils/common.h>
 
 #include "hwid/hex_helper.h"
 #include "hwid_win/internal.h"
@@ -27,12 +28,27 @@ cstr qmpc_hwid_disk(void) {
 
 cstr qmpc_hwid_network(void) {
   cstr out = cstr_init();
-  if (qmpc_hwid_net_ethernet(&out) && !cstr_is_empty(&out)) return out;
-  if (qmpc_hwid_net_netbios(&out) && !cstr_is_empty(&out)) return out;
+  if (qmpc_hwid_net_ethernet(&out) && !cstr_is_empty(&out)) {
+    qmpc_log_verbose("Using Ethernet ID: %s", cstr_data(&out));
+    return out;
+  }
+  if (qmpc_hwid_net_netbios(&out) && !cstr_is_empty(&out)) {
+    qmpc_log_verbose("Using NetBIOS ID: %s", cstr_data(&out));
+    return out;
+  }
   cstr_clear(&out);
   qmpc_log_warning("No valid network id found.");
   return out;
 }
+
+#pragma pack(push, 1)
+typedef struct {
+  uint32_t data1;
+  uint16_t data2;
+  uint16_t data3;
+  uint8_t data4[8];
+} qmpc_hwid_digest_t;
+#pragma pack(pop)
 
 cstr qmpc_hwid_system_id(void) {
   MD5Context ctx_md5 = {};
@@ -46,12 +62,10 @@ cstr qmpc_hwid_system_id(void) {
   md5Finalize(&ctx_md5);
 
   // Byteswaps (UUID-style layout of the MD5 digest)
-  uint32_t* w0 = (uint32_t*)&ctx_md5.digest[0];
-  uint16_t* w1 = (uint16_t*)&ctx_md5.digest[4];
-  uint16_t* w2 = (uint16_t*)&ctx_md5.digest[6];
-  *w0 = __builtin_bswap32(*w0);
-  *w1 = __builtin_bswap16(*w1);
-  *w2 = __builtin_bswap16(*w2);
+  qmpc_hwid_digest_t* digest = (qmpc_hwid_digest_t*)ctx_md5.digest;
+  digest->data1 = qmpc_htobe32(digest->data1);
+  digest->data2 = qmpc_htobe16(digest->data2);
+  digest->data3 = qmpc_htobe16(digest->data3);
 
   cstr hwid_hex = cstr_init();
   qmpc_hwid_to_hex_upper(&hwid_hex, ctx_md5.digest, sizeof(ctx_md5.digest));

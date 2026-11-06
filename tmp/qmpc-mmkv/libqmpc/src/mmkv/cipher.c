@@ -13,15 +13,15 @@ static inline bool load_mmkv_metadata(qmpc_mmkv_crc_hdr_t* hdr, csview file_path
   bool ok = false;
   c_with(cstr metadata_path = cstr_from_sv(file_path), cstr_drop(&metadata_path)) {
     cstr_append_n(&metadata_path, ".crc", 4);
-    c_with(FILE* fp = fopen_u8_sv(cstr_sv(&metadata_path), "rb"), fclose(fp)) {
-      if (fp != NULL) {
-        ok = fread(hdr, sizeof(*hdr), 1, fp) == 1;
-        if (!ok) {
-          qmpc_log_verbose("load_mmkv_metadata: fread(%s) failed", cstr_str(&metadata_path));
-        }
-      } else {
-        qmpc_log_verbose("load_mmkv_metadata: fopen(%s) failed", cstr_str(&metadata_path));
+    FILE* fp = fopen_u8_sv(cstr_sv(&metadata_path), "rb");
+    if (fp != NULL) {
+      ok = fread(hdr, sizeof(*hdr), 1, fp) == 1;
+      if (!ok) {
+        qmpc_log_verbose("load_mmkv_metadata: fread(%s) failed", cstr_str(&metadata_path));
       }
+      fclose(fp);
+    } else {
+      qmpc_log_verbose("load_mmkv_metadata: fopen(%s) failed", cstr_str(&metadata_path));
     }
   }
   return ok;
@@ -69,6 +69,7 @@ void qmpc_mmkv_cipher_reader_drop(qmpc_mmkv_cipher_reader_t* self) {
 size_t qmpc_mmkv_cipher_reader_read(qmpc_mmkv_cipher_reader_t* self, uint8_t* buffer, size_t len) {
   if (self->mmkv_view_ == NULL) return 0;
 
+  if (self->offset_ >= self->mmkv_len_) return 0;  // avoid size_t underflow on truncated files
   len = QMPC_MIN(len, self->mmkv_len_ - self->offset_);
   memcpy(buffer, self->mmkv_view_ + self->offset_, len);
   self->offset_ += len;

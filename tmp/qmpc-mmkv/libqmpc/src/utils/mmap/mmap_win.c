@@ -9,7 +9,8 @@
 bool qmpc_mmap_init(qmpc_mmap_t* self, const char* path) {
   memset(self, 0, sizeof(*self));
 
-  HANDLE file = CreateFileU8(path, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+  HANDLE file = CreateFileU8(path, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL,
+                             OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
   if (file == INVALID_HANDLE_VALUE) {
     qmpc_log_error("qmpc_mmap_init: CreateFileA(%s) failed (error=%lu)", path, GetLastError());
     return false;

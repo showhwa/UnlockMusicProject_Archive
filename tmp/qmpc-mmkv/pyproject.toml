@@ -1,0 +1,28 @@
+[project]
+name = "qmpc-mmkv"
+version = "0.1.0"
+requires-python = ">=3.13"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "prek>=0.5.10",
+    "ruff>=0.17.3",
+    "rumdl>=0.3.2",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py313"
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.rumdl]
+line-length = 120
+exclude = [
+    ".git",
+    "subprojects",
+    "dist",
+]
+respect-gitignore = true

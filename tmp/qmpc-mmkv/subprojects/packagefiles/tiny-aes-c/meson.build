@@ -1,4 +1,4 @@
-project('tiny-aes-c', 'c', default_options: ['c_std=c23'])
+project('tiny-aes-c', 'c')
 
 # Private to aes.c only: trim upstream optional modes/key sizes.
 # Do not put these on declare_dependency — they must not leak to consumers.

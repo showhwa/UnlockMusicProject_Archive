@@ -38,6 +38,11 @@ describe('stagingToProduction / productionToStaging', () => {
           streamingZip: true,
           blobZip: false,
         },
+        directWrite: {
+          outputMode: 'fixedDirectory',
+          fixedDirectoryPath: '/out',
+          deleteSourceAfterDecrypt: true,
+        },
       },
       qmc2: {
         allowFuzzyNameSearch: false,
@@ -59,6 +64,11 @@ describe('stagingToProduction / productionToStaging', () => {
           rememberDirectory: false,
           streamingZip: true,
           blobZip: false,
+        },
+        directWrite: {
+          outputMode: 'fixedDirectory',
+          fixedDirectoryPath: '/out',
+          deleteSourceAfterDecrypt: true,
         },
       },
       qmc2: {
@@ -172,6 +182,7 @@ describe('mergeSettings', () => {
     } as unknown as ProductionSettings);
 
     expect(merged.general.batchDownload).toEqual(settingsSlice.getInitialState().production.general.batchDownload);
+    expect(merged.general.directWrite).toEqual(settingsSlice.getInitialState().production.general.directWrite);
     expect(merged.qmc2).toEqual({ allowFuzzyNameSearch: false, keys: { 'a.mflac': 'ek' } });
     // only keys matching /^(\d+)-(\w+)$/
     expect(merged.kwm2.keys).toEqual({ '1-2000': 'kw', '2-hi': 'y' });
@@ -189,6 +200,11 @@ describe('mergeSettings', () => {
           streamingZip: false,
           blobZip: true,
         },
+        directWrite: {
+          outputMode: 'fixedDirectory',
+          fixedDirectoryPath: '/music/out',
+          deleteSourceAfterDecrypt: true,
+        },
       },
       qmc2: { allowFuzzyNameSearch: true, keys: { 'song.mflac': 'ek' } },
       kwm2: { keys: { '9-1000': 'kw' } },
@@ -202,5 +218,42 @@ describe('mergeSettings', () => {
     expect(roundTrip.kwm2).toEqual(merged.kwm2);
     expect(roundTrip.kugou).toEqual(merged.kugou);
     expect(roundTrip.qtfm).toEqual(merged.qtfm);
+  });
+
+  test('mergeSettings fills directWrite defaults and ignores invalid fields', () => {
+    const merged = mergeSettings({
+      general: {
+        directWrite: {
+          outputMode: 'nope',
+          fixedDirectoryPath: 42,
+          deleteSourceAfterDecrypt: 'yes',
+        },
+      },
+    } as unknown as ProductionSettings);
+
+    expect(merged.general.directWrite).toEqual({
+      outputMode: 'besideSource',
+      fixedDirectoryPath: null,
+      deleteSourceAfterDecrypt: false,
+    });
+  });
+
+  test('mergeSettings keeps valid directWrite values when batchDownload omitted', () => {
+    const merged = mergeSettings({
+      general: {
+        directWrite: {
+          outputMode: 'fixedDirectory',
+          fixedDirectoryPath: null,
+          deleteSourceAfterDecrypt: true,
+        },
+      },
+    } as unknown as ProductionSettings);
+
+    expect(merged.general.directWrite).toEqual({
+      outputMode: 'fixedDirectory',
+      fixedDirectoryPath: null,
+      deleteSourceAfterDecrypt: true,
+    });
+    expect(merged.general.batchDownload).toEqual(settingsSlice.getInitialState().production.general.batchDownload);
   });
 });

@@ -52,7 +52,7 @@ bool scan_printable_chars_from_hex(cstr* result, csview str) {
       last_byte |= chr - 'A' + 0x0A;
     } else if (chr >= 'a' && chr <= 'f') {
       last_byte |= chr - 'a' + 0x0A;
-    } else if (!isspace(chr)) {
+    } else if (!isspace((unsigned char)chr)) {
       // cleanup
       cstr_clear(result);
       return false;
@@ -78,7 +78,7 @@ bool scan_printable_chars_from_hex(cstr* result, csview str) {
 bool scan_printable_chars(cstr* result, const csview str) {
   cstr_clear(result);
   for (isize_t i = 0; i < str.size; i++) {
-    if (!isprint(str.buf[i])) {
+    if (!isprint((unsigned char)str.buf[i])) {
       cstr_clear(result);
       return false;
     }

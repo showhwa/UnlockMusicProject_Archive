@@ -92,8 +92,21 @@ docker run -d -p 8080:80 --name um-react um-react
 
 然后访问 `http://localhost:8080` 即可。
 
+## 部署到子目录
+
 > [!NOTE]
-> 项目不支持运行在子目录下。
+> 官方 Docker 镜像与默认构建产物按站点**根路径**（`/`）部署，不支持部署到子目录下。
+
+若要部署到子目录（例如 `https://example.com/um-react/`），你需要重新使用 Vite 进行构建，并指定 `--base` 参数（路径以 `/` 开头、以 `/` 结尾）。
+
+以部署到 `https://example.com/um-react/` 为例：
+
+```sh
+pnpm exec vite build --base=/um-react/
+pnpm build:finalize
+```
+
+部署时，服务器还需把该子目录下的所有前端路由回退到对应的 `index.html`（SPA）。
 
 ## 开发相关
 

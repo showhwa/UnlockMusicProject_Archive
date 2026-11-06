@@ -1,18 +1,15 @@
 import { MdInfoOutline } from 'react-icons/md';
-import { workerClientBus } from '~/decrypt-worker/client';
 import { DECRYPTION_WORKER_ACTION_NAME } from '~/decrypt-worker/constants';
+import { usePlatform } from '~/platform/PlatformContext';
 import { useEffect, useRef, useState } from 'react';
 
-const getSDKVersion = async (): Promise<string> => {
-  return workerClientBus.request(DECRYPTION_WORKER_ACTION_NAME.VERSION, null);
-};
-
 export function SDKVersion() {
+  const { crypto } = usePlatform();
   const refDialog = useRef<HTMLDialogElement>(null);
   const [sdkVersion, setSdkVersion] = useState('...');
   useEffect(() => {
-    getSDKVersion().then(setSdkVersion, () => setSdkVersion('N/A'));
-  }, []);
+    crypto.request(DECRYPTION_WORKER_ACTION_NAME.VERSION, null).then(setSdkVersion, () => setSdkVersion('N/A'));
+  }, [crypto]);
 
   return (
     <>

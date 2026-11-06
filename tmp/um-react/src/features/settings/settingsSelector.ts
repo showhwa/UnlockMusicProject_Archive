@@ -14,3 +14,6 @@ export const selectIsSettingsNotSaved = (state: RootState) => state.settings.dir
 
 export const selectStagingBatchDownloadSettings = (state: RootState) => state.settings.staging.general.batchDownload;
 export const selectFinalBatchDownloadSettings = (state: RootState) => state.settings.production.general.batchDownload;
+
+export const selectStagingDirectWriteSettings = (state: RootState) => state.settings.staging.general.directWrite;
+export const selectFinalDirectWriteSettings = (state: RootState) => state.settings.production.general.directWrite;

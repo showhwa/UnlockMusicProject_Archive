@@ -11,7 +11,7 @@
 void qmpc_flip_string(cstr* str);
 
 /**
- * Trim space (checked by `isspace`) and null-terminator at both ends of string.
+ * Trim trailing whitespace (checked by `isspace`); index 0 is never trimmed.
  * @param str input string
  */
 void qmpc_trim_space(cstr* str);

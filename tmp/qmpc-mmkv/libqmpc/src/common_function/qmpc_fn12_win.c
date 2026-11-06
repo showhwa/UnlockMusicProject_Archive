@@ -1,8 +1,9 @@
 #include "libqmpc/log.h"
-#include "libqmpc_qmpc_fn12_data.h"
 #include "libqmpc/common_function/qmpc_fn12.h"
 #include "libqmpc/proc.h"
-#include "stc/common.h"
+#include "qmpc_fn12_data.h"
+
+#include <stc/common.h>
 
 #include <memoryapi.h>
 #include <minwindef.h>

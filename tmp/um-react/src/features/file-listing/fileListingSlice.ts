@@ -4,12 +4,12 @@ import type { RootState } from '~/store';
 
 import { DECRYPTION_WORKER_ACTION_NAME, type DecryptionResult } from '~/decrypt-worker/constants';
 import type { DecryptCommandOptions } from '~/decrypt-worker/types';
-import { decryptionQueue, workerClientBus } from '~/decrypt-worker/client';
 import { DecryptErrorType } from '~/decrypt-worker/util/DecryptError';
 import { selectQMCv2KeyByFileName } from '~/features/qmc/keyLookup';
 import { selectKWMv2Key } from '~/features/kwm/keyLookup';
 import { selectKugouKey } from '~/features/kugou/keyLookup';
 import { selectQtfmAndroidKey } from '~/features/qtfm/keyLookup';
+import { getPlatform } from '~/platform/platformSingleton';
 import { cleanFilename } from '~/util/cleanFilename';
 
 export enum ProcessState {
@@ -70,14 +70,15 @@ export const processFile = createAsyncThunk<
     thunkAPI.dispatch(setFileAsProcessing({ id: fileId }));
   };
 
+  const { crypto } = getPlatform();
   const [qmcv2MusicExMediaFile, kuwoHdr, kugouHdr] = await Promise.all([
-    workerClientBus.request(DECRYPTION_WORKER_ACTION_NAME.FIND_QMC_MUSICEX_NAME, {
+    crypto.request(DECRYPTION_WORKER_ACTION_NAME.FIND_QMC_MUSICEX_NAME, {
       blobURI: file.raw,
     }),
-    workerClientBus.request(DECRYPTION_WORKER_ACTION_NAME.KUWO_PARSE_HEADER, {
+    crypto.request(DECRYPTION_WORKER_ACTION_NAME.KUWO_PARSE_HEADER, {
       blobURI: file.raw,
     }),
-    workerClientBus.request(DECRYPTION_WORKER_ACTION_NAME.KUGOU_PARSE_HEADER, {
+    crypto.request(DECRYPTION_WORKER_ACTION_NAME.KUGOU_PARSE_HEADER, {
       blobURI: file.raw,
     }),
   ]);
@@ -89,7 +90,7 @@ export const processFile = createAsyncThunk<
     kugouKey: selectKugouKey(state, kugouHdr),
     qingTingAndroidKey: selectQtfmAndroidKey(state),
   };
-  return decryptionQueue.add({ fileId, blobURI: file.raw, options }, onPreProcess);
+  return crypto.enqueueDecrypt({ fileId, blobURI: file.raw, options }, onPreProcess);
 });
 
 export const fileListingSlice = createSlice({

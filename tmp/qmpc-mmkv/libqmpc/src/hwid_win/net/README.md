@@ -4,7 +4,7 @@ Windows 网卡 / MAC 相关硬件标识，来自对 **QQ 音乐 Windows 客户�
 
 | 本仓库 | 角色 |
 |--------|------|
-| `ethernet_id.c` | 首个以太网或无线网卡 MAC |
+| `ethernet_id.c` | 按优先级（PCI 以太网 > 无线 > 其他以太网 > 其他）选取网卡 MAC |
 | `netbios_id.c` | NetBIOS 工作站传输枚举（`NetWkstaTransportEnum`） |
 
 ## 授权

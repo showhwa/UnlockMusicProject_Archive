@@ -3,6 +3,8 @@
 #include "libqmpc/mmkv/reader.h"
 #include "libqmpc/utils/common.h"
 
+#include <ctype.h>
+
 #include <stc/common.h>
 #include <stc/cstr.h>
 
@@ -38,7 +40,7 @@ static inline void strip_whitespace_cstr(cstr* str) {
   char* clean = buf;
 
   for (isize_t n = cstr_size(str); n != 0; n--) {
-    if (isspace(*buf)) {
+    if (isspace((unsigned char)*buf)) {
       buf++;
       continue;
     }

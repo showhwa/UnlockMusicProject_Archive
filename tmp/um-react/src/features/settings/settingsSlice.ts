@@ -32,9 +32,20 @@ export interface BatchDownloadSettings {
   blobZip: boolean;
 }
 
+/** Where native clients write decrypted files (gated by `capabilities.directFsAccess`). */
+export type DirectWriteOutputMode = 'besideSource' | 'fixedDirectory';
+
+export interface DirectWriteSettings {
+  outputMode: DirectWriteOutputMode;
+  /** Absolute path when `outputMode` is `fixedDirectory`; unused in the browser UI. */
+  fixedDirectoryPath: string | null;
+  deleteSourceAfterDecrypt: boolean;
+}
+
 export interface StagingSettings {
   general: {
     batchDownload: BatchDownloadSettings;
+    directWrite: DirectWriteSettings;
   };
   qmc2: {
     keys: StagingQMCv2Key[];
@@ -56,6 +67,7 @@ export interface StagingSettings {
 export interface ProductionSettings {
   general: {
     batchDownload: BatchDownloadSettings;
+    directWrite: DirectWriteSettings;
   };
   qmc2: {
     keys: ProductionQMCv2Keys; // {  [fileName]: ekey  }
@@ -81,6 +93,12 @@ export const DEFAULT_BATCH_DOWNLOAD_SETTINGS: BatchDownloadSettings = {
   blobZip: true,
 };
 
+export const DEFAULT_DIRECT_WRITE_SETTINGS: DirectWriteSettings = {
+  outputMode: 'besideSource',
+  fixedDirectoryPath: null,
+  deleteSourceAfterDecrypt: false,
+};
+
 export interface SettingsState {
   dirty: boolean;
   staging: StagingSettings;
@@ -90,14 +108,20 @@ export interface SettingsState {
 const initialState: SettingsState = {
   dirty: false,
   staging: {
-    general: { batchDownload: { ...DEFAULT_BATCH_DOWNLOAD_SETTINGS } },
+    general: {
+      batchDownload: { ...DEFAULT_BATCH_DOWNLOAD_SETTINGS },
+      directWrite: { ...DEFAULT_DIRECT_WRITE_SETTINGS },
+    },
     qmc2: { allowFuzzyNameSearch: true, keys: [] },
     kwm2: { keys: [] },
     qtfm: { ...EMPTY_QTFM_SETTINGS },
     kugou: { keys: [] },
   },
   production: {
-    general: { batchDownload: { ...DEFAULT_BATCH_DOWNLOAD_SETTINGS } },
+    general: {
+      batchDownload: { ...DEFAULT_BATCH_DOWNLOAD_SETTINGS },
+      directWrite: { ...DEFAULT_DIRECT_WRITE_SETTINGS },
+    },
     qmc2: { allowFuzzyNameSearch: true, keys: {} },
     kwm2: { keys: {} },
     kugou: { keys: {} },
@@ -108,6 +132,7 @@ const initialState: SettingsState = {
 export const stagingToProduction = (staging: StagingSettings): ProductionSettings => ({
   general: {
     batchDownload: { ...staging.general.batchDownload },
+    directWrite: { ...staging.general.directWrite },
   },
   qmc2: {
     keys: stagingKeyToProduction(staging.qmc2.keys, qmc2StagingToProductionKey, qmc2StagingToProductionValue),
@@ -125,6 +150,7 @@ export const stagingToProduction = (staging: StagingSettings): ProductionSetting
 export const productionToStaging = (production: ProductionSettings): StagingSettings => ({
   general: {
     batchDownload: { ...production.general.batchDownload },
+    directWrite: { ...production.general.directWrite },
   },
   qmc2: {
     keys: productionKeyToStaging(production.qmc2.keys, qmc2ProductionToStaging),
@@ -184,6 +210,13 @@ export const settingsSlice = createSlice({
       state.staging.general.batchDownload[key] = value;
       state.dirty = true;
     },
+    updateDirectWriteSetting(state, { payload }: PayloadAction<Partial<DirectWriteSettings>>) {
+      state.staging.general.directWrite = {
+        ...state.staging.general.directWrite,
+        ...payload,
+      };
+      state.dirty = true;
+    },
     discardStagingChanges: (state) => {
       state.dirty = false;
       state.staging = productionToStaging(state.production);
@@ -224,6 +257,7 @@ export const {
 
   qtfmAndroidUpdateKey,
   updateBatchDownloadSetting,
+  updateDirectWriteSetting,
 
   commitStagingChange,
   discardStagingChanges,

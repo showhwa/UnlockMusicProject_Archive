@@ -3,7 +3,6 @@
 #include <libqmpc/export.h>
 
 #include <stc/cstr.h>
-#include "stc/cstr.h"
 
 /**
  * Convert a system ID to a MMKV name.

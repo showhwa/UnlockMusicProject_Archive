@@ -12,17 +12,17 @@
  * @param serial The serial number to check.
  */
 static bool is_valid_serial(const char* serial) {
-  return c_strlen(serial) >= 20 && isalnum(serial[0]) && isalnum(serial[19]);
+  return isalnum((unsigned char)serial[0]) || (c_strlen(serial) >= 20 && isalnum((unsigned char)serial[19]));
 }
 
 cstr qmpc_hwid_drive_id_zero_rights(const int drive_id) {
   DriveInfoData props = {};
   cstr hwid = cstr_init();
   c_with(cstr drive_path = cstr_from_fmt("\\\\.\\PhysicalDrive%d", drive_id), cstr_drop(&drive_path)) {
-    qmpc_log_trace("qmpc_hwid_drive_id_zero_rights: open drive %s", cstr_str(&drive_path));
     c_with(HANDLE fp = CreateFileA(cstr_str(&drive_path), 0, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, OPEN_EXISTING,
                                    0, NULL),
            fp != INVALID_HANDLE_VALUE, CloseHandle(fp)) {
+      qmpc_log_trace("qmpc_hwid_drive_id_zero_rights: open drive %s", cstr_str(&drive_path));
       DWORD bytes_written = 0;
       STORAGE_PROPERTY_QUERY query = {
           .PropertyId = StorageDeviceProperty,

@@ -22,7 +22,7 @@ const version = `${pkg.version} (${shortCommit})`;
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: './',
+  base: '/',
   worker: {
     format: 'es',
   },
@@ -97,6 +97,7 @@ export default defineConfig({
     },
   },
   build: {
+    assetsDir: 'um-react.assets',
     minify: true,
     rolldownOptions: {
       output: {

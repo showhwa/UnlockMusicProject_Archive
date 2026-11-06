@@ -4,7 +4,7 @@
 #include <windows.h>
 
 #include <stc/csview.h>
-#include "stc/cstr.h"
+#include <stc/cstr.h>
 
 #define i_type vec_wstr, wchar_t
 #include "stc/vec.h"

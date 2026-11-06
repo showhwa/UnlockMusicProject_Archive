@@ -15,7 +15,7 @@
 #define QMPC_COMMIT "dev"
 #endif
 
-void usage(const char* program) {
+static void usage(const char* program) {
   fprintf(stderr, "usage: %s [options]\n", program);
   fputs(
       "\n"
@@ -32,11 +32,12 @@ void usage(const char* program) {
       "              \t\tUse \"-\" to write to stdout.\n"
       "  -f, --format\t\tformat to use, one of [raw, plaintext] (default: raw)\n"
       "              \t\tWhen \"format\" is \"plaintext\", it will produce \"key\\nvalue\\n\" pairs.\n"
+      "  -m, --method\t\tmethod to use, one of [hwid, rpc] (default: hwid)\n"
       "\n",
       stderr);
 }
 
-int main_u8(int argc, char* argv[]) {
+static int main_u8(int argc, char* argv[]) {
   qmpc_logger_set_default_file_logger(stderr);
 
   qmpc_log_info("QMPC MMKV CLI by LSR@UnlockMusic (v%s [%s])", QMPC_VERSION, QMPC_COMMIT);
@@ -50,15 +51,11 @@ int main_u8(int argc, char* argv[]) {
       .adapter_type = MMKV_READER_ADAPTER_TYPE_RAW,
       .mmkv_key_method = QMPC_MMKV_KEY_METHOD_HWID,
   };
-  coption_long longopts[] = {{"verbose", coption_no_argument, 'v'},
-                             {"level", coption_required_argument, 'l'},
-                             {"command", coption_required_argument, 'c'},
-                             {"input", coption_required_argument, 'i'},
-                             {"key", coption_required_argument, 'k'},
-                             {"output", coption_required_argument, 'o'},
-                             {"format", coption_required_argument, 'f'},
-                             {"method", coption_required_argument, 'm'},
-                             {}};
+  coption_long longopts[] = {{"verbose", coption_no_argument, 'v'},      {"help", coption_no_argument, 'h'},
+                             {"level", coption_required_argument, 'l'},  {"command", coption_required_argument, 'c'},
+                             {"input", coption_required_argument, 'i'},  {"key", coption_required_argument, 'k'},
+                             {"output", coption_required_argument, 'o'}, {"format", coption_required_argument, 'f'},
+                             {"method", coption_required_argument, 'm'}, {}};
   const char* shortopts = "hvc:i:k:o:f:l:m:";
   coption opt = coption_init();
   int c;
@@ -89,6 +86,10 @@ int main_u8(int argc, char* argv[]) {
         args.input = opt.arg;
         break;
       case 'k':
+        if (strlen(opt.arg) != 16) {
+          qmpc_log_error("key must be 16 characters long");
+          return 1;
+        }
         args.key = opt.arg;
         break;
       case 'f':

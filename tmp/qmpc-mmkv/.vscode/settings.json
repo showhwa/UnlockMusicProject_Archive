@@ -8,4 +8,7 @@
     "--cross-file",
     "toolchains/mingw-w64.ini"
   ],
+  "editor.rulers": [
+    120
+  ]
 }

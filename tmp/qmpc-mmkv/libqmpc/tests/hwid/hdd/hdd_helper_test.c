@@ -35,7 +35,7 @@ static void store_identify_field(char* identify, isize_t start, const char* logi
 static int test_identify(void) {
   char identify[94] = {0};
 
-  store_identify_field(identify, 10, "WD-WMC1T042596    ", 10);
+  store_identify_field(identify, 10, "WD-WMC1T042596      ", 10);
   store_identify_field(identify, 27, "WDC WD10EZEX-00BN5A0                   ", 20);
   store_identify_field(identify, 23, "01.01A01", 4);
 

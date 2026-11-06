@@ -35,7 +35,7 @@ struct qmpc_net_connection_iter {
   bool is_ethernet_;
 };
 
-bool qmpc_net_connections_init(struct qmpc_net_connections* self) {
+static bool qmpc_net_connections_init(struct qmpc_net_connections* self) {
   memset(self, 0, sizeof(*self));
 
   ULONG cbSize = QMPC_ADAPTER_LENGTH;
@@ -94,7 +94,7 @@ static bool qmpc_net_connections_read(struct qmpc_net_connections* self, struct 
     DWORD media_sub_type = 0;
     char pnp_instance_id[260] = {};
 
-    // rank: Ethernet(PCI) > Non-Wireless > USB Ethernet > WiFi
+    // rank: PCI Ethernet (0) > Wireless (1) > other Ethernet, e.g. USB (2) > unknown/other (3); lower rank wins
     if (reg_read_dword(reg_conn, "MediaSubType", &media_sub_type) &&
         reg_read_string(reg_conn, "PnpInstanceID", pnp_instance_id, sizeof(pnp_instance_id) - 1)) {
       if (media_sub_type == QMPC_NET_MEDIA_SUBTYPE_ETHERNET) {

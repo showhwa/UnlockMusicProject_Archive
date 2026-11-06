@@ -51,7 +51,7 @@ bool qmpc_mmkv_reader__read_u64(qmpc_mmkv_reader_t* self, uint64_t* out, isize_t
 
     ++count;
     if (!unrestricted_read) container_len--;
-    result |= (next_byte & 0x7F) << shift;
+    result |= (uint64_t)(next_byte & 0x7F) << shift;
     shift += 7;
 
     // When high bit is 0, we've completed the read.

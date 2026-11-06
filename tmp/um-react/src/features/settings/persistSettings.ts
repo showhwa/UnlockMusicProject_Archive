@@ -6,15 +6,16 @@ import {
   setProductionChanges,
   ProductionSettings,
   DEFAULT_BATCH_DOWNLOAD_SETTINGS,
+  DEFAULT_DIRECT_WRITE_SETTINGS,
   BatchDownloadSettings,
+  DirectWriteSettings,
 } from './settingsSlice';
 import { enumObject } from '~/util/objects';
 import { getLogger } from '~/util/logUtils';
 import { parseKwm2ProductionKey } from '~/features/kwm/types';
 import { sanitizeQtfmAndroidKey } from '~/features/qtfm/types';
 import { deepClone } from '~/util/deepClone';
-
-const DEFAULT_STORAGE_KEY = 'um-react-settings';
+import type { PlatformProvider } from '~/platform/PlatformProvider';
 
 function mergeBatchDownload(source: Partial<BatchDownloadSettings> | undefined): BatchDownloadSettings {
   const result = { ...DEFAULT_BATCH_DOWNLOAD_SETTINGS };
@@ -29,11 +30,29 @@ function mergeBatchDownload(source: Partial<BatchDownloadSettings> | undefined):
   return result;
 }
 
+function mergeDirectWrite(source: Partial<DirectWriteSettings> | undefined): DirectWriteSettings {
+  const result = { ...DEFAULT_DIRECT_WRITE_SETTINGS };
+  if (!source) {
+    return result;
+  }
+  if (source.outputMode === 'besideSource' || source.outputMode === 'fixedDirectory') {
+    result.outputMode = source.outputMode;
+  }
+  if (source.fixedDirectoryPath === null || typeof source.fixedDirectoryPath === 'string') {
+    result.fixedDirectoryPath = source.fixedDirectoryPath;
+  }
+  if (typeof source.deleteSourceAfterDecrypt === 'boolean') {
+    result.deleteSourceAfterDecrypt = source.deleteSourceAfterDecrypt;
+  }
+  return result;
+}
+
 /** Normalize / sanitize loaded production settings against defaults. Exported for tests. */
 export function mergeSettings(settings: ProductionSettings): ProductionSettings {
   const draft = deepClone(settingsSlice.getInitialState().production);
 
   draft.general.batchDownload = mergeBatchDownload(settings?.general?.batchDownload);
+  draft.general.directWrite = mergeDirectWrite(settings?.general?.directWrite);
 
   if (settings?.qmc2) {
     const { allowFuzzyNameSearch, keys } = settings.qmc2;
@@ -75,28 +94,47 @@ export function mergeSettings(settings: ProductionSettings): ProductionSettings 
   return draft;
 }
 
-export function persistSettings(store: AppStore, storageKey = DEFAULT_STORAGE_KEY) {
+/**
+ * Load production settings via `provider.settings`, merge into the store, and
+ * debounce-save on production changes. Storage details stay inside the provider.
+ */
+export function persistSettings(store: AppStore, provider: PlatformProvider) {
   let lastSettings: unknown;
+  let cancelled = false;
 
-  try {
-    const loadedSettings = JSON.parse(localStorage.getItem(storageKey) ?? '') as ProductionSettings;
-    if (loadedSettings) {
-      const mergedSettings = mergeSettings(loadedSettings);
-      store.dispatch(setProductionChanges(mergedSettings));
-      getLogger().debug('settings loaded');
-    }
-  } catch {
-    // load failed, ignore.
-  }
-
-  return store.subscribe(
+  const unsubscribe = store.subscribe(
     debounce({ delay: 150 }, () => {
       const currentSettings = store.getState().settings.production;
       if (lastSettings !== currentSettings) {
         lastSettings = currentSettings;
-        localStorage.setItem(storageKey, JSON.stringify(currentSettings));
-        getLogger().debug('settings saved');
+        void provider.settings.save(currentSettings).then(
+          () => getLogger().debug('settings saved'),
+          () => {
+            // save failed; keep lastSettings so we do not spin-retry on every tick
+          },
+        );
       }
     }),
   );
+
+  void provider.settings
+    .load()
+    .then((loadedSettings) => {
+      if (cancelled || !loadedSettings) {
+        return;
+      }
+      const mergedSettings = mergeSettings(loadedSettings);
+      store.dispatch(setProductionChanges(mergedSettings));
+      // Avoid an immediate rewrite of the same production snapshot after load.
+      lastSettings = store.getState().settings.production;
+      getLogger().debug('settings loaded');
+    })
+    .catch(() => {
+      // load failed, ignore.
+    });
+
+  return () => {
+    cancelled = true;
+    unsubscribe();
+  };
 }

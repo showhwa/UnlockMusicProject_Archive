@@ -1,11 +1,11 @@
 #pragma once
 
 #include <stc/cstr.h>
-#include "stc/cstr.h"
 
 /**
  * Get the first valid MAC address of the system, using Ethernet API.
- * Order: Ethernet(PCI) > Non-Wireless > USB Ethernet > WiFi
+ * Order: PCI Ethernet (0) > Wireless (1) > other Ethernet, e.g. USB (2) > unknown/other (3); lower rank wins.
+ * Only adapters with Type == MIB_IF_TYPE_ETHERNET can replace the first adapter.
  *
  * @param[out] out The output parameter.
  *                  The output string will be cleared if the function fails.

@@ -19,4 +19,8 @@
 #endif
 
 static inline uint32_t qmpc_htole32(uint32_t value) { return QMPC_LITTLE_ENDIAN ? value : __builtin_bswap32(value); }
-static inline uint32_t qmpc_letoh32(uint32_t value) { return QMPC_LITTLE_ENDIAN ? __builtin_bswap32(value) : value; }
+static inline uint32_t qmpc_letoh32(uint32_t value) { return QMPC_LITTLE_ENDIAN ? value : __builtin_bswap32(value); }
+static inline uint32_t qmpc_htobe32(uint32_t value) { return QMPC_LITTLE_ENDIAN ? __builtin_bswap32(value) : value; }
+static inline uint16_t qmpc_htole16(uint16_t value) { return QMPC_LITTLE_ENDIAN ? value : __builtin_bswap16(value); }
+static inline uint16_t qmpc_letoh16(uint16_t value) { return QMPC_LITTLE_ENDIAN ? value : __builtin_bswap16(value); }
+static inline uint16_t qmpc_htobe16(uint16_t value) { return QMPC_LITTLE_ENDIAN ? __builtin_bswap16(value) : value; }

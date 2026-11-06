@@ -27,7 +27,7 @@ static bool parse_mac(cstr* mac, const wchar_t* text) {
     sum |= mac_hex[i] | mac_hex[i + 1];
   }
 
-  // Rejest all zeros
+  // Reject all zeros
   if (sum == '0') return false;
 
   cstr_assign_n(mac, mac_hex, 12);

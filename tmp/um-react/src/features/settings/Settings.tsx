@@ -2,14 +2,17 @@ import { useAppDispatch, useAppSelector } from '~/hooks';
 import { commitStagingChange, discardStagingChanges } from './settingsSlice';
 import { selectIsSettingsNotSaved } from './settingsSelector';
 import { Outlet } from 'react-router';
-import { SETTINGS_TABS } from '~/features/settings/settingsTabs.tsx';
+import { getSettingsTabs } from '~/features/settings/settingsTabs.tsx';
 import { MdOutlineSettingsBackupRestore } from 'react-icons/md';
 import { toast } from 'react-toastify';
 import { ResponsiveNav } from '../nav/ResponsiveNav';
 import { TabNavLink } from '../nav/TabNavLink';
+import { usePlatform } from '~/platform/PlatformContext';
 
 export function Settings() {
   const dispatch = useAppDispatch();
+  const { capabilities } = usePlatform();
+  const settingsTabs = getSettingsTabs(capabilities);
 
   const handleResetSettings = () => {
     dispatch(discardStagingChanges());
@@ -35,7 +38,7 @@ export function Settings() {
         navigationClassName="overflow-x-auto pb-[2px] md:pb-0 h-full items-start [&]:md:flex"
         navigation={
           <div role="tablist" className="tabs gap-1 flex-nowrap md:flex-col grow items-center">
-            {Object.entries(SETTINGS_TABS).map(([id, { name }]) => (
+            {Object.entries(settingsTabs).map(([id, { name }]) => (
               <TabNavLink key={id} to={`/settings/${id}`}>
                 {name}
               </TabNavLink>

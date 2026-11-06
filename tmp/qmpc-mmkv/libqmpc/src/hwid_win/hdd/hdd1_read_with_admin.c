@@ -12,10 +12,10 @@ static bool is_atapi_device(const uint32_t device_map, const int drive_id) {
 cstr qmpc_hwid_drive_id_as_admin(const int drive_id) {
   cstr hwid = cstr_init();
   c_with(cstr drive_path = cstr_from_fmt("\\\\.\\PhysicalDrive%d", drive_id), cstr_drop(&drive_path)) {
-    qmpc_log_trace("qmpc_hwid_drive_id_as_admin: open drive %s", cstr_str(&drive_path));
     c_with(HANDLE fp = CreateFileA(cstr_str(&drive_path), GENERIC_READ | GENERIC_WRITE,
                                    FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, 0, NULL),
            fp != INVALID_HANDLE_VALUE, CloseHandle(fp)) {
+      qmpc_log_trace("qmpc_hwid_drive_id_as_admin: open drive %s", cstr_str(&drive_path));
       GETVERSIONINPARAMS version_params = {};
       DWORD cbBytesReturned = 0;
       if (!DeviceIoControl(fp, SMART_GET_VERSION, nullptr, 0, &version_params, sizeof(version_params), &cbBytesReturned,

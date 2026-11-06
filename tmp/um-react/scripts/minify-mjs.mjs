@@ -1,7 +1,9 @@
 import { minify } from 'terser';
 import { readFileSync, writeFileSync, readdirSync } from 'fs';
 
-for (const file of readdirSync('dist/assets')) {
+const assetsDir = 'dist/um-react.assets';
+
+for (const file of readdirSync(assetsDir)) {
   if (!/\.(mjs|js)$/.test(file)) {
     continue;
   }
@@ -9,11 +11,11 @@ for (const file of readdirSync('dist/assets')) {
   console.log(`minifying ${file}...`);
   const isModule = /\.mjs$/.test(file);
 
-  const output = await minify(readFileSync(`dist/assets/${file}`, 'utf-8'), {
+  const output = await minify(readFileSync(`${assetsDir}/${file}`, 'utf-8'), {
     compress: true,
     mangle: true,
     module: isModule,
   });
 
-  writeFileSync(`dist/assets/${file}`, output.code);
+  writeFileSync(`${assetsDir}/${file}`, output.code);
 }

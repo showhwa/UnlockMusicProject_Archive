@@ -23,7 +23,7 @@ jobs:
           cp dist/qmpc-mmkv-cli.exe LICENSE.txt credits.txt dist/qmpc-mmkv-cli/
 
       - name: Upload CLI artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v7
         with:
           name: qmpc-mmkv-cli
           path: dist/qmpc-mmkv-cli/
