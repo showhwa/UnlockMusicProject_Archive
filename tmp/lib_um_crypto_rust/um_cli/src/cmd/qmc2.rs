@@ -2,12 +2,25 @@ use crate::buffered_decrypt::buffered_decrypt;
 use crate::Cli;
 use anyhow::{bail, Result};
 use clap::Args;
+use serde::Serialize;
 use std::fs;
 use std::fs::File;
 use std::io::{BufReader, Read, Seek, SeekFrom};
 use std::path::PathBuf;
 use umc_qmc::{footer, QMCv2Cipher};
 use umc_utils::base64;
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct Qmc2FileInfo {
+    footer_len: u64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    ekey: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    metadata_type: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    musicex_media_filename: Option<String>,
+}
 
 /// Decrypt a QMCv2 file (QQMusic)
 #[derive(Args)]
@@ -69,28 +82,44 @@ impl ArgsQMCv2 {
         let input_size = file_input.stream_position()?;
         file_input.seek(SeekFrom::Start(0))?;
 
-        let (footer_len, ekey) = match footer::from_byte_slice(&footer_detection_buffer) {
+        let info = match footer::from_byte_slice(&footer_detection_buffer) {
             Ok(Some(metadata)) => {
-                if self.info_only || cli.verbose {
+                if cli.verbose {
                     println!("metadata: {:?}", metadata);
                 }
-                (metadata.size, metadata.ekey.or_else(|| self.ekey.clone()))
+                Qmc2FileInfo {
+                    footer_len: metadata.size as u64,
+                    ekey: metadata.ekey.or_else(|| self.ekey.clone()),
+                    metadata_type: Some(metadata.data.get_type_name()),
+                    musicex_media_filename: metadata.data.get_media_filename(),
+                }
             }
             Ok(None) => {
                 eprintln!("[warn] could not find any qmc metadata.");
-                (0usize, self.ekey.clone())
+                Qmc2FileInfo {
+                    footer_len: 0u64,
+                    ekey: self.ekey.clone(),
+                    metadata_type: None,
+                    musicex_media_filename: None,
+                }
             }
             Err(err) => {
                 eprintln!("[warn] failed to parse qmc metadata: {}", err);
-                (0usize, self.ekey.clone())
+                Qmc2FileInfo {
+                    footer_len: 0u64,
+                    ekey: self.ekey.clone(),
+                    metadata_type: None,
+                    musicex_media_filename: None,
+                }
             }
         };
 
         if self.info_only {
+            println!("{}", serde_json::to_string(&info)?);
             return Ok(0);
         }
 
-        let key = match ekey {
+        let key = match info.ekey {
             None => bail!("--ekey is required when embedded ekey is not present."),
             Some(ekey) => read_ekey(ekey.as_str())?,
         };
@@ -102,7 +131,7 @@ impl ArgsQMCv2 {
         };
 
         let reader = BufReader::with_capacity(cli.buffer_size, file_input);
-        let mut reader = reader.take(input_size - footer_len as u64);
+        let mut reader = reader.take(input_size - info.footer_len as u64);
         buffered_decrypt(
             &mut reader,
             &mut file_output,

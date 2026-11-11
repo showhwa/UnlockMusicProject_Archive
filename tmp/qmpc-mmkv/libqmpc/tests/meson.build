@@ -38,6 +38,14 @@ test(
     suite: ['hwid', 'unit'],
 )
 
+mmkv_test = executable(
+    'mmkv-test',
+    'mmkv_test.c',
+    dependencies: libqmpc_dep,
+)
+test('mmkv-varint', mmkv_test, args: ['varint'], suite: ['mmkv', 'unit'])
+test('mmkv-robustness', mmkv_test, args: ['robustness'], suite: ['mmkv', 'unit'])
+
 if host_machine.system() == 'windows'
     utils_wstr_test = executable(
         'utils-wstr-test',

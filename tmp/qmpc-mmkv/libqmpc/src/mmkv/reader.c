@@ -42,7 +42,12 @@ bool qmpc_mmkv_reader__read_u64(qmpc_mmkv_reader_t* self, uint64_t* out, isize_t
   uint32_t shift = 0;
   isize_t count = 0;
 
-  while (unrestricted_read || container_len) {
+  while (unrestricted_read || container_len > 0) {
+    if (count >= 10 || shift > 63) {
+      if (bytes_read) *bytes_read = count;
+      return false;
+    }
+
     uint8_t next_byte;
     if (qmpc_mmkv_reader__read(self, &next_byte, 1) != 1) {
       if (bytes_read) *bytes_read = count;
@@ -51,6 +56,13 @@ bool qmpc_mmkv_reader__read_u64(qmpc_mmkv_reader_t* self, uint64_t* out, isize_t
 
     ++count;
     if (!unrestricted_read) container_len--;
+
+    if (shift == 63 && (next_byte & ~1) != 0) {
+      // 10th byte can only have bit 0 set (and high bit 0)
+      if (bytes_read) *bytes_read = count;
+      return false;
+    }
+
     result |= (uint64_t)(next_byte & 0x7F) << shift;
     shift += 7;
 
@@ -75,12 +87,18 @@ bool qmpc_mmkv_reader_read_string(qmpc_mmkv_reader_t* self, cstr* out, isize_t m
   if (unrestricted_read) {
     read_len = str_len;
   } else {
-    read_len = QMPC_MIN(str_len, (uint64_t)max_len - u64_bytes_read);
+    read_len = QMPC_MIN(str_len, (uint64_t)max_len - (uint64_t)u64_bytes_read);
+  }
+  if (read_len > (uint64_t)PTRDIFF_MAX) {
+    return false;
   }
   if (bytes_read) *bytes_read = u64_bytes_read + (isize_t)read_len;
 
-  cstr_resize(out, read_len, '\0');
-  if (qmpc_mmkv_reader__read(self, (uint8_t*)cstr_data(out), read_len) != read_len) {
+  if (cstr_resize(out, (isize_t)read_len, '\0') == NULL && read_len > 0) {
+    cstr_clear(out);
+    return false;
+  }
+  if (qmpc_mmkv_reader__read(self, (uint8_t*)cstr_data(out), (size_t)read_len) != read_len) {
     cstr_clear(out);
     return false;
   }
@@ -95,11 +113,15 @@ bool qmpc_mmkv_reader_read_optional_string(qmpc_mmkv_reader_t* self, cstr* out) 
     cstr_clear(out);
     return true;
   }
+  if (container_len > (uint64_t)PTRDIFF_MAX) {
+    return false;
+  }
 
   isize_t bytes_read = 0;
-  if (!qmpc_mmkv_reader_read_string(self, out, container_len, &bytes_read)) return false;
+  if (!qmpc_mmkv_reader_read_string(self, out, (isize_t)container_len, &bytes_read)) return false;
 
   // Seek until the end of the string.
-  auto seek = container_len - bytes_read;
-  return seek == 0 || qmpc_mmkv_reader__seek(self, seek) == seek;
+  if ((uint64_t)bytes_read > container_len) return false;
+  uint64_t seek = container_len - (uint64_t)bytes_read;
+  return seek == 0 || qmpc_mmkv_reader__seek(self, (size_t)seek) == (size_t)seek;
 }

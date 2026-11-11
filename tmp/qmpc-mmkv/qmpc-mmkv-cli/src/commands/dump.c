@@ -57,7 +57,7 @@ int qmpc_command_dump(const qmpc_command_args* args) {
 
           c_with(mmkv_reader_adapter_t adapter = {}, mmkv_reader_adapter_drop(&adapter)) {
             qmpc_log_verbose("Initializing mmkv reader adapter...");
-            if (!mmkv_reader_adapter_init(&adapter, args->adapter_type, &mmkv_source, &w)) {
+            if (!mmkv_reader_adapter_init(&adapter, args->adapter_type, &mmkv_source, &w, args->filter)) {
               rc = 3;
               qmpc_log_error("Failed to initialize mmkv reader adapter");
               continue;

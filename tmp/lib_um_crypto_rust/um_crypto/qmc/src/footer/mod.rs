@@ -62,6 +62,24 @@ pub enum Data {
     AndroidSTag(android_stag::STagMetadata),
 }
 
+impl Data {
+    pub fn get_media_filename(&self) -> Option<String> {
+        match self {
+            Data::PCv2MusicEx(d) => Some(d.media_filename.clone()),
+            _ => None,
+        }
+    }
+
+    pub fn get_type_name(&self) -> String {
+        match self {
+            Data::PCv1Legacy(_) => "PCv1".to_string(),
+            Data::PCv2MusicEx(_) => "MusicEx".to_string(),
+            Data::AndroidQTag(_) => "QTag".to_string(),
+            Data::AndroidSTag(_) => "STag".to_string(),
+        }
+    }
+}
+
 /// File Footer metadata
 #[derive(Debug, Clone, PartialEq)]
 pub struct Metadata {

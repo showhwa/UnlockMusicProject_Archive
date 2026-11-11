@@ -28,6 +28,6 @@ void qmpc_proc_enum_module(uint32_t pid, qmpc_fn12_module_filter_fn filter, void
         if (filter(&me32, user_data)) break;
       } while (Module32Next(snapshot, &me32));
     }
+    CloseHandle(snapshot);
   }
-  CloseHandle(snapshot);
 }

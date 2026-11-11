@@ -37,6 +37,7 @@ const char* qmpc_logger_level_to_string(qmpc_logger_level_t level) {
 }
 
 qmpc_logger_level_t qmpc_logger_string_to_level(const char* str) {
+  if (str == NULL) return (qmpc_logger_level_t)0;
   if (qmpc_str_ieq(str, "TRACE")) return QMPC_LOGGER_LEVEL_TRACE;
   if (qmpc_str_ieq(str, "VERBOSE")) return QMPC_LOGGER_LEVEL_VERBOSE;
   if (qmpc_str_ieq(str, "DEBUG")) return QMPC_LOGGER_LEVEL_DEBUG;
@@ -54,10 +55,15 @@ void qmpc_logger_default(qmpc_logger_level_t level, const char* fmt, va_list arg
 
   c_with(cstr prefix = cstr_from_fmt("[%-7s] ", qmpc_logger_level_to_string(level)), cstr_drop(&prefix)) {
     c_with(cstr msg = cstr_init(), cstr_drop(&msg)) {
-      c_with(cstr buf = cstr_with_capacity(cstr_size(&msg) + 32), cstr_drop(&buf)) {
-        cstr_vfmt(&msg, cstr_size(&msg), fmt, args);
+      cstr_vfmt(&msg, 0, fmt, args);
 
+      c_with(cstr buf = cstr_with_capacity(cstr_size(&msg) + 64), cstr_drop(&buf)) {
         csview msg_view = cstr_sv(&msg);
+        while (msg_view.size > 0 &&
+               (msg_view.buf[msg_view.size - 1] == '\n' || msg_view.buf[msg_view.size - 1] == '\r')) {
+          msg_view.size--;
+        }
+
         while (true) {
           cstr_append_sv(&buf, cstr_sv(&prefix));
           isize_t pos = csview_find_sv(msg_view, newline);
@@ -73,6 +79,7 @@ void qmpc_logger_default(qmpc_logger_level_t level, const char* fmt, va_list arg
           msg_view.size -= len;
         }
         fputs(cstr_str(&buf), qmpc_logger_file);
+        fflush(qmpc_logger_file);
       }
     }
   }

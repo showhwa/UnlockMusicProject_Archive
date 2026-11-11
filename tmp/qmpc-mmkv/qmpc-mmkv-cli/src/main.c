@@ -32,6 +32,7 @@ static void usage(const char* program) {
       "              \t\tUse \"-\" to write to stdout.\n"
       "  -f, --format\t\tformat to use, one of [raw, plaintext] (default: raw)\n"
       "              \t\tWhen \"format\" is \"plaintext\", it will produce \"key\\nvalue\\n\" pairs.\n"
+      "  -F, --filter\t\texact MMKV key name to emit (plaintext only; default: all keys)\n"
       "  -m, --method\t\tmethod to use, one of [hwid, rpc] (default: hwid)\n"
       "\n",
       stderr);
@@ -47,16 +48,23 @@ static int main_u8(int argc, char* argv[]) {
       .input = nullptr,
       .key = nullptr,
       .output = "qmpc-mmkv-v1.mmkv",
+      .filter = nullptr,
       .level = QMPC_LOGGER_LEVEL_DEFAULT,
       .adapter_type = MMKV_READER_ADAPTER_TYPE_RAW,
       .mmkv_key_method = QMPC_MMKV_KEY_METHOD_HWID,
   };
-  coption_long longopts[] = {{"verbose", coption_no_argument, 'v'},      {"help", coption_no_argument, 'h'},
-                             {"level", coption_required_argument, 'l'},  {"command", coption_required_argument, 'c'},
-                             {"input", coption_required_argument, 'i'},  {"key", coption_required_argument, 'k'},
-                             {"output", coption_required_argument, 'o'}, {"format", coption_required_argument, 'f'},
-                             {"method", coption_required_argument, 'm'}, {}};
-  const char* shortopts = "hvc:i:k:o:f:l:m:";
+  coption_long longopts[] = {{"verbose", coption_no_argument, 'v'},
+                             {"help", coption_no_argument, 'h'},
+                             {"level", coption_required_argument, 'l'},
+                             {"command", coption_required_argument, 'c'},
+                             {"input", coption_required_argument, 'i'},
+                             {"key", coption_required_argument, 'k'},
+                             {"output", coption_required_argument, 'o'},
+                             {"format", coption_required_argument, 'f'},
+                             {"filter", coption_required_argument, 'F'},
+                             {"method", coption_required_argument, 'm'},
+                             {}};
+  const char* shortopts = "hvc:i:k:o:f:F:l:m:";
   coption opt = coption_init();
   int c;
   while ((c = coption_get(&opt, argc, argv, shortopts, longopts)) != -1) {
@@ -94,6 +102,15 @@ static int main_u8(int argc, char* argv[]) {
         break;
       case 'f':
         args.adapter_type = mmkv_reader_adapter_type_from_string(opt.arg);
+        if (args.adapter_type == MMKV_READER_ADAPTER_TYPE_INVALID) {
+          qmpc_log_fatal("invalid format (%s). Must be one of [raw, plaintext]", opt.arg);
+          return 1;
+        }
+        break;
+      case 'F':
+        if (*opt.arg == '\0') {
+          args.filter = opt.arg;
+        }
         break;
       case 'l':
         if (!(args.level = qmpc_logger_string_to_level(opt.arg))) {
@@ -142,12 +159,13 @@ int main(int argc, char* argv[]) {
 
   int rc = 0;
 #if defined(_WIN32)
-  c_with(char** argv_u8 = malloc((argc + 1) * sizeof(char*)), argv_u8, free(argv_u8)) {
-    c_with(vec_cstr argv_vec = qmpc_argv_u8(argc, argv), vec_cstr_drop(&argv_vec)) {
-      c_with(char** p = argv_u8, (void)0) {
-        for (c_each(i, vec_cstr, argv_vec)) *p++ = cstr_data(i.ref);
-        rc = main_u8(argc, argv_u8);
-      }
+  c_with(vec_cstr argv_vec = qmpc_argv_u8(argc, argv), vec_cstr_drop(&argv_vec)) {
+    const isize_t count = vec_cstr_size(&argv_vec);
+    c_with(char** argv_u8 = malloc((count + 1) * sizeof(char*)), argv_u8, free(argv_u8)) {
+      char** p = argv_u8;
+      for (c_each(i, vec_cstr, argv_vec)) *p++ = cstr_data(i.ref);
+      *p = NULL;
+      rc = main_u8((int)count, argv_u8);
     }
   }
 #else

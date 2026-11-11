@@ -16,6 +16,7 @@ typedef enum {
 } qmpc_mmkv_key_method_t;
 
 inline static qmpc_mmkv_key_method_t qmpc_mmkv_key_method_from_str(const char* str) {
+  if (str == NULL) return (qmpc_mmkv_key_method_t)0;
   if (qmpc_str_ieq(str, "hwid")) return QMPC_MMKV_KEY_METHOD_HWID;
   if (qmpc_str_ieq(str, "rpc")) return QMPC_MMKV_KEY_METHOD_RPC;
   return (qmpc_mmkv_key_method_t)0;  // invalid

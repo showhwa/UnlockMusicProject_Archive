@@ -196,7 +196,7 @@ bool qmpc_fn12_call(qmpc_fn12_t* self, char* mmkv_name, char* mmkv_key) {
 
       SIZE_T bytes_read = 0;
       if (!ReadProcessMemory(self->process, p, &params, sizeof(params), &bytes_read) || bytes_read != sizeof(params)) {
-        qmpc_log_error("ReadProcessMemory failed (code=%08lx)\n", GetLastError());
+        qmpc_log_error("ReadProcessMemory failed (code=%08lx)", GetLastError());
         continue;
       }
       ok = params.ok == 1;

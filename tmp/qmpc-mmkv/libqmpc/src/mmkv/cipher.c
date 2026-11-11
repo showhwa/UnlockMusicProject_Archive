@@ -30,16 +30,26 @@ static inline bool load_mmkv_metadata(qmpc_mmkv_crc_hdr_t* hdr, csview file_path
 bool qmpc_mmkv_cipher_reader_init_from_path(qmpc_mmkv_cipher_reader_t* self, csview file_path, csview key) {
   memset(self, 0, sizeof(*self));
 
+  if (key.size != 16) {
+    qmpc_log_error("qmpc_mmkv_cipher_reader: key must be 16 bytes (got %d)", (int)key.size);
+    return false;
+  }
+
   qmpc_mmkv_crc_hdr_t hdr;
   if (!load_mmkv_metadata(&hdr, file_path)) {
-    qmpc_log_error("qmpc_mmkv_cipher_reader: init metadata failed (file=%s)", file_path.buf);
+    qmpc_log_error("qmpc_mmkv_cipher_reader: init metadata failed (file=%.*s)", (int)file_path.size, file_path.buf);
+    return false;
+  }
+
+  if (hdr.real_size > UINT32_MAX - sizeof(uint32_t)) {
+    qmpc_log_error("qmpc_mmkv_cipher_reader: invalid mmkv real_size (0x%08x)", hdr.real_size);
     return false;
   }
 
   self->crc32_rolling_ = 0;
   self->crc32_ = hdr.crc32;
   self->offset_ = sizeof(uint32_t);
-  self->mmkv_len_ = hdr.real_size + sizeof(uint32_t);
+  self->mmkv_len_ = (size_t)hdr.real_size + sizeof(uint32_t);
   qmpc_aes_128_cfb_init(&self->aes_, (const uint8_t*)key.buf, hdr.iv);
 
   bool ok = false;

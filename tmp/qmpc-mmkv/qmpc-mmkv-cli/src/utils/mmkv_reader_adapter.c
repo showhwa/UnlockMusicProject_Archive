@@ -2,6 +2,7 @@
 #include "libqmpc/log.h"
 #include "libqmpc/mmkv/reader.h"
 #include "libqmpc/utils/common.h"
+#include "libqmpc/utils/str.h"
 
 #include <ctype.h>
 
@@ -25,6 +26,7 @@ bool mmkv_reader_adapter_pipe__raw(mmkv_reader_adapter_t* self) {
   while (!r->eof_(r->ctx_)) {
     uint8_t buffer[4096];
     size_t read_len = r->read_(r->ctx_, buffer, sizeof(buffer));
+    if (read_len == 0) break;
     size_t write_len = fwrite(buffer, 1, read_len, self->w_->fp);
     if (write_len != read_len) {
       qmpc_log_error("Failed to write mmkv data to output file");
@@ -47,6 +49,7 @@ static inline void strip_whitespace_cstr(cstr* str) {
     *clean++ = *buf++;
   }
   *clean = '\0';
+  cstr_resize(str, clean - cstr_data(str), '\0');
 }
 
 bool mmkv_reader_adapter_pipe__plaintext(mmkv_reader_adapter_t* self) {
@@ -63,6 +66,8 @@ bool mmkv_reader_adapter_pipe__plaintext(mmkv_reader_adapter_t* self) {
       // Strip whitespace from key and value
       strip_whitespace_cstr(&key);
       strip_whitespace_cstr(&value);
+
+      if (self->filter_ && !qmpc_str_eq(cstr_str(&key), self->filter_)) continue;
 
       if (fprintf(self->w_->fp, "%s\n%s\n", cstr_str(&key), cstr_str(&value)) <= 0) return false;
     }

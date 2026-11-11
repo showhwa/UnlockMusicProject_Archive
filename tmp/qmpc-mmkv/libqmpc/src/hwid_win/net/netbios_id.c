@@ -47,7 +47,7 @@ bool qmpc_hwid_net_netbios(cstr* out) {
   const WKSTA_TRANSPORT_INFO_0* p = p_transports;
   bool found = false;
   for (DWORD i = 0; i < entriesread; i++, p++) {
-    if (parse_mac(out, p->wkti0_transport_address)) {
+    if (p->wkti0_transport_address != nullptr && parse_mac(out, p->wkti0_transport_address)) {
       found = true;
       break;
     }

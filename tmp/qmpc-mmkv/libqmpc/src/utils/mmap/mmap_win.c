@@ -66,7 +66,7 @@ bool qmpc_mmap_init_writable(qmpc_mmap_t* self, const char* path, size_t size) {
     const DWORD size_low = (DWORD)(uint64_t)size;
     mapping = CreateFileMappingA(file, NULL, PAGE_READWRITE, size_high, size_low, NULL);
     if (mapping == NULL) {
-      qmpc_log_error("qmpc_mmap_init_writable: MapViewOfFile(%s) failed (error=%lu)", path, GetLastError());
+      qmpc_log_error("qmpc_mmap_init_writable: CreateFileMappingA(%s) failed (error=%lu)", path, GetLastError());
       CloseHandle(file);
       return false;
     }
@@ -113,7 +113,7 @@ void qmpc_mmap_drop(qmpc_mmap_t* self) {
   if (self->os_mapping_ != NULL) {
     CloseHandle(self->os_mapping_);
   }
-  if (self->os_file_ != NULL) {
+  if (self->os_file_ != NULL && self->os_file_ != INVALID_HANDLE_VALUE) {
     CloseHandle(self->os_file_);
   }
   memset(self, 0, sizeof(*self));

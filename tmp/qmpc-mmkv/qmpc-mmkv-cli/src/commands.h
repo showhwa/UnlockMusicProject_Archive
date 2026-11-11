@@ -8,6 +8,7 @@ typedef struct {
   const char* input;
   const char* key;
   const char* output;
+  const char* filter;
   qmpc_mmkv_key_method_t mmkv_key_method;
   mmkv_reader_adapter_type_t adapter_type;
   qmpc_logger_level_t level;

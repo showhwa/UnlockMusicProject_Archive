@@ -1,0 +1,35 @@
+name: Build (win32)
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      TARGET: x86_64-pc-windows-gnu
+      CARGO_TARGET_X86_64_PC_WINDOWS_GNU_LINKER: x86_64-w64-mingw32-gcc
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          target: ${{ env.TARGET }}
+          cache: true
+          cache-key: win32
+      - name: Install MinGW
+        run: sudo apt-get update && sudo apt-get install -y mingw-w64
+      - name: Build (win32 release)
+        run: |
+          cargo build --release --target ${{ env.TARGET }} -p um_cli
+          mkdir -p dist
+          mv target/${{ env.TARGET }}/release/um_cli.exe dist/um_cli_rs.exe
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: um_cli-win32
+          path: dist/*
