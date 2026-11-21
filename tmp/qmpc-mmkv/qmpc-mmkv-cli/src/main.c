@@ -22,6 +22,7 @@ static void usage(const char* program) {
       "options:\n"
       "  -h, --help\t\tshow this help message and exit\n"
       "  -v, --verbose\t\tenable verbose output, short for \"--level verbose\"\n"
+      "  -V, --version\t\tprint version and commit hash, then exit\n"
       "  -l, --level\t\tset log level, one of [trace, debug, verbose, info, warning, error, fatal] (default: info)\n"
       "  -c, --command\t\tcommand to execute, one of [dump, system-id] (default: dump)\n"
       "\n"
@@ -41,8 +42,6 @@ static void usage(const char* program) {
 static int main_u8(int argc, char* argv[]) {
   qmpc_logger_set_default_file_logger(stderr);
 
-  qmpc_log_info("QMPC MMKV CLI by LSR@UnlockMusic (v%s [%s])", QMPC_VERSION, QMPC_COMMIT);
-
   const char* command = "dump";
   qmpc_command_args args = {
       .input = nullptr,
@@ -53,24 +52,22 @@ static int main_u8(int argc, char* argv[]) {
       .adapter_type = MMKV_READER_ADAPTER_TYPE_RAW,
       .mmkv_key_method = QMPC_MMKV_KEY_METHOD_HWID,
   };
-  coption_long longopts[] = {{"verbose", coption_no_argument, 'v'},
-                             {"help", coption_no_argument, 'h'},
-                             {"level", coption_required_argument, 'l'},
-                             {"command", coption_required_argument, 'c'},
-                             {"input", coption_required_argument, 'i'},
-                             {"key", coption_required_argument, 'k'},
-                             {"output", coption_required_argument, 'o'},
-                             {"format", coption_required_argument, 'f'},
-                             {"filter", coption_required_argument, 'F'},
-                             {"method", coption_required_argument, 'm'},
-                             {}};
-  const char* shortopts = "hvc:i:k:o:f:F:l:m:";
+  coption_long longopts[] = {{"verbose", coption_no_argument, 'v'},       {"help", coption_no_argument, 'h'},
+                             {"version", coption_no_argument, 'V'},       {"level", coption_required_argument, 'l'},
+                             {"command", coption_required_argument, 'c'}, {"input", coption_required_argument, 'i'},
+                             {"key", coption_required_argument, 'k'},     {"output", coption_required_argument, 'o'},
+                             {"format", coption_required_argument, 'f'},  {"filter", coption_required_argument, 'F'},
+                             {"method", coption_required_argument, 'm'},  {}};
+  const char* shortopts = "hVvc:i:k:o:f:F:l:m:";
   coption opt = coption_init();
   int c;
   while ((c = coption_get(&opt, argc, argv, shortopts, longopts)) != -1) {
     switch (c) {
       case 'h':
         usage(argv[0]);
+        return 0;
+      case 'V':
+        printf("%s %s\n", QMPC_VERSION, QMPC_COMMIT);
         return 0;
       case '?':
         qmpc_log_error("unknown option: %s", opt.optstr);
@@ -131,6 +128,7 @@ static int main_u8(int argc, char* argv[]) {
     }
   }
 
+  qmpc_log_info("QMPC MMKV CLI by LSR@UnlockMusic (v%s [%s])", QMPC_VERSION, QMPC_COMMIT);
   qmpc_log_verbose(
       "\n"
       "This software is provided as is, without any warranty.\n"

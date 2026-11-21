@@ -35,12 +35,6 @@ where
     let metadata = aes
         .decrypt_padded::<Pkcs7>(&mut data[..])
         .map_err(NetEaseCryptoError::MetadataDecryptError)?;
-    let metadata = match metadata.strip_prefix(b"music:") {
-        None => Err(NetEaseCryptoError::MetadataInvalidJsonPrefix(
-            String::from_utf8_lossy(metadata).to_string(),
-        ))?,
-        Some(stripped) => stripped,
-    };
     Ok(Vec::from(metadata))
 }
 
@@ -106,6 +100,6 @@ fn test_decrypt_metadata() -> Result<(), NetEaseCryptoError> {
         0x25, 0x1B, 0x37, 0x48, 0x57, 0x53, 0x2A, 0x22, 0x3A, 0x00, 0x34, 0x53, 0x24, 0x12,
     ];
     let key = decrypt(enciphered_metadata)?;
-    assert_eq!(key[0], b'{');
+    assert!(key.starts_with("music:{".as_bytes()));
     Ok(())
 }

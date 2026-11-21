@@ -5,7 +5,7 @@ pub mod v2;
 pub mod v3;
 mod v5;
 
-pub use pc_db_decrypt::decrypt_db;
+pub use pc_db_decrypt::{decrypt_db, is_db_encrypted};
 
 use crate::header::Header;
 use crate::v2::DecipherV2;

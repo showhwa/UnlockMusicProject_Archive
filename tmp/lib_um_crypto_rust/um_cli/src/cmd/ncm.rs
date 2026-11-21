@@ -36,10 +36,10 @@ impl ArgsNCM {
                 if cli.verbose {
                     let metadata_path = metadata_path.display();
                     let len = metadata.len();
-                    println!("metadata written to {metadata_path} ({len} bytes)");
+                    eprintln!("metadata written to {metadata_path} ({len} bytes)");
                 }
             } else {
-                println!("metadata is empty, skip.");
+                eprintln!("metadata is empty, skip.");
             }
         }
         Ok(())

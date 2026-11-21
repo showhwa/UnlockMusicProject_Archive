@@ -27,7 +27,7 @@ jobs:
         run: |
           cargo build --release --target ${{ env.TARGET }} -p um_cli
           mkdir -p dist
-          mv target/${{ env.TARGET }}/release/um_cli.exe dist/um_cli_rs.exe
+          mv target/${{ env.TARGET }}/release/um_cli_rs.exe dist/
       - name: Upload artifact
         uses: actions/upload-artifact@v7
         with:

@@ -7,6 +7,12 @@ use key_derive::decrypt_db_page;
 const PAGE_SIZE: usize = 0x400;
 const SQLITE_HEADER: [u8; 0x10] = *b"SQLite format 3\0";
 
+/// A database is encrypted when its prefix is not the plaintext SQLite magic.
+/// A prefix shorter than that magic is treated as encrypted.
+pub fn is_db_encrypted(header: &[u8]) -> bool {
+    !header.starts_with(&SQLITE_HEADER)
+}
+
 fn validate_page_1_header(header: &[u8]) -> Result<(), KugouError> {
     let o10 = LE::read_u32(&header[0x10..0x14]);
     let o14 = LE::read_u32(&header[0x14..0x18]);
@@ -23,8 +29,7 @@ pub fn decrypt_db<T: AsMut<[u8]> + ?Sized>(buffer: &mut T) -> Result<(), KugouEr
     let buffer = buffer.as_mut();
     let db_size = buffer.len();
 
-    // not encrypted
-    if buffer.starts_with(&SQLITE_HEADER) {
+    if !is_db_encrypted(buffer) {
         return Ok(());
     }
 
