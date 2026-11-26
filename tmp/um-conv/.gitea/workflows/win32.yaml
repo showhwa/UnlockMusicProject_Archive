@@ -1,0 +1,84 @@
+name: Build (win32)
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+    tags:
+      - "*"
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      DOCKER_BUILDKIT: "1"
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Build (win32 release)
+        shell: bash
+        run: |
+          set -euo pipefail
+          APP_VERSION="$(git describe --tags --always --dirty)"
+          APP_COMMIT="$(git rev-parse --short HEAD)"
+          echo ">> version ${APP_VERSION} (${APP_COMMIT})"
+          docker build \
+            -f containers/win32-prod.Dockerfile \
+            --target artifacts \
+            --build-arg "APP_VERSION=${APP_VERSION}" \
+            --build-arg "APP_COMMIT=${APP_COMMIT}" \
+            --output type=local,dest=dist \
+            .
+          test -f dist/um-conv-windows-amd64.exe
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: um-conv-windows-amd64
+          path: dist/*
+
+      - name: Create Release Package
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF#refs/tags/}"
+          VERSION="${TAG#v}"
+          mkdir -p release
+          python3 - "${VERSION}" <<'PY'
+          import sys
+          import zipfile
+
+          version = sys.argv[1]
+          archive = f"release/um-conv-windows-amd64-{version}.zip"
+          with zipfile.ZipFile(archive, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+              zf.write("dist/um-conv-windows-amd64.exe", arcname="um-conv.exe")
+          PY
+
+      - name: Create Draft Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: akkuman/gitea-release-action@v1
+        with:
+          draft: true
+          files: |
+            release/um-conv-windows-amd64-*.zip
+          body: |
+            上个版本：[v0.0.0](${{ github.server_url }}/${{ github.repository }}/releases/tag/v0.0.0)
+
+            ## 🐛 修正
+
+            - 修正内容
+
+            ## ✨ 新增
+
+            - 新增内容
+
+            ## 🔧 维护
+
+            - 维护内容

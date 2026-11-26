@@ -592,6 +592,7 @@ dependencies = [
  "serde_json",
  "umc_joox",
  "umc_kgm",
+ "umc_kuwo",
  "umc_mg3d",
  "umc_ncm",
  "umc_qmc",

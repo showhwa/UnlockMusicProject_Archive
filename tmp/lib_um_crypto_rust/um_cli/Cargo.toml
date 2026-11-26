@@ -1,6 +1,6 @@
 [package]
 name = "um_cli"
-version = "0.1.12"
+version = "0.1.13"
 edition = "2021"
 
 [[bin]]
@@ -15,6 +15,7 @@ serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 umc_joox = { path = "../um_crypto/joox" }
 umc_kgm = { path = "../um_crypto/kgm" }
+umc_kuwo = { path = "../um_crypto/kuwo" }
 umc_mg3d = { path = "../um_crypto/mg3d" }
 umc_ncm = { path = "../um_crypto/ncm" }
 umc_qmc = { path = "../um_crypto/qmc" }

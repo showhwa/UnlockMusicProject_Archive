@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-labelledby="title">
+  <title id="title">um</title>
+  <defs>
+    <linearGradient id="tile" gradientUnits="userSpaceOnUse" x1="100" y1="12" x2="350" y2="500">
+      <stop offset="0" stop-color="#7489ef"/>
+      <stop offset=".54" stop-color="#7967e5"/>
+      <stop offset="1" stop-color="#a251d7"/>
+    </linearGradient>
+    <g id="word" fill="none" stroke-width="37" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M110 225v45c0 54 79 54 79 0v-45m0 45v37"/>
+      <path d="M254 307v-82m0 39c0-52 71-52 71 0v43m0-43c0-52 73-52 73 0v43"/>
+    </g>
+  </defs>
+  <path fill="url(#tile)" stroke="#e8dbff" stroke-opacity=".36" stroke-width="5" d="M140 12h232c79 0 128 49 128 128v232c0 79-49 128-128 128H140C61 500 12 451 12 372V140C12 61 61 12 140 12Z"/>
+  <path fill="#eee6ff" fill-opacity=".32" d="M178 153v227c0 21-18 39-43 42-24 3-42-9-42-28 0-21 19-39 44-42 10-1 19 0 26 4V140c0-9 6-16 15-18l184-42c11-3 21 5 21 16v246c0 22-19 40-44 43-24 3-42-9-42-28 0-21 19-39 44-42 10-1 19 0 27 4V127Z"/>
+  <use href="#word" stroke="#322266" opacity=".34" transform="translate(0 6)"/>
+  <use href="#word" stroke="#fffaff"/>
+</svg>

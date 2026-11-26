@@ -1,7 +1,7 @@
 project(
     'qmpc-mmkv',
     'c',
-    version: '1.0.3',
+    version: '1.0.4',
     meson_version: '>=1.3.0',
     default_options: [
         'c_std=c23,c2x',

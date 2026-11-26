@@ -2,6 +2,7 @@ use clap::Subcommand;
 
 pub mod joox;
 pub mod kgm;
+pub mod kuwo;
 pub mod mg3d;
 pub mod ncm;
 pub mod qmc1;
@@ -17,6 +18,9 @@ pub enum Commands {
 
     #[command(name = "kgm")]
     Kgm(kgm::ArgsKGM),
+
+    #[command(name = "kuwo")]
+    Kuwo(kuwo::ArgsKuwo),
 
     #[command(name = "mg3d")]
     Migu3D(mg3d::ArgsMigu3D),

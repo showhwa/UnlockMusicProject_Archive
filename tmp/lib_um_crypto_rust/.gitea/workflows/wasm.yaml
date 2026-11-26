@@ -15,6 +15,16 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: cargo-wasm-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            cargo-wasm-
       - uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           toolchain: stable
@@ -31,9 +41,18 @@ jobs:
         with:
           standalone: true
           package_json_file: um_wasm_loader/package.json
-          run_install: |
-            - cwd: um_wasm_loader
-              args: [--frozen-lockfile, --strict-peer-dependencies]
+      - name: Get pnpm store directory
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> "$GITHUB_ENV"
+      - uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: pnpm-${{ hashFiles('um_wasm_loader/pnpm-lock.yaml') }}
+          restore-keys: |
+            pnpm-
+      - name: Install pnpm dependencies
+        working-directory: um_wasm_loader
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies
       - name: Build (wasm)
         working-directory: um_wasm_loader
         run: pnpm build

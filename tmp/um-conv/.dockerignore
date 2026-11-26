@@ -1,0 +1,15 @@
+.git
+.gitea
+.task
+bin
+build
+dist
+**/node_modules
+frontend/node_modules
+frontend/dist
+frontend/bindings
+**/*.exe
+*.syso
+**/*~
+*.md
+agent-transcripts

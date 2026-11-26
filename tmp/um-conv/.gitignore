@@ -1,0 +1,11 @@
+bin
+dist
+node_modules
+
+frontend/bindings/
+
+.task
+build/
+tmp/
+out/
+/local

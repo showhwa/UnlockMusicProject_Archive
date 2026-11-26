@@ -1,0 +1,48 @@
+[unix]
+set shell := ["sh", "-cu"]
+
+[windows]
+set shell := ["pwsh.exe", "-NoLogo", "-Command"]
+
+# Suppress wails3 CLI docs/sponsor footer
+export WAILS_MCP_CHILD := "1"
+
+container := "podman"
+force := "false"
+# create/cp/rm 代替 --output；Windows 下脚本会自动启用
+extract := "false"
+
+bootstrap:
+  go run ./scripts/bootstrap -force={{force}}
+
+binding:
+  wails3 generate bindings -clean=true -time-type=Date -ts ./...
+
+tidy:
+  go mod tidy
+
+[working-directory: 'frontend']
+frontend-deps:
+  {{ if path_exists('frontend/node_modules/') == 'true' { '
+  # Skip: node_modules install if it already exists
+  ' } else { 'fnm use && npm ci' } }}
+
+[working-directory: 'frontend']
+frontend: frontend-deps
+  fnm use && npm run build
+  just binding
+
+dev: bootstrap frontend-deps
+  wails3 task dev
+
+build: bootstrap
+  wails3 build
+
+icons:
+  magick -background none -density 384 MSVG:app/assets/icon.svg -filter Lanczos -resize 1024x1024 -strip PNG32:app/assets/icon.png
+  magick app/assets/icon.png -filter Lanczos -define icon:auto-resize=256,128,64,48,32,24,16 app/assets/icon.ico
+
+# 容器内交叉编译 Windows GUI 生产包 → dist/
+# 强制 extract：just extract=true build-prod-win32
+build-prod-win32:
+  go run ./scripts/build-prod-win32 -container={{container}} -extract={{extract}}
